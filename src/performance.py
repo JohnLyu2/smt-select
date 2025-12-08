@@ -9,7 +9,7 @@ class MultiSolverDataset:
     def __init__(
         self,
         perf_dict: Dict[str, List[Tuple[int, float]]],
-        solver_dict: Dict[int, str],
+        solver_id_dict: Dict[int, str],
         timeout: float,
     ):
         """
@@ -17,11 +17,11 @@ class MultiSolverDataset:
 
         Args:
             perf_dict: Dictionary mapping path to list of (is_solved, wc_time) tuples
-            solver_dict: Dictionary mapping solver ID to solver name
+            solver_id_dict: Dictionary mapping solver ID to solver name
             timeout: Timeout in seconds
         """
         self._dict = perf_dict
-        self._solver_dict = solver_dict
+        self._solver_id_dict = solver_id_dict
         self._timeout = timeout
 
     def __getitem__(self, path: str) -> List[Tuple[int, float]]:
@@ -94,15 +94,15 @@ class MultiSolverDataset:
 
     def get_solver_name(self, solver_id: int) -> Optional[str]:
         """Get solver name by ID."""
-        return self._solver_dict.get(solver_id)
+        return self._solver_id_dict.get(solver_id)
 
-    def get_solver_dict(self) -> Dict[int, str]:
-        """Get the solver dictionary."""
-        return self._solver_dict.copy()
+    def get_solver_id_dict(self) -> Dict[int, str]:
+        """Get the solver id to name dictionary."""
+        return self._solver_id_dict.copy()
 
     def num_solvers(self) -> int:
         """Get number of solvers."""
-        return len(self._solver_dict)
+        return len(self._solver_id_dict)
 
     def get_timeout(self) -> float:
         """Get the timeout value in seconds."""
