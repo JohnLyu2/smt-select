@@ -20,14 +20,14 @@ def placehold_feature_extract(instance_path):
 
 
 # now the target func is par2
-def create_pairwise_samples(perf_data, solver0_id, solver1_id):
+def create_pairwise_samples(multi_perf_data, solver0_id, solver1_id):
     inputs = []
     labels = []
     costs = []
-    for instance_path in perf_data.keys():
+    for instance_path in multi_perf_data.keys():
         feature = placehold_feature_extract(instance_path)
-        par2_0 = perf_data.get_par2(instance_path, solver0_id)
-        par2_1 = perf_data.get_par2(instance_path, solver1_id)
+        par2_0 = multi_perf_data.get_par2(instance_path, solver0_id)
+        par2_1 = multi_perf_data.get_par2(instance_path, solver1_id)
         label = 1 if par2_0 < par2_1 else 0  # label 1 represents solver0 is better
         cost = abs(par2_0 - par2_1)
         if cost > PERF_DIFF_THRESHOLD:  # if the performance difference is 0, ignore
@@ -115,9 +115,9 @@ class PwcModel:
         return selected_id
 
 
-def train_pwc(perf_data, save_dir, xg_flag=False):
+def train_pwc(multi_perf_data, save_dir, xg_flag=False):
     Path(save_dir).mkdir(parents=True, exist_ok=True)
-    solver_size = perf_data.num_solvers()
+    solver_size = multi_perf_data.num_solvers()
 
     model_matrix = np.empty((solver_size, solver_size), dtype=object)
     model_matrix[:] = None
@@ -128,7 +128,7 @@ def train_pwc(perf_data, save_dir, xg_flag=False):
                 inputs_array,
                 labels_array,
                 costs_array,
-            ) = create_pairwise_samples(perf_data, i, j)
+            ) = create_pairwise_samples(multi_perf_data, i, j)
             unique_labels = np.unique(labels_array)
             if len(unique_labels) == 1:
                 model = DummyClassifier(strategy="constant", constant=unique_labels[0])

@@ -14,11 +14,11 @@ def parse_performance_csv(csv_path: str, timeout: float) -> MultiSolverDataset:
 
     Returns:
         A MultiSolverDataset containing:
-        - performance_dict: path -> list of (is_solved, wc_time) tuples
+        - multi_perf_dict: path -> list of (is_solved, wc_time) tuples
         - solver_dict: id -> solver name, where id corresponds to the position in the performance list
         - timeout: timeout value in seconds
     """
-    performance_dict: Dict[str, List[Tuple[int, float]]] = {}
+    multi_perf_dict: Dict[str, List[Tuple[int, float]]] = {}
     solver_dict: Dict[int, str] = {}
 
     with open(csv_path, "r", encoding="utf-8") as f:
@@ -66,6 +66,6 @@ def parse_performance_csv(csv_path: str, timeout: float) -> MultiSolverDataset:
                     # Handle missing columns
                     results.append((0, 0.0))
 
-            performance_dict[path] = results
+            multi_perf_dict[path] = results
 
-    return MultiSolverDataset(performance_dict, solver_dict, timeout)
+    return MultiSolverDataset(multi_perf_dict, solver_dict, timeout)
