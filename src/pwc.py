@@ -12,7 +12,7 @@ from sklearn.preprocessing import StandardScaler
 
 from .parser import parse_performance_csv
 
-PERF_DIFF_THRESHOLD = 1e-10  # Threshold for considering performance differences
+PERF_DIFF_THRESHOLD = 1e-3  # Threshold for considering performance differences
 
 
 def placehold_feature_extract(instance_path):
@@ -80,14 +80,14 @@ class PwcModel:
         Path(save_dir).mkdir(parents=True, exist_ok=True)
         save_path = f"{save_dir}/model.joblib"
         joblib.dump(self, save_path)
-        logging.info(f"Saved PWC_{self.model_type}_BoKW model at {save_path}")
+        logging.info(f"Saved PWC_{self.model_type} model at {save_path}")
 
     @staticmethod
     def load(load_path):
         return joblib.load(load_path)
 
-    def _get_rank_lst(self, bokw, random_seed=42):
-        btor2kw_array = np.array(bokw).reshape(1, -1)
+    def _get_rank_lst(self, feature, random_seed=42):
+        btor2kw_array = np.array(feature).reshape(1, -1)
         votes = np.zeros(self.solver_size, dtype=int)
         for i in range(self.solver_size):
             for j in range(i + 1, self.solver_size):
