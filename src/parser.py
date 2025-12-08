@@ -1,19 +1,19 @@
 import csv
 from typing import Dict, List, Tuple
 
-from .performance import PerformanceDataset
+from .performance import MultiSolverDataset
 
 
-def parse_performance_csv(csv_path: str, timeout: float) -> PerformanceDataset:
+def parse_performance_csv(csv_path: str, timeout: float) -> MultiSolverDataset:
     """
-    Parse a performance CSV file and create a PerformanceDataset.
+    Parse a performance CSV file and create a MultiSolverDataset.
 
     Args:
         csv_path: Path to the CSV file
         timeout: Timeout value in seconds (used for benchmarking)
 
     Returns:
-        A PerformanceDataset containing:
+        A MultiSolverDataset containing:
         - performance_dict: path -> list of (is_solved, wc_time) tuples
         - solver_dict: id -> solver name, where id corresponds to the position in the performance list
         - timeout: timeout value in seconds
@@ -68,4 +68,4 @@ def parse_performance_csv(csv_path: str, timeout: float) -> PerformanceDataset:
 
             performance_dict[path] = results
 
-    return PerformanceDataset(performance_dict, solver_dict, timeout)
+    return MultiSolverDataset(performance_dict, solver_dict, timeout)
