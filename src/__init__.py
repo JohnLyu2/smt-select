@@ -1,0 +1,2 @@
+# SMT Algorithm Selection package
+

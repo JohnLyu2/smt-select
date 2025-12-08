@@ -18,23 +18,21 @@ from .evaluate import get_par_n
 PERF_DIFF_THRESHOLD = 1e-10  # Threshold for considering performance differences
 
 
-def generate_training_samples_for_config_pair(
-    training_perf_dict, tool_config_pair, res2target_func, feature_dict
+def generate_training_samples_for_solver_pair(
+    training_perf_dict, solver_pair, res2target_func, feature_dict
 ):
-    tool_config0, tool_config1 = tool_config_pair
+    solver0, solver1 = solver_pair
     inputs = []
     labels = []
     costs = []
-    for btor2_path, perf_lst in training_perf_dict.items():
-        feature = feature_dict[btor2_path]
-        result_tuple0 = perf_lst[tool_config0]
-        result_tuple1 = perf_lst[tool_config1]
+    for instance_path, perf_lst in training_perf_dict.items():
+        feature = feature_dict[instance_path]
+        result_tuple0 = perf_lst[solver0]
+        result_tuple1 = perf_lst[solver1]
         target0 = res2target_func(result_tuple0)
         target1 = res2target_func(result_tuple1)
         # here assume always the less target the better
-        label = (
-            1 if target0 < target1 else 0
-        )  # label 1 represents tool_config0 is better
+        label = 1 if target0 < target1 else 0  # label 1 represents solver0 is better
         cost = abs(target0 - target1)
         if cost > PERF_DIFF_THRESHOLD:  # if the performance difference is 0, ignore
             inputs.append(feature)
@@ -113,22 +111,22 @@ class PwcBokwModel:
         )[::-1]
         return sorted_indices
 
-    def algorithm_select(self, btor2_path, top_k=1, random_seed=42):
+    def algorithm_select(self, instance_path, top_k=1, random_seed=42):
         """
-        input btor2 path, output list of tool-config ids; for cross validation
+        input instance path, output list of tool-config ids; for cross validation
         """
         assert top_k > 0, f"invalid top_k value {top_k}"
         assert top_k <= self.tool_size, f"invalid top_k value {top_k}"
-        bokw = get_bokw(btor2_path)
+        bokw = get_bokw(instance_path)
         selected_ids = self._get_rank_lst(bokw, random_seed)[:top_k]
         return selected_ids
 
-    def algorithm_select_name(self, btor2path, top_k=1, random_seed=42):
+    def algorithm_select_name(self, instance_path, top_k=1, random_seed=42):
         """
-        input btor2 path, output list of (tool, config) tuples
+        input instance path, output list of (tool, config) tuples
         Now only use bokw as the feature
         """
-        selected_ids = self.algorithm_select(btor2path, top_k, random_seed)
+        selected_ids = self.algorithm_select(instance_path, top_k, random_seed)
         tool_configs = []
         for selected_id in selected_ids:
             tool, config, _ = self.tool_dict[selected_id][1].split(".")
@@ -151,7 +149,7 @@ def train_pwc_bokw(perf_dict, tool_dict, target_func, save_dir, xg_flag=False):
                 inputs_array,
                 labels_array,
                 costs_array,
-            ) = generate_training_samples_for_config_pair(
+            ) = generate_training_samples_for_solver_pair(
                 perf_dict, (i, j), target_func, bokw_dict
             )
             unique_labels = np.unique(labels_array)
