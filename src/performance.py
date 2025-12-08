@@ -66,6 +66,28 @@ class PerformanceDataset:
             return None
         return perf_list[solver_id]
 
+    def get_par2(self, path: str, solver_id: int) -> Optional[float]:
+        """
+        Get PAR-2 score for a specific instance and solver.
+
+        PAR-2 is the solving time if solved, otherwise twice the timeout.
+
+        Args:
+            path: Instance path
+            solver_id: Solver ID
+
+        Returns:
+            PAR-2 score (solving time if solved, else 2 * timeout) or None if not found
+        """
+        perf = self.get_performance(path, solver_id)
+        if perf is None:
+            return None
+        is_solved, wc_time = perf
+        if is_solved == 1:
+            return wc_time
+        else:
+            return 2.0 * self._timeout
+
     def get_solved_count(self, solver_id: int) -> int:
         """Get number of instances solved by a specific solver."""
         count = 0
