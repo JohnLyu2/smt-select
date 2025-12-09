@@ -88,6 +88,12 @@ def main():
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
         help="Logging level (default: INFO)",
     )
+    parser.add_argument(
+        "--feature-csv",
+        type=str,
+        default=None,
+        help="Path to the features CSV file (required if model doesn't have it set)",
+    )
 
     args = parser.parse_args()
 
@@ -103,6 +109,18 @@ def main():
     logging.info(
         f"Loaded {as_model.model_type} model with {as_model.solver_size} solvers"
     )
+
+    # Set feature CSV path if not already set or if override is provided
+    if args.feature_csv is not None:
+        as_model.feature_csv_path = args.feature_csv
+        logging.info(f"Using feature CSV: {args.feature_csv}")
+    elif as_model.feature_csv_path is None:
+        raise ValueError(
+            "feature_csv_path not set in model and --feature-csv not provided. "
+            "Please provide --feature-csv argument."
+        )
+    else:
+        logging.info(f"Using feature CSV from model: {as_model.feature_csv_path}")
 
     # Load performance data
     logging.info(f"Loading performance data from {args.perf_csv}")
@@ -120,11 +138,52 @@ def main():
     total_count = len(result_dataset)
     solve_rate = (solved_count / total_count * 100) if total_count > 0 else 0.0
 
+    # Calculate average PAR-2 for algorithm selection
+    total_par2_as = sum(result_dataset.get_par2(path) for path in result_dataset.keys())
+    avg_par2_as = total_par2_as / total_count if total_count > 0 else 0.0
+
+    # Get best single solver for comparison
+    best_solver_dataset = multi_perf_data.get_best_solver_dataset()
+    best_solver_solved = best_solver_dataset.get_solved_count()
+    best_solver_solve_rate = (
+        (best_solver_solved / total_count * 100) if total_count > 0 else 0.0
+    )
+    total_par2_best = sum(
+        best_solver_dataset.get_par2(path) for path in best_solver_dataset.keys()
+    )
+    avg_par2_best = total_par2_best / total_count if total_count > 0 else 0.0
+
+    # Get virtual best solver for comparison
+    virtual_best_dataset = multi_perf_data.get_virtual_best_solver_dataset()
+    virtual_best_solved = virtual_best_dataset.get_solved_count()
+    virtual_best_solve_rate = (
+        (virtual_best_solved / total_count * 100) if total_count > 0 else 0.0
+    )
+    total_par2_virtual_best = sum(
+        virtual_best_dataset.get_par2(path) for path in virtual_best_dataset.keys()
+    )
+    avg_par2_virtual_best = (
+        total_par2_virtual_best / total_count if total_count > 0 else 0.0
+    )
+
     logging.info("=" * 60)
     logging.info("Evaluation Results:")
     logging.info(f"  Total instances: {total_count}")
     logging.info(f"  Solved: {solved_count}")
     logging.info(f"  Solve rate: {solve_rate:.2f}%")
+    logging.info(f"  Average PAR-2: {avg_par2_as:.2f}")
+    logging.info("")
+    logging.info("Best Single Solver (for comparison):")
+    logging.info(f"  Solver: {best_solver_dataset.get_solver_name()}")
+    logging.info(f"  Solved: {best_solver_solved}")
+    logging.info(f"  Solve rate: {best_solver_solve_rate:.2f}%")
+    logging.info(f"  Average PAR-2: {avg_par2_best:.2f}")
+    logging.info("")
+    logging.info("Virtual Best Solver (upper bound):")
+    logging.info(f"  Solver: {virtual_best_dataset.get_solver_name()}")
+    logging.info(f"  Solved: {virtual_best_solved}")
+    logging.info(f"  Solve rate: {virtual_best_solve_rate:.2f}%")
+    logging.info(f"  Average PAR-2: {avg_par2_virtual_best:.2f}")
     logging.info("=" * 60)
 
     if args.output_csv:

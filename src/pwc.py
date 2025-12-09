@@ -11,21 +11,18 @@ from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler
 
 from .parser import parse_performance_csv
+from .feature import extract_feature_from_csv
 
-PERF_DIFF_THRESHOLD = 1e-3  # Threshold for considering performance differences
-
-
-def placehold_feature_extract(instance_path):
-    return np.random.rand(10)
+PERF_DIFF_THRESHOLD = 1e-1  # Threshold for considering performance differences
 
 
 # now the target func is par2
-def create_pairwise_samples(multi_perf_data, solver0_id, solver1_id):
+def create_pairwise_samples(multi_perf_data, solver0_id, solver1_id, feature_csv_path):
     inputs = []
     labels = []
     costs = []
     for instance_path in multi_perf_data.keys():
-        feature = placehold_feature_extract(instance_path)
+        feature = extract_feature_from_csv(instance_path, feature_csv_path)
         par2_0 = multi_perf_data.get_par2(instance_path, solver0_id)
         par2_1 = multi_perf_data.get_par2(instance_path, solver1_id)
         label = 1 if par2_0 < par2_1 else 0  # label 1 represents solver0 is better
@@ -71,10 +68,11 @@ class PairwiseSVM(SVC):
 
 
 class PwcModel:
-    def __init__(self, model_matrix, xg_flag):
+    def __init__(self, model_matrix, xg_flag, feature_csv_path=None):
         self.model_type = "XG" if xg_flag else "SVM"
         self.model_matrix = model_matrix
         self.solver_size = model_matrix.shape[0]
+        self.feature_csv_path = feature_csv_path
 
     def save(self, save_dir):
         Path(save_dir).mkdir(parents=True, exist_ok=True)
@@ -110,12 +108,18 @@ class PwcModel:
         """
         input instance path, output list of tool-config ids; for cross validation
         """
-        feature = placehold_feature_extract(instance_path)
+        feature_csv_path = self.feature_csv_path
+        if feature_csv_path is None:
+            raise ValueError(
+                "feature_csv_path not set in PwcModel. "
+                "It must be provided during model creation or loading."
+            )
+        feature = extract_feature_from_csv(instance_path, feature_csv_path)
         selected_id = self._get_rank_lst(feature, random_seed)[0]
         return selected_id
 
 
-def train_pwc(multi_perf_data, save_dir, xg_flag=False):
+def train_pwc(multi_perf_data, save_dir, xg_flag=False, feature_csv_path=None):
     Path(save_dir).mkdir(parents=True, exist_ok=True)
     solver_size = multi_perf_data.num_solvers()
 
@@ -128,7 +132,7 @@ def train_pwc(multi_perf_data, save_dir, xg_flag=False):
                 inputs_array,
                 labels_array,
                 costs_array,
-            ) = create_pairwise_samples(multi_perf_data, i, j)
+            ) = create_pairwise_samples(multi_perf_data, i, j, feature_csv_path)
             unique_labels = np.unique(labels_array)
             if len(unique_labels) == 1:
                 model = DummyClassifier(strategy="constant", constant=unique_labels[0])
@@ -139,7 +143,7 @@ def train_pwc(multi_perf_data, save_dir, xg_flag=False):
                     model = PairwiseXGBoost()
                 model.fit(inputs_array, labels_array, costs_array)
             model_matrix[i, j] = model
-    pwc_model = PwcModel(model_matrix, xg_flag)
+    pwc_model = PwcModel(model_matrix, xg_flag, feature_csv_path)
     pwc_model.save(save_dir)
 
 
@@ -161,6 +165,12 @@ def main():
         default=1200.0,
         help="Timeout value in seconds (default: 1200.0)",
     )
+    parser.add_argument(
+        "--feature-csv",
+        type=str,
+        required=True,
+        help="Path to the features CSV file",
+    )
 
     args = parser.parse_args()
     logging.basicConfig(
@@ -176,7 +186,7 @@ def main():
         f"Training performance parse: {len(train_dataset)} benchmarks and {train_dataset.num_solvers()} solvers from {args.perf_csv}"
     )
 
-    train_pwc(train_dataset, save_dir, xg_flag)
+    train_pwc(train_dataset, save_dir, xg_flag, args.feature_csv)
 
 
 if __name__ == "__main__":

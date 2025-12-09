@@ -129,6 +129,84 @@ class MultiSolverDataset:
         solver_name = self.get_solver_name(solver_id)
         return SingleSolverDataset(solver_perf_dict, solver_name, self._timeout)
 
+    def get_best_solver_dataset(self) -> "SingleSolverDataset":
+        """
+        Get the SingleSolverDataset for the best performing solver.
+
+        The best solver is determined by the lowest average PAR-2 score.
+
+        Returns:
+            SingleSolverDataset containing performance data for the best solver
+
+        Raises:
+            ValueError: If there are no solvers or no valid performance data
+        """
+        if self.num_solvers() == 0:
+            raise ValueError("Cannot find best solver: no solvers in dataset")
+
+        best_solver_id = None
+        best_avg_par2 = float("inf")
+
+        for solver_id in range(self.num_solvers()):
+            total_par2 = 0.0
+            count = 0
+            for path in self.keys():
+                par2 = self.get_par2(path, solver_id)
+                if par2 is not None:
+                    total_par2 += par2
+                    count += 1
+
+            if count > 0:
+                avg_par2 = total_par2 / count
+                if avg_par2 < best_avg_par2:
+                    best_avg_par2 = avg_par2
+                    best_solver_id = solver_id
+
+        if best_solver_id is None:
+            raise ValueError("Cannot find best solver: no valid performance data")
+
+        return self.get_solver_dataset(best_solver_id)
+
+    def get_virtual_best_solver_dataset(self) -> "SingleSolverDataset":
+        """
+        Get a SingleSolverDataset representing the virtual best solver.
+
+        The virtual best solver is a theoretical solver that, for each instance,
+        always selects the solver with the best (lowest) PAR-2 score for that instance.
+        This represents an upper bound on achievable performance.
+
+        Returns:
+            SingleSolverDataset containing performance data for the virtual best solver
+
+        Raises:
+            ValueError: If there are no solvers or no valid performance data
+        """
+        if self.num_solvers() == 0:
+            raise ValueError("Cannot create virtual best solver: no solvers in dataset")
+
+        virtual_best_perf_dict: Dict[str, Tuple[int, float]] = {}
+
+        for path in self.keys():
+            best_perf = None
+            best_par2 = float("inf")
+
+            # Find the solver with the best PAR-2 score for this instance
+            for solver_id in range(self.num_solvers()):
+                par2 = self.get_par2(path, solver_id)
+                if par2 is not None and par2 < best_par2:
+                    best_par2 = par2
+                    best_perf = self.get_performance(path, solver_id)
+
+            if best_perf is not None:
+                virtual_best_perf_dict[path] = best_perf
+
+        if len(virtual_best_perf_dict) == 0:
+            raise ValueError(
+                "Cannot create virtual best solver: no valid performance data"
+            )
+
+        return SingleSolverDataset(virtual_best_perf_dict, "VirtualBest", self._timeout)
+
 
 class SingleSolverDataset:
     """A data structure for performance data for a single solver."""
