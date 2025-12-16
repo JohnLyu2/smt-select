@@ -26,7 +26,7 @@ def parse_performance_csv(csv_path: str, timeout: float) -> MultiSolverDataset:
 
         # Read header rows
         header_row0 = next(reader)  # path,OpenSMT,,SMTInterpol,,...
-        next(reader)  # Skip second header row: ,result,runtime,result,runtime,...
+        next(reader)  # Skip second header row: ,solved,runtime,solved,runtime,...
 
         # Extract solver names from header_row0 (skip empty columns)
         solver_names = []
@@ -38,7 +38,7 @@ def parse_performance_csv(csv_path: str, timeout: float) -> MultiSolverDataset:
         for idx, solver_name in enumerate(solver_names):
             solver_dict[idx] = solver_name
 
-        # Calculate column indices for each solver's result and runtime
+        # Calculate column indices for each solver's solved and runtime
         # Solver columns start at index 1, then every other column (1, 3, 5, 7, 9, ...)
         # Result is at solver_col, runtime is at solver_col + 1
         num_solvers = len(solver_names)
