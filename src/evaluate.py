@@ -21,7 +21,7 @@ def as_evaluate(as_model, multi_perf_data, write_csv_path=None):
                     "benchmark",
                     "selected",
                     "solved",
-                    "time",
+                    "runtime",
                 ]
             )
     perf_dict = {}
