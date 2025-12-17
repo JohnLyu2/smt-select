@@ -137,31 +137,42 @@ def process_logic(
 
 
 def compute_gap_closed(
-    as_solved: int, sbs_solved: int, vbs_solved: int
+    as_value: float, sbs_value: float, vbs_value: float, use_par2: bool = False
 ) -> Optional[float]:
     """
     Compute the percentage of gap closed by an algorithm selector.
 
-    Formula: (as_solved - sbs_solved) / (vbs_solved - sbs_solved)
+    For #solved (higher is better): (as - sbs) / (vbs - sbs)
+    For PAR2 (lower is better): (sbs - as) / (sbs - vbs)
 
     Args:
-        as_solved: Number of instances solved by algorithm selector
-        sbs_solved: Number of instances solved by SBS
-        vbs_solved: Number of instances solved by VBS
+        as_value: Value for algorithm selector (#solved or PAR2)
+        sbs_value: Value for SBS (#solved or PAR2)
+        vbs_value: Value for VBS (#solved or PAR2)
+        use_par2: If True, use PAR2 formula (lower is better)
 
     Returns:
-        Gap closed percentage (0-100), or None if gap is zero (vbs == sbs)
+        Gap closed percentage (0-100), or None if gap is zero
     """
-    gap = vbs_solved - sbs_solved
-    if gap == 0:
-        return None  # No gap to close
-    return ((as_solved - sbs_solved) / gap) * 100
+    if use_par2:
+        # For PAR2: lower is better, so gap = sbs - vbs
+        gap = sbs_value - vbs_value
+        if gap == 0:
+            return None  # No gap to close
+        return ((sbs_value - as_value) / gap) * 100
+    else:
+        # For #solved: higher is better, so gap = vbs - sbs
+        gap = vbs_value - sbs_value
+        if gap == 0:
+            return None  # No gap to close
+        return ((as_value - sbs_value) / gap) * 100
 
 
 def write_results_csv(
     output_path: Path,
-    logic_results: Dict[str, Dict[str, int]],
+    logic_results: Dict[str, Dict[str, float]],
     gap_cls: bool = False,
+    use_par2: bool = False,
 ):
     """
     Write results to a CSV file with logic as rows and selectors as columns.
@@ -169,7 +180,8 @@ def write_results_csv(
     Args:
         output_path: Path to output CSV file
         logic_results: Dictionary mapping logic names to their results
-        gap_cls: If True, output gap-closed percentages instead of solved counts for selectors
+        gap_cls: If True, output gap-closed percentages instead of raw values for selectors
+        use_par2: If True, values are PAR2 scores instead of solved counts
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -199,7 +211,7 @@ def write_results_csv(
                     if as_value == "" or sbs == "" or vbs == "":
                         row.append("")
                     else:
-                        gap_pct = compute_gap_closed(as_value, sbs, vbs)
+                        gap_pct = compute_gap_closed(as_value, sbs, vbs, use_par2)
                         if gap_pct is None:
                             row.append("")  # No gap to close
                         else:
@@ -207,7 +219,12 @@ def write_results_csv(
                 else:
                     # Output raw values for sbs, vbs, or when gap_cls is False
                     value = results.get(col, "")
-                    row.append(value if value != "" else "")
+                    if value == "":
+                        row.append("")
+                    elif use_par2:
+                        row.append(f"{value:.1f}")
+                    else:
+                        row.append(value)
             writer.writerow(row)
 
     print(f"\nResults saved to: {output_path}", file=sys.stderr)
@@ -228,7 +245,12 @@ def main():
     parser.add_argument(
         "--gap-cls",
         action="store_true",
-        help="Output gap-closed percentages instead of solved counts for algorithm selectors",
+        help="Output gap-closed percentages instead of raw values for algorithm selectors",
+    )
+    parser.add_argument(
+        "--par2",
+        action="store_true",
+        help="Output PAR2 scores instead of solved counts",
     )
 
     args = parser.parse_args()
@@ -268,7 +290,9 @@ def main():
     for logic in logics:
         print(f"Processing logic: {logic}", file=sys.stderr)
         try:
-            results = process_logic(logic, selector_res_dir, raw_perf_dir, timeout)
+            results = process_logic(
+                logic, selector_res_dir, raw_perf_dir, timeout, use_par2=args.par2
+            )
             logic_results[logic] = results
         except (FileNotFoundError, ValueError, RuntimeError) as e:
             error_msg = f"Error processing {logic}: {e}"
@@ -284,18 +308,21 @@ def main():
         sys.exit(1)
 
     # Print results table
+    metric_label = "PAR2" if args.par2 else "#solved"
     if args.gap_cls:
         print("=" * 80)
         print(
             f"{'Logic':12s} | {'machsmt':>8s} | {'syn':>8s} | {'des':>8s} | {'des_exp':>8s} | {'des_syn':>8s}"
         )
-        print("  (gap-closed %)" + " " * 65)
+        print(f"  (gap-closed % based on {metric_label})" + " " * 40)
         print("=" * 80)
     else:
         print("=" * 110)
         print(
             f"{'Logic':12s} | {'machsmt':>8s} | {'syn':>8s} | {'des':>8s} | {'des_exp':>8s} | {'des_syn':>8s} | {'sbs':>8s} | {'vbs':>8s}"
         )
+        if args.par2:
+            print(f"  ({metric_label})" + " " * 95)
         print("=" * 110)
 
     for logic in sorted(logic_results.keys()):
@@ -314,7 +341,7 @@ def main():
             def format_gap(val):
                 if val == "" or sbs == "" or vbs == "":
                     return ""
-                gap_pct = compute_gap_closed(val, sbs, vbs)
+                gap_pct = compute_gap_closed(val, sbs, vbs, args.par2)
                 if gap_pct is None:
                     return ""
                 return f"{gap_pct:.1f}%"
@@ -335,9 +362,18 @@ def main():
             des_exp = results.get("des_exp", "")
             des_syn = results.get("des_syn", "")
 
-            print(
-                f"{logic:12s} | {machsmt:>8} | {syn:>8} | {des:>8} | {des_exp:>8} | {des_syn:>8} | {sbs:>8} | {vbs:>8}"
-            )
+            if args.par2:
+                # Format PAR2 values with one decimal place
+                def fmt(v):
+                    return f"{v:.1f}" if v != "" else ""
+
+                print(
+                    f"{logic:12s} | {fmt(machsmt):>8} | {fmt(syn):>8} | {fmt(des):>8} | {fmt(des_exp):>8} | {fmt(des_syn):>8} | {fmt(sbs):>8} | {fmt(vbs):>8}"
+                )
+            else:
+                print(
+                    f"{logic:12s} | {machsmt:>8} | {syn:>8} | {des:>8} | {des_exp:>8} | {des_syn:>8} | {sbs:>8} | {vbs:>8}"
+                )
 
     if args.gap_cls:
         print("=" * 80)
@@ -346,7 +382,9 @@ def main():
 
     # Write results to CSV
     output_path = Path(args.output)
-    write_results_csv(output_path, logic_results, gap_cls=args.gap_cls)
+    write_results_csv(
+        output_path, logic_results, gap_cls=args.gap_cls, use_par2=args.par2
+    )
 
 
 if __name__ == "__main__":
