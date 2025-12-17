@@ -22,29 +22,38 @@ from src.parser import parse_performance_csv, parse_as_perf_csv
 from src.performance import MultiSolverDataset, SingleSolverDataset
 
 
+def compute_avg_par2(dataset) -> float:
+    """Compute average PAR2 for a dataset."""
+    total_par2 = sum(dataset.get_par2(path) for path in dataset.keys())
+    count = len(list(dataset.keys()))
+    return total_par2 / count if count > 0 else 0.0
+
+
 def process_logic(
     logic: str,
     selector_res_dir: Path,
     raw_perf_dir: Path,
     timeout: float = 1200.0,
-) -> Dict[str, int]:
+    use_par2: bool = False,
+) -> Dict[str, float]:
     """
-    Process a single logic and return solved counts for all required selectors.
+    Process a single logic and return solved counts or PAR2 for all required selectors.
 
     Args:
         logic: Logic name (e.g., "abv", "qf_slia")
         selector_res_dir: Base directory for selector results
         raw_perf_dir: Base directory for raw performance data
         timeout: Timeout value in seconds
+        use_par2: If True, return PAR2 values instead of solved counts
 
     Returns:
-        Dictionary mapping selector names to solved counts
+        Dictionary mapping selector names to solved counts or PAR2 values
 
     Raises:
         FileNotFoundError: If any required file is missing
         ValueError: If SBS or VBS cannot be computed
     """
-    results: Dict[str, int] = {}
+    results: Dict[str, float] = {}
 
     # Paths
     logic_test_dir = selector_res_dir / logic / "test"
@@ -79,14 +88,20 @@ def process_logic(
     # Get SBS
     try:
         sbs_dataset = multi_perf.get_best_solver_dataset()
-        results["sbs"] = sbs_dataset.get_solved_count()
+        if use_par2:
+            results["sbs"] = compute_avg_par2(sbs_dataset)
+        else:
+            results["sbs"] = sbs_dataset.get_solved_count()
     except ValueError as e:
         raise ValueError(f"Could not compute SBS for {logic}: {e}")
 
     # Get VBS
     try:
         vbs_dataset = multi_perf.get_virtual_best_solver_dataset()
-        results["vbs"] = vbs_dataset.get_solved_count()
+        if use_par2:
+            results["vbs"] = compute_avg_par2(vbs_dataset)
+        else:
+            results["vbs"] = vbs_dataset.get_solved_count()
     except ValueError as e:
         raise ValueError(f"Could not compute VBS for {logic}: {e}")
 
@@ -96,7 +111,10 @@ def process_logic(
         print(f"Loading selector: {selector_csv.name}", file=sys.stderr)
         try:
             selector_dataset = parse_as_perf_csv(str(selector_csv), timeout)
-            results[selector_name] = selector_dataset.get_solved_count()
+            if use_par2:
+                results[selector_name] = compute_avg_par2(selector_dataset)
+            else:
+                results[selector_name] = selector_dataset.get_solved_count()
         except Exception as e:
             raise RuntimeError(f"Could not load {selector_csv}: {e}")
 
@@ -105,7 +123,10 @@ def process_logic(
         print(f"Loading selector: {machsmt_csv.name}", file=sys.stderr)
         try:
             machsmt_dataset = parse_as_perf_csv(str(machsmt_csv), timeout)
-            results["machsmt"] = machsmt_dataset.get_solved_count()
+            if use_par2:
+                results["machsmt"] = compute_avg_par2(machsmt_dataset)
+            else:
+                results["machsmt"] = machsmt_dataset.get_solved_count()
         except Exception as e:
             print(
                 f"Warning: Could not load {machsmt_csv}: {e}",
