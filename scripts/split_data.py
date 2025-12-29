@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to split qflia.csv into training and testing sets.
+Script to split a performance CSV file into training and testing sets.
 """
 
 import csv
@@ -78,14 +78,14 @@ def main():
     parser.add_argument(
         "--train",
         type=str,
-        default=None,
-        help="Output training CSV file path (default: input filename + '_train')",
+        required=True,
+        help="Output training CSV file path",
     )
     parser.add_argument(
         "--test",
         type=str,
-        default=None,
-        help="Output testing CSV file path (default: input filename + '_test')",
+        required=True,
+        help="Output testing CSV file path",
     )
     parser.add_argument(
         "--test-size",
@@ -101,18 +101,6 @@ def main():
     )
 
     args = parser.parse_args()
-
-    # Generate default train and test paths from input filename if not provided
-    if args.train is None or args.test is None:
-        input_path = Path(args.input)
-        stem = input_path.stem  # filename without extension
-        suffix = input_path.suffix  # extension (e.g., .csv)
-        parent = input_path.parent  # directory
-
-        if args.train is None:
-            args.train = str(parent / f"{stem}_train{suffix}")
-        if args.test is None:
-            args.test = str(parent / f"{stem}_test{suffix}")
 
     split_csv(
         args.input,
