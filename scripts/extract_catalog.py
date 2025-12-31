@@ -67,6 +67,7 @@ def find_benchmarks(
             b.category,
             b.size,
             b.queryCount,
+            b.description,
             q.id AS query_id,
             q.idx AS query_index,
             ev.id AS evaluation_id,
@@ -122,29 +123,33 @@ def find_benchmarks(
         cursor.execute(symbol_query, (query_id,))
         symbol_counts = {name: count for name, count in cursor.fetchall()}
 
-        benchmarks.append(
-            {
-                "benchmark_id": row["benchmark_id"],
-                "benchmark_name": row["benchmark_name"],
-                "logic": row["logic"],
-                "category": row["category"],
-                "size": row["size"],
-                "evaluation": row["evaluation_name"],
-                "family": row["family_name"],
-                "smtlib_path": smtlib_path,
-                "asserts_count": row["assertsCount"] or 0,
-                "declare_fun_count": row["declareFunCount"] or 0,
-                "declare_const_count": row["declareConstCount"] or 0,
-                "declare_sort_count": row["declareSortCount"] or 0,
-                "define_fun_count": row["defineFunCount"] or 0,
-                "define_fun_rec_count": row["defineFunRecCount"] or 0,
-                "constant_fun_count": row["constantFunCount"] or 0,
-                "define_sort_count": row["defineSortCount"] or 0,
-                "declare_datatype_count": row["declareDatatypeCount"] or 0,
-                "max_term_depth": row["maxTermDepth"] or 0,
-                "symbol_counts": symbol_counts,
-            }
-        )
+        benchmark_dict = {
+            "benchmark_id": row["benchmark_id"],
+            "benchmark_name": row["benchmark_name"],
+            "logic": row["logic"],
+            "category": row["category"],
+            "size": row["size"],
+            "evaluation": row["evaluation_name"],
+            "family": row["family_name"],
+            "smtlib_path": smtlib_path,
+            "asserts_count": row["assertsCount"] or 0,
+            "declare_fun_count": row["declareFunCount"] or 0,
+            "declare_const_count": row["declareConstCount"] or 0,
+            "declare_sort_count": row["declareSortCount"] or 0,
+            "define_fun_count": row["defineFunCount"] or 0,
+            "define_fun_rec_count": row["defineFunRecCount"] or 0,
+            "constant_fun_count": row["constantFunCount"] or 0,
+            "define_sort_count": row["defineSortCount"] or 0,
+            "declare_datatype_count": row["declareDatatypeCount"] or 0,
+            "max_term_depth": row["maxTermDepth"] or 0,
+            "symbol_counts": symbol_counts,
+        }
+
+        # Only include description if it exists and is not empty
+        if row["description"]:
+            benchmark_dict["description"] = row["description"]
+
+        benchmarks.append(benchmark_dict)
 
     conn.close()
     return benchmarks
@@ -185,8 +190,18 @@ def print_results(
     # Get unique families
     unique_families = set()
     for b in benchmarks:
-        if b.get("family_name"):
-            unique_families.add(b["family_name"])
+        if b.get("family"):
+            unique_families.add(b["family"])
+
+    # Count benchmarks with and without descriptions
+    unique_benchmarks_with_desc = set()
+    unique_benchmarks_without_desc = set()
+    for b in benchmarks:
+        bench_id = b["benchmark_id"]
+        if "description" in b and b["description"]:
+            unique_benchmarks_with_desc.add(bench_id)
+        else:
+            unique_benchmarks_without_desc.add(bench_id)
 
     print("\nSummary:")
     print(
@@ -194,6 +209,8 @@ def print_results(
     )
     print(f"  Out of {evaluation_benchmark_count} benchmark(s) in evaluation")
     print(f"  Across {len(unique_families)} families")
+    print(f"  With description: {len(unique_benchmarks_with_desc)} benchmark(s)")
+    print(f"  Without description: {len(unique_benchmarks_without_desc)} benchmark(s)")
 
     # Show a few example benchmarks
     if benchmarks:
@@ -204,7 +221,7 @@ def print_results(
             if bench_id not in unique_benchmarks:
                 unique_benchmarks[bench_id] = {
                     "name": b["benchmark_name"],
-                    "family_name": b.get("family_name"),
+                    "family_name": b.get("family"),
                     "smtlib_path": b.get("smtlib_path"),
                 }
 
