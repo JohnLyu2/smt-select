@@ -33,9 +33,7 @@ def _load_feature_cache(csv_path: str):
     return cache
 
 
-def extract_feature_from_csv(
-    instance_path, feature_csv_path: str = "data/qfnia_features_filtered.csv"
-):
+def extract_feature_from_csv(instance_path: str, feature_csv_path: str):
     """
     Extract features for an instance from the features CSV file.
 
