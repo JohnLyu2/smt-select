@@ -11,6 +11,7 @@ Performs k-fold cross-validation using pre-split fold files by:
 """
 
 import argparse
+import json
 import logging
 from pathlib import Path
 import numpy as np
@@ -388,6 +389,36 @@ def cross_validate(
         "folds": fold_results,
         "aggregated": aggregated,
     }
+
+    # Save summary.json if output_dir is provided
+    if output_dir:
+        summary_path = output_dir / "summary.json"
+
+        # Convert numpy types to native Python types for JSON serialization
+        def convert_to_json_serializable(obj):
+            """Recursively convert numpy types to native Python types."""
+            if isinstance(obj, np.integer):
+                return int(obj)
+            elif isinstance(obj, np.floating):
+                return float(obj)
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, dict):
+                return {
+                    key: convert_to_json_serializable(value)
+                    for key, value in obj.items()
+                }
+            elif isinstance(obj, list):
+                return [convert_to_json_serializable(item) for item in obj]
+            else:
+                return obj
+
+        json_results = convert_to_json_serializable(results)
+
+        with open(summary_path, "w") as f:
+            json.dump(json_results, f, indent=2)
+
+        logging.info(f"Saved summary to {summary_path}")
 
     return results
 
