@@ -1,0 +1,1 @@
+*catalog0*: created by Paul in our preliminary FoIKS experiments. Features are all extracted from SMT-LIB Catalog and filtered by logics. See [logic_features.py](../../dataCreation/logic_features.py) for more details.
