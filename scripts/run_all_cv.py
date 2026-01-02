@@ -4,7 +4,7 @@ Run cross-validation experiments for all logics.
 
 For each logic found in the folds directory:
 1. Finds the corresponding feature CSV in the features directory
-2. Runs cross-validation using scripts/cross_validate.py
+2. Runs cross-validation using the cross_validate function
 3. Saves results to the results directory under {LOGIC}
 
 Command-line arguments:
@@ -14,15 +14,16 @@ Command-line arguments:
 """
 
 import argparse
-import subprocess
+import logging
 import sys
 from pathlib import Path
+
+from scripts.cross_validate import cross_validate
 
 # Default directories
 DEFAULT_FOLDS_BASE_DIR = Path("data/perf_data/folds")
 DEFAULT_FEATURES_DIR = Path("data/features/syntactic/catalog_all")
 DEFAULT_RESULTS_BASE_DIR = Path("data/cv_results")
-SCRIPT_PATH = Path("scripts/cross_validate.py")
 
 
 def discover_logics(folds_dir: Path) -> list[str]:
@@ -95,25 +96,21 @@ def run_cv_for_logic(
     print(f"  Results dir:  {logic_results_dir}")
     print(f"  Folds found:  {len(csv_files)}")
 
-    # Build command
-    cmd = [
-        sys.executable,
-        str(SCRIPT_PATH),
-        "--folds-dir",
-        str(logic_folds_dir),
-        "--feature-csv",
-        str(feature_csv),
-        "--output-dir",
-        str(logic_results_dir),
-    ]
-
     try:
         # Run cross-validation
-        subprocess.run(cmd, check=True, capture_output=False)
+        _ = cross_validate(
+            folds_dir=logic_folds_dir,
+            feature_csv_path=str(feature_csv),
+            xg_flag=False,
+            save_models=False,
+            output_dir=logic_results_dir,
+            timeout=1200.0,
+        )
         print(f"Completed CV for {logic}")
         return True
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         print(f"ERROR: Failed running CV for {logic}: {e}")
+        logging.exception("Cross-validation failed")
         return False
 
 
@@ -157,9 +154,11 @@ def main():
         print(f"Error: Features directory does not exist: {features_dir}")
         sys.exit(1)
 
-    if not SCRIPT_PATH.exists():
-        print(f"Error: Cross-validation script does not exist: {SCRIPT_PATH}")
-        sys.exit(1)
+    # Setup logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+    )
 
     # Discover logics
     logics = discover_logics(folds_base_dir)
