@@ -9,8 +9,8 @@ For each logic found in the folds directory:
 
 Command-line arguments:
     --folds-dir: Base directory containing fold CSV files (default: data/perf_data/folds)
-    --features-dir: Directory containing feature CSV files (default: data/features/syntactic/catalog_all)
-    --results-dir: Base directory to save results (default: data/cv_results)
+    --features-dir: Directory containing feature CSV files (required)
+    --results-dir: Base directory to save results (required)
 """
 
 import argparse
@@ -22,8 +22,6 @@ from scripts.cross_validate import cross_validate
 
 # Default directories
 DEFAULT_FOLDS_BASE_DIR = Path("data/perf_data/folds")
-DEFAULT_FEATURES_DIR = Path("data/features/syntactic/catalog_all")
-DEFAULT_RESULTS_BASE_DIR = Path("data/cv_results")
 
 
 def discover_logics(folds_dir: Path) -> list[str]:
@@ -128,14 +126,14 @@ def main():
     parser.add_argument(
         "--features-dir",
         type=str,
-        default=str(DEFAULT_FEATURES_DIR),
-        help=f"Directory containing feature CSV files (default: {DEFAULT_FEATURES_DIR})",
+        required=True,
+        help="Directory containing feature CSV files",
     )
     parser.add_argument(
         "--results-dir",
         type=str,
-        default=str(DEFAULT_RESULTS_BASE_DIR),
-        help=f"Base directory to save results (default: {DEFAULT_RESULTS_BASE_DIR})",
+        required=True,
+        help="Base directory to save results",
     )
 
     args = parser.parse_args()
