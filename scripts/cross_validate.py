@@ -67,41 +67,47 @@ def compute_metrics(result_dataset, multi_perf_data):
     avg_par2 = total_par2 / total_count if total_count > 0 else 0.0
 
     # Get best single solver for comparison
-    best_solver_dataset = multi_perf_data.get_best_solver_dataset()
-    best_solver_solved = best_solver_dataset.get_solved_count()
-    best_solver_solve_rate = (
-        (best_solver_solved / total_count * 100) if total_count > 0 else 0.0
-    )
-    total_par2_best = sum(
-        best_solver_dataset.get_par2(path) for path in best_solver_dataset.keys()
-    )
-    avg_par2_best = total_par2_best / total_count if total_count > 0 else 0.0
+    sbs_dataset = multi_perf_data.get_best_solver_dataset()
+    sbs_solved = sbs_dataset.get_solved_count()
+    sbs_solve_rate = (sbs_solved / total_count * 100) if total_count > 0 else 0.0
+    total_par2_sbs = sum(sbs_dataset.get_par2(path) for path in sbs_dataset.keys())
+    avg_par2_sbs = total_par2_sbs / total_count if total_count > 0 else 0.0
 
     # Get virtual best solver for comparison
-    virtual_best_dataset = multi_perf_data.get_virtual_best_solver_dataset()
-    virtual_best_solved = virtual_best_dataset.get_solved_count()
-    virtual_best_solve_rate = (
-        (virtual_best_solved / total_count * 100) if total_count > 0 else 0.0
+    vbs_dataset = multi_perf_data.get_virtual_best_solver_dataset()
+    vbs_solved = vbs_dataset.get_solved_count()
+    vbs_solve_rate = (vbs_solved / total_count * 100) if total_count > 0 else 0.0
+    total_par2_vbs = sum(vbs_dataset.get_par2(path) for path in vbs_dataset.keys())
+    avg_par2_vbs = total_par2_vbs / total_count if total_count > 0 else 0.0
+
+    # Assert that SBS and VBS are not the same
+    assert vbs_solved != sbs_solved, (
+        f"SBS and VBS have the same solved count: {sbs_solved}"
     )
-    total_par2_virtual_best = sum(
-        virtual_best_dataset.get_par2(path) for path in virtual_best_dataset.keys()
+    assert avg_par2_vbs != avg_par2_sbs, (
+        f"SBS and VBS have the same avg_par2: {avg_par2_sbs}"
     )
-    avg_par2_virtual_best = (
-        total_par2_virtual_best / total_count if total_count > 0 else 0.0
-    )
+
+    # Calculate gap_cls (closed gap) metrics: (as - sbs) / (vbs - sbs)
+    # For solved: gap_cls_solved = (solved_count - sbs_solved) / (vbs_solved - sbs_solved)
+    # For par2: gap_cls_par2 = (avg_par2 - avg_par2_sbs) / (avg_par2_vbs - avg_par2_sbs)
+    gap_cls_solved = (solved_count - sbs_solved) / (vbs_solved - sbs_solved)
+    gap_cls_par2 = (avg_par2 - avg_par2_sbs) / (avg_par2_vbs - avg_par2_sbs)
 
     return {
         "total_instances": total_count,
         "solved": solved_count,
         "solve_rate": solve_rate,
         "avg_par2": avg_par2,
-        "best_solver_name": best_solver_dataset.get_solver_name(),
-        "best_solver_solved": best_solver_solved,
-        "best_solver_solve_rate": best_solver_solve_rate,
-        "best_solver_avg_par2": avg_par2_best,
-        "virtual_best_solved": virtual_best_solved,
-        "virtual_best_solve_rate": virtual_best_solve_rate,
-        "virtual_best_avg_par2": avg_par2_virtual_best,
+        "sbs_name": sbs_dataset.get_solver_name(),
+        "sbs_solved": sbs_solved,
+        "sbs_solve_rate": sbs_solve_rate,
+        "sbs_avg_par2": avg_par2_sbs,
+        "vbs_solved": vbs_solved,
+        "vbs_solve_rate": vbs_solve_rate,
+        "vbs_avg_par2": avg_par2_vbs,
+        "gap_cls_solved": gap_cls_solved,
+        "gap_cls_par2": gap_cls_par2,
     }
 
 
@@ -327,57 +333,75 @@ def cross_validate(
         "test_solve_rate_std": np.std([m["solve_rate"] for m in test_metrics_list]),
         "test_avg_par2_mean": np.mean([m["avg_par2"] for m in test_metrics_list]),
         "test_avg_par2_std": np.std([m["avg_par2"] for m in test_metrics_list]),
-        "test_best_solver_solve_rate_mean": np.mean(
-            [m["best_solver_solve_rate"] for m in test_metrics_list]
+        "test_sbs_solve_rate_mean": np.mean(
+            [m["sbs_solve_rate"] for m in test_metrics_list]
         ),
-        "test_best_solver_solve_rate_std": np.std(
-            [m["best_solver_solve_rate"] for m in test_metrics_list]
+        "test_sbs_solve_rate_std": np.std(
+            [m["sbs_solve_rate"] for m in test_metrics_list]
         ),
-        "test_best_solver_avg_par2_mean": np.mean(
-            [m["best_solver_avg_par2"] for m in test_metrics_list]
+        "test_sbs_avg_par2_mean": np.mean(
+            [m["sbs_avg_par2"] for m in test_metrics_list]
         ),
-        "test_best_solver_avg_par2_std": np.std(
-            [m["best_solver_avg_par2"] for m in test_metrics_list]
+        "test_sbs_avg_par2_std": np.std([m["sbs_avg_par2"] for m in test_metrics_list]),
+        "test_vbs_solve_rate_mean": np.mean(
+            [m["vbs_solve_rate"] for m in test_metrics_list]
         ),
-        "test_virtual_best_solve_rate_mean": np.mean(
-            [m["virtual_best_solve_rate"] for m in test_metrics_list]
+        "test_vbs_solve_rate_std": np.std(
+            [m["vbs_solve_rate"] for m in test_metrics_list]
         ),
-        "test_virtual_best_solve_rate_std": np.std(
-            [m["virtual_best_solve_rate"] for m in test_metrics_list]
+        "test_vbs_avg_par2_mean": np.mean(
+            [m["vbs_avg_par2"] for m in test_metrics_list]
         ),
-        "test_virtual_best_avg_par2_mean": np.mean(
-            [m["virtual_best_avg_par2"] for m in test_metrics_list]
+        "test_vbs_avg_par2_std": np.std([m["vbs_avg_par2"] for m in test_metrics_list]),
+        "test_gap_cls_solved_mean": np.mean(
+            [m["gap_cls_solved"] for m in test_metrics_list]
         ),
-        "test_virtual_best_avg_par2_std": np.std(
-            [m["virtual_best_avg_par2"] for m in test_metrics_list]
+        "test_gap_cls_solved_std": np.std(
+            [m["gap_cls_solved"] for m in test_metrics_list]
         ),
+        "test_gap_cls_par2_mean": np.mean(
+            [m["gap_cls_par2"] for m in test_metrics_list]
+        ),
+        "test_gap_cls_par2_std": np.std([m["gap_cls_par2"] for m in test_metrics_list]),
         "train_solve_rate_mean": np.mean([m["solve_rate"] for m in train_metrics_list]),
         "train_solve_rate_std": np.std([m["solve_rate"] for m in train_metrics_list]),
         "train_avg_par2_mean": np.mean([m["avg_par2"] for m in train_metrics_list]),
         "train_avg_par2_std": np.std([m["avg_par2"] for m in train_metrics_list]),
-        "train_best_solver_solve_rate_mean": np.mean(
-            [m["best_solver_solve_rate"] for m in train_metrics_list]
+        "train_sbs_solve_rate_mean": np.mean(
+            [m["sbs_solve_rate"] for m in train_metrics_list]
         ),
-        "train_best_solver_solve_rate_std": np.std(
-            [m["best_solver_solve_rate"] for m in train_metrics_list]
+        "train_sbs_solve_rate_std": np.std(
+            [m["sbs_solve_rate"] for m in train_metrics_list]
         ),
-        "train_best_solver_avg_par2_mean": np.mean(
-            [m["best_solver_avg_par2"] for m in train_metrics_list]
+        "train_sbs_avg_par2_mean": np.mean(
+            [m["sbs_avg_par2"] for m in train_metrics_list]
         ),
-        "train_best_solver_avg_par2_std": np.std(
-            [m["best_solver_avg_par2"] for m in train_metrics_list]
+        "train_sbs_avg_par2_std": np.std(
+            [m["sbs_avg_par2"] for m in train_metrics_list]
         ),
-        "train_virtual_best_solve_rate_mean": np.mean(
-            [m["virtual_best_solve_rate"] for m in train_metrics_list]
+        "train_vbs_solve_rate_mean": np.mean(
+            [m["vbs_solve_rate"] for m in train_metrics_list]
         ),
-        "train_virtual_best_solve_rate_std": np.std(
-            [m["virtual_best_solve_rate"] for m in train_metrics_list]
+        "train_vbs_solve_rate_std": np.std(
+            [m["vbs_solve_rate"] for m in train_metrics_list]
         ),
-        "train_virtual_best_avg_par2_mean": np.mean(
-            [m["virtual_best_avg_par2"] for m in train_metrics_list]
+        "train_vbs_avg_par2_mean": np.mean(
+            [m["vbs_avg_par2"] for m in train_metrics_list]
         ),
-        "train_virtual_best_avg_par2_std": np.std(
-            [m["virtual_best_avg_par2"] for m in train_metrics_list]
+        "train_vbs_avg_par2_std": np.std(
+            [m["vbs_avg_par2"] for m in train_metrics_list]
+        ),
+        "train_gap_cls_solved_mean": np.mean(
+            [m["gap_cls_solved"] for m in train_metrics_list]
+        ),
+        "train_gap_cls_solved_std": np.std(
+            [m["gap_cls_solved"] for m in train_metrics_list]
+        ),
+        "train_gap_cls_par2_mean": np.mean(
+            [m["gap_cls_par2"] for m in train_metrics_list]
+        ),
+        "train_gap_cls_par2_std": np.std(
+            [m["gap_cls_par2"] for m in train_metrics_list]
         ),
     }
 
@@ -515,19 +539,19 @@ def main():
     logging.info(
         f"    Average PAR-2: {agg['train_avg_par2_mean']:.2f} ± {agg['train_avg_par2_std']:.2f}"
     )
-    logging.info("  Best Single Solver (for comparison):")
+    logging.info("  SBS (Single Best Solver, for comparison):")
     logging.info(
-        f"    Solve rate: {agg['train_best_solver_solve_rate_mean']:.2f}% ± {agg['train_best_solver_solve_rate_std']:.2f}%"
+        f"    Solve rate: {agg['train_sbs_solve_rate_mean']:.2f}% ± {agg['train_sbs_solve_rate_std']:.2f}%"
     )
     logging.info(
-        f"    Average PAR-2: {agg['train_best_solver_avg_par2_mean']:.2f} ± {agg['train_best_solver_avg_par2_std']:.2f}"
+        f"    Average PAR-2: {agg['train_sbs_avg_par2_mean']:.2f} ± {agg['train_sbs_avg_par2_std']:.2f}"
     )
-    logging.info("  Virtual Best Solver (upper bound):")
+    logging.info("  VBS (Virtual Best Solver, upper bound):")
     logging.info(
-        f"    Solve rate: {agg['train_virtual_best_solve_rate_mean']:.2f}% ± {agg['train_virtual_best_solve_rate_std']:.2f}%"
+        f"    Solve rate: {agg['train_vbs_solve_rate_mean']:.2f}% ± {agg['train_vbs_solve_rate_std']:.2f}%"
     )
     logging.info(
-        f"    Average PAR-2: {agg['train_virtual_best_avg_par2_mean']:.2f} ± {agg['train_virtual_best_avg_par2_std']:.2f}"
+        f"    Average PAR-2: {agg['train_vbs_avg_par2_mean']:.2f} ± {agg['train_vbs_avg_par2_std']:.2f}"
     )
     logging.info("")
     logging.info("Test Set Performance:")
@@ -538,19 +562,19 @@ def main():
     logging.info(
         f"    Average PAR-2: {agg['test_avg_par2_mean']:.2f} ± {agg['test_avg_par2_std']:.2f}"
     )
-    logging.info("  Best Single Solver (for comparison):")
+    logging.info("  SBS (Single Best Solver, for comparison):")
     logging.info(
-        f"    Solve rate: {agg['test_best_solver_solve_rate_mean']:.2f}% ± {agg['test_best_solver_solve_rate_std']:.2f}%"
+        f"    Solve rate: {agg['test_sbs_solve_rate_mean']:.2f}% ± {agg['test_sbs_solve_rate_std']:.2f}%"
     )
     logging.info(
-        f"    Average PAR-2: {agg['test_best_solver_avg_par2_mean']:.2f} ± {agg['test_best_solver_avg_par2_std']:.2f}"
+        f"    Average PAR-2: {agg['test_sbs_avg_par2_mean']:.2f} ± {agg['test_sbs_avg_par2_std']:.2f}"
     )
-    logging.info("  Virtual Best Solver (upper bound):")
+    logging.info("  VBS (Virtual Best Solver, upper bound):")
     logging.info(
-        f"    Solve rate: {agg['test_virtual_best_solve_rate_mean']:.2f}% ± {agg['test_virtual_best_solve_rate_std']:.2f}%"
+        f"    Solve rate: {agg['test_vbs_solve_rate_mean']:.2f}% ± {agg['test_vbs_solve_rate_std']:.2f}%"
     )
     logging.info(
-        f"    Average PAR-2: {agg['test_virtual_best_avg_par2_mean']:.2f} ± {agg['test_virtual_best_avg_par2_std']:.2f}"
+        f"    Average PAR-2: {agg['test_vbs_avg_par2_mean']:.2f} ± {agg['test_vbs_avg_par2_std']:.2f}"
     )
     logging.info("=" * 60)
 
