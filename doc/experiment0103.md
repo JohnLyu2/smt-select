@@ -24,7 +24,8 @@ From the new results, syntactic features alone is always better than description
 
 ### Analysis on low performance of description embeddings
 
-
+Usually the SMT-LIB descriptions are identical within a family. I collected the familiy distribution statistics under [`data/features/family/summary`](../data/features/family/summary). Notably, in some logics, the number of families is very small or the family distribution is highly imbalanced. For example, in ABV and ALIA, they both only have 2 families, and one of the two accounts for more than 95% of all the benchmarks. One would not expect in such cases the description embedding can be useful.
+In UFLIA and UFNIA, although there are a few families (12 and 9 respectively), each logic still has a dominant family that accounts for more than 50% of all the benchmarks. 
 
 ### Analysis on high variability in performance
 
@@ -43,3 +44,15 @@ The metrics used is PAR-2 VBS-SBS gap closed. This metric would be pretty sensit
 | UFNIA | 6279 | 3688 | 3759 | 71 |
 
 We can see that the logics with larger performance variance (ALIA, BV, UFLIA, and UFNIA) all have relatively small VBS-SBS margins (< 100 instances). Also, for ALIA, the dataset may not be very sufficient because the VBS can only solve 390 instances. Previously, I set the logic filtering threshold to be at least 1000 instances in total. But for instances that can not be solved by the VBS, they are useless for training or testing.
+
+## Plans
+
+### LLM-generated descriptions
+
+Since the native descriptions does not distinguish well between instances within a family, generating more informative descriptions with LLMs may help. Maybe agent framework is not necessary for now. I will try feeding LLM with necessary info (such as syntax features, variables by types, sample assertions, etc.). One thing worth working on is how to cluster assertions by similarity, and then sample assertions from clusters.
+
+### Combine syntactic and description features
+
+Currently, we simply concatenate the syntactic and description features, which is likely not the best way to leverage more information. Ideally, the approach should be robust to the inclusion of weakly informative features, so that performance does not degrade when such features are added.
+
+One thing we can try is to use alternative base classifiers, such as XGBoost, which is better suited to handling heterogeneous feature types than our current SVM. Another thing is we can try *late fusion*, in which separate models are trained on syntactic and description features, respectively, and their predictions are combined using a weighted sum, i.e., $\text{pred} = \alpha \cdot \text{synt_model} + (1-\alpha) \cdot \text{desc_model}$, where $\alpha$ can be calibrated via cross-validation. 
