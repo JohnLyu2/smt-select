@@ -1,6 +1,6 @@
 ## New cross validation experiments
 
-The previous FoIKS results were based on one 80-20 split. These days I have tried 4-fold cross validation (on the training set).
+The previous [FoIKS results](../doc/FoIKS26_poster.pdf) were based on one 80-20 split. These days I have tried 4-fold cross validation (on the training set).
 
 ### Results Summary
 
