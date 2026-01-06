@@ -24,7 +24,7 @@ From the new results, syntactic features alone is always better than description
 
 ### Analysis on low performance of description embeddings
 
-Usually the SMT-LIB descriptions are identical within a family. I collected the familiy distribution statistics under [`data/features/family/summary`](../data/features/family/summary). Notably, in some logics, the number of families is very small or the family distribution is highly imbalanced. For example, in ABV and ALIA, they both only have 2 families, and one of the two accounts for more than 95% of all the benchmarks. One would not expect in such cases the description embedding can be useful.
+Usually the SMT-LIB descriptions are identical within a family. I collected the familiy distribution statistics under [`data/features/family/summary`](../data/features/family/summary). Also, you can check all the descriptions in [`data/raw_jsons`](../data/raw_jsons). Notably, in some logics, the number of families is very small or the family distribution is highly imbalanced. For example, in ABV and ALIA, they both only have 2 families, and one of the two accounts for more than 95% of all the benchmarks. One would not expect in such cases the description embedding can be useful.
 In UFLIA and UFNIA, although there are a few families (12 and 9 respectively), each logic still has a dominant family that accounts for more than 50% of all the benchmarks. 
 
 ### Analysis on high variability in performance
