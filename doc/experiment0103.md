@@ -4,7 +4,7 @@ The previous FoIKS results were based on one 80-20 split. These days I have trie
 
 ### Results Summary
 
-The table below shows the 4-fold cross validation 
+The table below shows the 4-fold cross validation results.
 
 | Logic | desc_train | desc_test | synt_train | synt_test | comb_train | comb_test |
 |--------|------------|-----------|------------|-----------|------------------|-----------------|
@@ -45,6 +45,10 @@ The metrics used is PAR-2 VBS-SBS gap closed. This metric would be pretty sensit
 
 We can see that the logics with larger performance variance (ALIA, BV, UFLIA, and UFNIA) all have relatively small VBS-SBS margins (< 100 instances). Also, for ALIA, the dataset may not be very sufficient because the VBS can only solve 390 instances. Previously, I set the logic filtering threshold to be at least 1000 instances in total. But for instances that can not be solved by the VBS, they are useless for training or testing.
 
+### Truncation statistics
+
+[all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2), the current embedding model we used imposes a maximum sequence length of 384 tokens. in 7/9 logics, none or negligible (< 1% of benchmarks) truncation happens. In BV, 6.83% of benchmarks are truncated, but on average only 3.5 tokens are truncated per truncated benchmark. In QF_NRA, 13.76% of benchmarks are truncated, and on average 99.5 tokens are truncated per truncated benchmark. See the full truncation statistics in [`data/features/native_desc/all_mpnet_base_v2/all_mpnet_base_v2.log`](../data/features/native_desc/all_mpnet_base_v2/all_mpnet_base_v2.log).
+
 ## Plans
 
 ### LLM-generated descriptions
@@ -53,6 +57,13 @@ Since the native descriptions does not distinguish well between instances within
 
 ### Combine syntactic and description features
 
-Currently, we simply concatenate the syntactic and description features, which is likely not the best way to leverage more information. Ideally, the approach should be robust to the inclusion of weakly informative features, so that performance does not degrade when such features are added.
+Currently, we simply concatenate the syntactic and description features, which may not be the best way to leverage more information. Ideally, the approach should be robust to the inclusion of weakly informative features, so that performance does not degrade when such features are added.
 
 One thing we can try is to use alternative base classifiers, such as XGBoost, which is better suited to handling heterogeneous feature types than our current SVM. Another thing is we can try *late fusion*, in which separate models are trained on syntactic and description features, respectively, and their predictions are combined using a weighted sum, i.e., $\text{pred} = \alpha \cdot \text{synt_model} + (1-\alpha) \cdot \text{desc_model}$, where $\alpha$ can be calibrated via cross-validation. 
+
+### Alternative embedding models and fine-tuning
+
+We can try alternative embedding models. Also, we can fine-tune the embedding model according to our task.
+
+### Experiment with randomly swapping descriptions
+
