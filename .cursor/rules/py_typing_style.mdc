@@ -1,0 +1,4 @@
+---
+alwaysApply: true
+---
+Use Python 3.10+ typing conventions. Prefer built-in generics (list[int], dict[str, int]) and PEP 604 unions (X | None). Do NOT import from typing unless necessary.
