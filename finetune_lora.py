@@ -338,13 +338,9 @@ def build_dataset_regression(
     desc: Dict[str, str],
     solver_names: List[str],
     perf: Dict[str, List[Tuple[int, float]]],
+    timeout: float = 1200.0,
     log1p: bool = True,
 ) -> List[Example]:
-    """
-    Runtime regression:
-    - keep instance if at least one solver solved
-    - target = runtime of fastest solver among solvers that solved
-    """
     data: List[Example] = []
 
     for path, d in desc.items():
@@ -353,27 +349,27 @@ def build_dataset_regression(
 
         results = perf[path]
 
-        solved_times = [
-            t for (s, t) in results
-            if s == 1 and math.isfinite(t) and t > 0
-        ]
-
-        if not solved_times:
+        # Keep only instances where at least one solver solved
+        if not any(s == 1 for s, _ in results):
             continue
 
-        y_val = min(solved_times)  # fastest solving runtime
-
-        if log1p:
-            y_val = math.log1p(y_val)
+        y = []
+        for solved, t in results:
+            if solved == 1 and math.isfinite(t) and t > 0:
+                val = math.log1p(t) if log1p else t
+            else:
+                val = math.log1p(timeout) if log1p else timeout
+            y.append(val)
 
         data.append(
             Example(
                 text=d,
-                y=torch.tensor(y_val, dtype=torch.float),
+                y=torch.tensor(y, dtype=torch.float),
             )
         )
 
     return data
+
 
 
 
@@ -535,7 +531,7 @@ def main():
     parser.add_argument("--solver_test_csv", type=str, required=True,
                         help="Solver CSV for test/inference (two-row header)")
 
-    parser.add_argument("--model", type=str, default="sentence-transformers/all-MiniLM-L12-v2")
+    parser.add_argument("--model", type=str, default="sentence-transformers/all-mpnet-base-v2")
     parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--batch_size", type=int, default=16)
     parser.add_argument("--lr", type=float, default=2e-5)
@@ -600,7 +596,6 @@ def main():
         train_data = build_dataset_regression(
             desc_train, solver_names, train_perf,
             log1p=args.reg_log1p,
-            timeout_fill=args.timeout_fill,
         )
         out_dim = len(solver_names)
 
