@@ -205,6 +205,9 @@ def create_prompt_from_smt_file(
 
     # Create prompt
     prompt = f"""Based on the following SMT-LIB instance and its metadata, provide a concise description of what it encodes. 
+
+Limit the description to 4–6 sentences.
+
 Focus on:
 - Basic information, such as logic/theory, size, source, etc.
 - The main problem structure

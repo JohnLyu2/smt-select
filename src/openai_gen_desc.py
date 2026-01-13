@@ -15,6 +15,7 @@ def openai_gen_desc(
     api_key: str | None = None,
     model: str = "gpt-5-mini",
     reasoning_effort: str | None = None,
+    verbosity: str | None = None,
     char_limit: int = 20000,
     prompt_only: bool = False,
 ):
@@ -28,6 +29,9 @@ def openai_gen_desc(
         reasoning_effort: Reasoning effort level.
                          Options may be model specific. For gpt-5-mini: "minimal", "low", "medium", "high".
                          If None, uses API default for the model.
+        verbosity: Verbosity level for the response. Options: "low", "medium" (default), "high".
+                   Controls the level of detail in the model's response.
+                   If None, uses API default for the model.
         char_limit: Maximum number of characters to include from SMT content (default: 20000).
                    Content exceeding this limit will be truncated.
         prompt_only: If True, only return the prompt string without calling the model (default: False).
@@ -57,6 +61,10 @@ def openai_gen_desc(
         if reasoning_effort is not None:
             api_params["reasoning"] = {"effort": reasoning_effort}
 
+        # Add verbosity if specified (within text object for Responses API)
+        if verbosity is not None:
+            api_params["text"] = {"verbosity": verbosity}
+
         response = client.responses.create(**api_params)
         return response
 
@@ -85,6 +93,9 @@ Examples:
 
   # Specify reasoning effort
   python -m src.generate_desc path/to/instance.smt2 --reasoning-effort minimal
+
+  # Specify verbosity level
+  python -m src.generate_desc path/to/instance.smt2 --verbosity high
 
   # Save full response to JSON file
   python -m src.generate_desc path/to/instance.smt2 --output-json response.json
@@ -117,6 +128,15 @@ Examples:
         "If not specified, uses API default for the model. May not be supported by all models.",
     )
     parser.add_argument(
+        "--verbosity",
+        type=str,
+        default=None,
+        choices=["low", "medium", "high"],
+        help="Verbosity level for the response. Options: low, medium (default), high. "
+        "Controls the level of detail in the model's response. "
+        "If not specified, uses API default for the model.",
+    )
+    parser.add_argument(
         "--output-json",
         type=str,
         default=None,
@@ -143,6 +163,7 @@ Examples:
             api_key=args.api_key,
             model=args.model,
             reasoning_effort=args.reasoning_effort,
+            verbosity=args.verbosity,
             char_limit=args.char_limit,
             prompt_only=args.prompt,
         )
