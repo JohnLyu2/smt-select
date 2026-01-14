@@ -1,4 +1,4 @@
-"""Generate descriptions for SMT instances using GPT-5-mini."""
+"""Generate descriptions for SMT instances using LLM API."""
 
 import argparse
 import json
@@ -13,20 +13,20 @@ from .prompt import create_prompt_from_smt_file
 def openai_gen_desc(
     smt_file_path: str | Path,
     api_key: str | None = None,
-    model: str = "gpt-5-mini",
+    model: str = "openai-gpt-oss-120b",
     base_url: str | None = None,
     reasoning_effort: str | None = None,
     verbosity: str | None = None,
-    char_limit: int = 20000,
+    char_limit: int = 200000,
     prompt_only: bool = False,
 ):
     """
-    Generate a description of an SMT instance using GPT-5-mini.
+    Generate a description of an SMT instance using LLM API.
 
     Args:
         smt_file_path: Path to the SMT file (.smt2)
         api_key: OpenAI API key. If None, uses OPENAI_API_KEY environment variable
-        model: Model name to use (default: "gpt-5-mini")
+        model: Model name to use (default: "openai-gpt-oss-120b")
         base_url: Base URL for the API endpoint. If None, uses OpenAI's default endpoint.
         reasoning_effort: Reasoning effort level.
                          Options may be model specific. For gpt-5-mini: "minimal", "low", "medium", "high".
@@ -80,7 +80,7 @@ def openai_gen_desc(
 def main():
     """Command-line interface for generate_description."""
     parser = argparse.ArgumentParser(
-        description="Generate a description of an SMT instance using GPT-5-mini.",
+        description="Generate a description of an SMT instance using LLM API.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -159,7 +159,7 @@ Examples:
     parser.add_argument(
         "--char-limit",
         type=int,
-        default=20000,
+        default=200000,
         help="Maximum number of characters to include from SMT content (default: 20000). "
         "Content exceeding this limit will be truncated.",
     )

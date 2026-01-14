@@ -16,6 +16,7 @@ Below I list the info about some LLM models we may use.
 | Model | Context Window | Price 
 |-------|----------------|-------
 | gpt-5-mini | 400k | 0.25 
+| gpt-oss-120b | 131k | open 
 | o4-mini | 200k | 1.1 
 | Claude Sonnet 4.5 | 200k+ | 3 
 
