@@ -140,7 +140,8 @@ def get_smt_content_from_file(
     smt_file_path: str | Path, char_limit: int = 20000
 ) -> str:
     """
-    Read SMT file content and return it, optionally truncated to char_limit.
+    Read SMT file content and return it formatted with label and code fences.
+    Content is optionally truncated to char_limit, with truncation notice if needed.
 
     Args:
         smt_file_path: Path to the SMT file (.smt2)
@@ -148,7 +149,8 @@ def get_smt_content_from_file(
                    Content exceeding this limit will be truncated.
 
     Returns:
-        SMT file content as a string (truncated if necessary)
+        Formatted string with "SMT-LIB instance:" label, code fences, and content.
+        If truncated, includes a truncation notice.
     """
     smt_path = Path(smt_file_path)
     if not smt_path.exists():
@@ -167,11 +169,24 @@ def get_smt_content_from_file(
     if not smt_content:
         raise ValueError(f"SMT file is empty: {smt_path}")
 
-    # Truncate if exceeds char_limit
-    if len(smt_content) > char_limit:
-        smt_content = smt_content[:char_limit]
+    original_length = len(smt_content)
+    was_truncated = original_length > char_limit
 
-    return smt_content
+    # Truncate if exceeds char_limit
+    truncation_notice = ""
+    if was_truncated:
+        smt_content = smt_content[:char_limit]
+        truncated_chars = original_length - char_limit
+        # Add ellipsis to indicate truncation
+        smt_content += "\n..."
+        truncation_notice = f"\n[Note: Content truncated. Original size: {original_length:,} characters. Truncated by: {truncated_chars:,} characters ({truncated_chars / original_length * 100:.1f}% removed). Only the first {char_limit:,} characters are shown above.]"
+
+    # Format with label and code fences
+    formatted_content = f"""SMT-LIB instance:
+```
+{smt_content}
+```{truncation_notice}"""
+    return formatted_content
 
 
 def create_prompt_from_smt_file(
@@ -197,7 +212,7 @@ def create_prompt_from_smt_file(
     # Get basic info from JSON
     basic_info_dict, symbol_counts = get_basic_info_from_json(smtlib_path)
 
-    # Get SMT file content
+    # Get SMT file content (includes truncation notice if truncated)
     smt_content = get_smt_content_from_file(smt_file_path, char_limit)
 
     # Build basic info string
@@ -214,10 +229,7 @@ Focus on:
 - Key constraints or properties being checked
 - Any notable characteristics
 
-SMT-LIB instance:
-```
 {smt_content}
-```
 {basic_info_str}
 """
     return prompt
