@@ -19,7 +19,7 @@ def openai_gen_desc(
     verbosity: str | None = None,
     char_limit: int = 200000,
     prompt_only: bool = False,
-):
+) -> tuple[object, bool]:
     """
     Generate a description of an SMT instance using LLM API.
 
@@ -39,14 +39,18 @@ def openai_gen_desc(
         prompt_only: If True, only return the prompt string without calling the model (default: False).
 
     Returns:
-        Response object from OpenAI API, or prompt string if prompt_only=True
+        Tuple of (response_or_prompt, is_truncated).
+        response_or_prompt is a Response object from OpenAI API, or prompt string if
+        prompt_only=True.
     """
     # Create prompt from SMT file
-    prompt = create_prompt_from_smt_file(smt_file_path, char_limit=char_limit)
+    prompt, is_truncated = create_prompt_from_smt_file(
+        smt_file_path, char_limit=char_limit
+    )
 
     # If prompt_only is True, just return the prompt
     if prompt_only:
-        return prompt
+        return prompt, is_truncated
 
     # Initialize OpenAI client
     client_kwargs = {"api_key": api_key}
@@ -71,7 +75,7 @@ def openai_gen_desc(
             api_params["text"] = {"verbosity": verbosity}
 
         response = client.responses.create(**api_params)
-        return response
+        return response, is_truncated
 
     except Exception as e:
         raise Exception(f"Failed to generate description: {e}") from e
@@ -85,28 +89,28 @@ def main():
         epilog="""
 Examples:
   # Basic usage (requires OPENAI_API_KEY environment variable)
-  python -m src.generate_desc path/to/instance.smt2
+  python -m src.desc_gen_llm path/to/instance.smt2
 
   # Just print the prompt without calling the model
-  python -m src.generate_desc path/to/instance.smt2 --prompt
+  python -m src.desc_gen_llm path/to/instance.smt2 --prompt
 
   # Specify API key explicitly
-  python -m src.generate_desc path/to/instance.smt2 --api-key sk-...
+  python -m src.desc_gen_llm path/to/instance.smt2 --api-key sk-...
 
   # Use different model
-  python -m src.generate_desc path/to/instance.smt2 --model gpt-5-mini
+  python -m src.desc_gen_llm path/to/instance.smt2 --model gpt-5-mini
 
   # Use custom API endpoint
-  python -m src.generate_desc path/to/instance.smt2 --base-url https://api.example.com/v1
+  python -m src.desc_gen_llm path/to/instance.smt2 --base-url https://api.example.com/v1
 
   # Specify reasoning effort
-  python -m src.generate_desc path/to/instance.smt2 --reasoning-effort minimal
+  python -m src.desc_gen_llm path/to/instance.smt2 --reasoning-effort minimal
 
   # Specify verbosity level
-  python -m src.generate_desc path/to/instance.smt2 --verbosity high
+  python -m src.desc_gen_llm path/to/instance.smt2 --verbosity high
 
   # Save full response to JSON file
-  python -m src.generate_desc path/to/instance.smt2 --output-json response.json
+  python -m src.desc_gen_llm path/to/instance.smt2 --output-json response.json
         """,
     )
     parser.add_argument(
@@ -172,7 +176,7 @@ Examples:
     args = parser.parse_args()
 
     try:
-        result = openai_gen_desc(
+        result, is_truncated = openai_gen_desc(
             smt_file_path=args.smt_file_path,
             api_key=args.api_key,
             model=args.model,

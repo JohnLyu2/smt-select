@@ -138,9 +138,9 @@ def format_basic_info_text(basic_info: dict, symbol_counts: dict) -> str:
 
 def get_smt_content_from_file(
     smt_file_path: str | Path, char_limit: int = 20000
-) -> str:
+) -> tuple[str, bool]:
     """
-    Read SMT file content and return it formatted with label and code fences.
+    Create the smt content part of the prompt from an SMT file.
     Content is optionally truncated to char_limit, with truncation notice if needed.
 
     Args:
@@ -149,8 +149,8 @@ def get_smt_content_from_file(
                    Content exceeding this limit will be truncated.
 
     Returns:
-        Formatted string with "SMT-LIB instance:" label, code fences, and content.
-        If truncated, includes a truncation notice.
+        Tuple of (formatted_content, was_truncated).
+        formatted_content includes a truncation notice if truncated.
     """
     smt_path = Path(smt_file_path)
     if not smt_path.exists():
@@ -186,12 +186,12 @@ def get_smt_content_from_file(
 ```
 {smt_content}
 ```{truncation_notice}"""
-    return formatted_content
+    return formatted_content, was_truncated
 
 
 def create_prompt_from_smt_file(
     smt_file_path: str | Path, char_limit: int = 20000
-) -> str:
+) -> tuple[str, bool]:
     """
     Read an SMT file and create a prompt for generating a description.
 
@@ -201,7 +201,7 @@ def create_prompt_from_smt_file(
                    Content exceeding this limit will be truncated.
 
     Returns:
-        Prompt string for the LLM
+        Tuple of (prompt, was_truncated)
     """
     # Extract smtlib_path by keeping only the part after "non-incremental/"
     smt_path_str = str(smt_file_path)
@@ -213,7 +213,7 @@ def create_prompt_from_smt_file(
     basic_info_dict, symbol_counts = get_basic_info_from_json(smtlib_path)
 
     # Get SMT file content (includes truncation notice if truncated)
-    smt_content = get_smt_content_from_file(smt_file_path, char_limit)
+    smt_content, was_truncated = get_smt_content_from_file(smt_file_path, char_limit)
 
     # Build basic info string
     basic_info_str = format_basic_info_text(basic_info_dict, symbol_counts)
@@ -232,4 +232,4 @@ Focus on:
 {smt_content}
 {basic_info_str}
 """
-    return prompt
+    return prompt, was_truncated
