@@ -5,8 +5,8 @@ import json
 import logging
 import os
 import sys
-from tqdm import tqdm
 from pathlib import Path
+from tqdm import tqdm
 
 from src.desc_gen_llm import openai_gen_desc
 
@@ -89,6 +89,21 @@ def load_benchmarks(input_json: Path) -> list[dict]:
     return data
 
 
+def load_existing_results(output_json: Path) -> list[dict]:
+    if not output_json.exists():
+        return []
+    with open(output_json, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    if not isinstance(data, list):
+        raise ValueError(f"Expected a list in {output_json}, got {type(data).__name__}")
+    return data
+
+
+def write_results(output_json: Path, results: list[dict]) -> None:
+    with open(output_json, "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2, ensure_ascii=False)
+
+
 def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     logger = logging.getLogger(__name__)
@@ -102,25 +117,42 @@ def main() -> int:
     benchmarks = load_benchmarks(input_json)
     if args.limit is not None:
         benchmarks = benchmarks[: args.limit]
-    results: list[dict] = []
-    total = len(benchmarks)
+    results = load_existing_results(output_json)
+    existing_paths = {
+        item.get("smtlib_path")
+        for item in results
+        if isinstance(item, dict) and item.get("smtlib_path")
+    }
+    pending = [
+        bench for bench in benchmarks if bench.get("smtlib_path") not in existing_paths
+    ]
+    if existing_paths:
+        logger.info("Skipping %s already completed", len(existing_paths))
+    total = len(pending)
 
-    iterable = tqdm(benchmarks, total=total, desc="Generating", unit="bench")
+    iterable = tqdm(pending, total=total, desc="Generating", unit="bench")
 
     for idx, benchmark in enumerate(iterable, start=1):
         smtlib_path = benchmark.get("smtlib_path")
         if not smtlib_path:
-            raise ValueError(f"Missing smtlib_path in benchmark: {benchmark}")
+            logger.error("Missing smtlib_path in benchmark: %s", benchmark)
+            continue
         smt_file_path = base_dir / smtlib_path
 
-        result, is_truncated = openai_gen_desc(
-            smt_file_path=smt_file_path,
-            api_key=args.api_key,
-            model=args.model,
-            base_url=args.base_url,
-            char_limit=args.char_limit,
-            prompt_only=False,
-        )
+        try:
+            result, is_truncated = openai_gen_desc(
+                smt_file_path=smt_file_path,
+                api_key=args.api_key,
+                model=args.model,
+                base_url=args.base_url,
+                char_limit=args.char_limit,
+                prompt_only=False,
+            )
+        except Exception as exc:
+            logger.error("Failed at %s: %s", smtlib_path, exc)
+            write_results(output_json, results)
+            return 1
+
         description = result.output_text
         results.append(
             {
@@ -129,9 +161,9 @@ def main() -> int:
                 "is_truncated": is_truncated,
             }
         )
+        write_results(output_json, results)
 
-    with open(output_json, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, ensure_ascii=False)
+    write_results(output_json, results)
     return 0
 
 
