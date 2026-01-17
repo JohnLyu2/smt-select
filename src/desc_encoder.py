@@ -217,7 +217,6 @@ def encode_all_desc(
             truncated_count += 1
             truncated_tokens += token_count - max_seq_length
 
-    # Calculate statistics
     total_descriptions = len(descriptions)
     truncation_percentage = (
         (truncated_count / total_descriptions * 100) if total_descriptions > 0 else 0
@@ -228,6 +227,9 @@ def encode_all_desc(
     avg_token_length = (
         total_tokens / total_descriptions if total_descriptions > 0 else 0
     )
+    min_token_length = min(token_lengths) if token_lengths else 0
+    max_token_length = max(token_lengths) if token_lengths else 0
+    quantiles = np.quantile(token_lengths, [0.25, 0.5, 0.75]) if token_lengths else []
 
     # Print truncation statistics if requested
     if show_trunc_stats:
@@ -237,6 +239,15 @@ def encode_all_desc(
         print(
             f"    Truncated descriptions: {truncated_count} ({truncation_percentage:.2f}%)"
         )
+        print(
+            f"    Token length min/median/max: {min_token_length}/"
+            f"{(quantiles[1] if len(quantiles) > 1 else 0):.1f}/{max_token_length}"
+        )
+        if len(quantiles) > 0:
+            print(
+                f"    Token length quantiles (25/50/75%): "
+                f"{quantiles[0]:.1f}/{quantiles[1]:.1f}/{quantiles[2]:.1f}"
+            )
         print(f"    Average token length: {avg_token_length:.1f} tokens")
         if truncated_count > 0:
             print(
