@@ -2,11 +2,10 @@ import argparse
 import json
 from pathlib import Path
 
-from setfit import SetFitModel
+from datasets import Dataset
+from setfit import SetFitModel, Trainer, TrainingArguments
 
 from .parser import parse_performance_csv
-
-model = SetFitModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
 
 
 def create_setfit_data(
@@ -35,6 +34,9 @@ def create_setfit_data(
         description = desc_map.get(path)
         if not description or not description.strip():
             raise AssertionError(f"Missing description for benchmark: {path}")
+
+        if multi_perf_data.is_none_solved(path):
+            continue
 
         solver_name = multi_perf_data.get_best_solver_for_instance(path)
         if solver_name is None:
@@ -69,6 +71,50 @@ def _load_description_map(desc_json_path: str) -> dict[str, str]:
     return desc_map
 
 
+def train_setfit_model(
+    train_data: dict[str, list],
+    test_data: dict[str, list] | None = None,
+    model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+    output_dir: str | None = None,
+    num_epochs: int = 1,
+    batch_size: int = 16,
+) -> SetFitModel:
+    if "texts" not in train_data or "labels" not in train_data:
+        raise ValueError("Expected train_data to include 'texts' and 'labels' keys.")
+
+    texts = train_data["texts"]
+    labels = train_data["labels"]
+    if len(texts) != len(labels):
+        raise ValueError("texts and labels must be the same length.")
+
+    train_dataset = Dataset.from_dict({"text": texts, "label": labels})
+    eval_dataset = None
+    if test_data is not None:
+        test_texts = test_data.get("texts", [])
+        test_labels = test_data.get("labels", [])
+        if len(test_texts) != len(test_labels):
+            raise ValueError("test texts and labels must be the same length.")
+        eval_dataset = Dataset.from_dict({"text": test_texts, "label": test_labels})
+
+    model = SetFitModel.from_pretrained(model_name)
+    training_args = TrainingArguments(
+        batch_size=batch_size,
+        num_epochs=num_epochs,
+    )
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+    )
+    trainer.train()
+
+    if output_dir:
+        model.save_pretrained(output_dir)
+
+    return model
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Create SetFit data from performance CSV and descriptions JSON."
@@ -90,6 +136,33 @@ def main() -> None:
         default=None,
         help="Optional path to write SetFit data as JSON.",
     )
+    parser.add_argument(
+        "--model-name",
+        default="sentence-transformers/all-MiniLM-L6-v2",
+        help="Base model name for SetFit training.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional directory to save the trained SetFit model.",
+    )
+    parser.add_argument(
+        "--test-perf-csv",
+        default=None,
+        help="Optional performance CSV for test data.",
+    )
+    parser.add_argument(
+        "--num-epochs",
+        default=1,
+        type=int,
+        help="Number of SetFit training epochs.",
+    )
+    parser.add_argument(
+        "--batch-size",
+        default=16,
+        type=int,
+        help="SetFit training batch size.",
+    )
 
     args = parser.parse_args()
 
@@ -102,6 +175,19 @@ def main() -> None:
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         print(f"Wrote SetFit data to: {output_path}")
+
+    test_data = None
+    if args.test_perf_csv:
+        test_data = create_setfit_data(args.test_perf_csv, args.desc_json, args.timeout)
+
+    train_setfit_model(
+        train_data=data,
+        test_data=test_data,
+        model_name=args.model_name,
+        output_dir=args.output_dir,
+        num_epochs=args.num_epochs,
+        batch_size=args.batch_size,
+    )
 
 
 if __name__ == "__main__":
