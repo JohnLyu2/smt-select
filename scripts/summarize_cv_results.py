@@ -91,6 +91,7 @@ def generate_summary_csv(
     results_dir: Path,
     output_csv: Path,
     precision: int = 4,
+    show_train: bool = False,
 ):
     """
     Generate CSV summary of CV results.
@@ -99,6 +100,7 @@ def generate_summary_csv(
         results_dir: Base directory containing CV results
         output_csv: Path to output CSV file
         precision: Number of decimal places for formatting
+        show_train: Include train statistics if True
     """
     # Discover methods and logics
     method_to_logics, all_logics = discover_methods_and_logics(results_dir)
@@ -125,18 +127,19 @@ def generate_summary_csv(
             try:
                 summary = load_summary_json(summary_path)
 
-                # Extract train metrics
-                train_metrics = extract_gap_cls_par2(summary, "train")
-                if train_metrics:
-                    mean, std = train_metrics
-                    # Multiply by 100 to show as percentage
-                    mean *= 100
-                    std *= 100
-                    data[logic][f"{method_name}_train"] = format_mean_std(
-                        mean, std, precision=1
-                    )
-                else:
-                    data[logic][f"{method_name}_train"] = "N/A"
+                if show_train:
+                    # Extract train metrics
+                    train_metrics = extract_gap_cls_par2(summary, "train")
+                    if train_metrics:
+                        mean, std = train_metrics
+                        # Multiply by 100 to show as percentage
+                        mean *= 100
+                        std *= 100
+                        data[logic][f"{method_name}_train"] = format_mean_std(
+                            mean, std, precision=1
+                        )
+                    else:
+                        data[logic][f"{method_name}_train"] = "N/A"
 
                 # Extract test metrics
                 test_metrics = extract_gap_cls_par2(summary, "test")
@@ -153,13 +156,15 @@ def generate_summary_csv(
 
             except Exception as e:
                 print(f"Error processing {method_name}/{logic}: {e}")
-                data[logic][f"{method_name}_train"] = "ERROR"
+                if show_train:
+                    data[logic][f"{method_name}_train"] = "ERROR"
                 data[logic][f"{method_name}_test"] = "ERROR"
 
-    # Build column names: all methods with _train and _test suffixes
+    # Build column names: all methods with _test suffixes, optional _train
     columns = ["logic"]
     for method_name in sorted(method_to_logics.keys()):
-        columns.append(f"{method_name}_train")
+        if show_train:
+            columns.append(f"{method_name}_train")
         columns.append(f"{method_name}_test")
 
     # Write CSV
@@ -171,7 +176,8 @@ def generate_summary_csv(
         for logic in all_logics:
             row = [logic]
             for method_name in sorted(method_to_logics.keys()):
-                row.append(data[logic].get(f"{method_name}_train", "N/A"))
+                if show_train:
+                    row.append(data[logic].get(f"{method_name}_train", "N/A"))
                 row.append(data[logic].get(f"{method_name}_test", "N/A"))
             writer.writerow(row)
 
@@ -200,13 +206,18 @@ def main():
         default=4,
         help="Number of decimal places for formatting (default: 4)",
     )
+    parser.add_argument(
+        "--show-train",
+        action="store_true",
+        help="Include train statistics in the output CSV",
+    )
 
     args = parser.parse_args()
 
     results_dir = Path(args.results_dir)
     output_csv = Path(args.output)
 
-    generate_summary_csv(results_dir, output_csv, args.precision)
+    generate_summary_csv(results_dir, output_csv, args.precision, args.show_train)
 
 
 if __name__ == "__main__":
