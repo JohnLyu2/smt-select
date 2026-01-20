@@ -5,8 +5,12 @@ and save them to data/features/native_desc/all_mpnet_base_v2/{LOGIC}.csv
 """
 
 import argparse
+import os
 import sys
 from pathlib import Path
+
+# Avoid tokenizers fork warnings by disabling parallelism.
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 # Add src to path to import desc_encoder
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -29,6 +33,12 @@ def main():
         "--trunc-stats",
         action="store_true",
         help="Show truncation statistics",
+    )
+    parser.add_argument(
+        "--model-name",
+        type=str,
+        default="sentence-transformers/all-mpnet-base-v2",
+        help="Sentence-transformer model name to use",
     )
 
     args = parser.parse_args()
@@ -76,7 +86,7 @@ def main():
             csv_path = encode_all_desc(
                 json_path=str(json_file),
                 output_csv_path=str(output_csv) if output_csv else None,
-                model_name="sentence-transformers/all-mpnet-base-v2",
+                model_name=args.model_name,
                 normalize=False,
                 batch_size=8,
                 show_progress=True,
