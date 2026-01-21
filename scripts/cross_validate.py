@@ -170,6 +170,7 @@ def cross_validate(
     output_dir: Path = None,
     timeout: float = 1200.0,
     svm_c: float = 1.0,
+    random_seed: int = 42,
 ):
     """
     Perform k-fold cross-validation on algorithm selection model using pre-split fold files.
@@ -294,6 +295,7 @@ def cross_validate(
             xg_flag=xg_flag,
             feature_csv_path=feature_csv_path,
             svm_c=svm_c,
+            random_seed=random_seed,
         )
 
         # Load trained model
@@ -551,6 +553,12 @@ def main():
         default=1.0,
         help="Regularization parameter C for SVM (default: 1.0)",
     )
+    parser.add_argument(
+        "--random-seed",
+        type=int,
+        default=42,
+        help="Random seed for solver selection tie-breaking (default: 42)",
+    )
 
     args = parser.parse_args()
 
@@ -579,6 +587,7 @@ def main():
         output_dir=output_dir,
         timeout=args.timeout,
         svm_c=args.svm_c,
+        random_seed=args.random_seed,
     )
 
     # Print aggregated results

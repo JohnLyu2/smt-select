@@ -12,6 +12,7 @@ from sklearn.preprocessing import StandardScaler
 
 from .parser import parse_performance_csv
 from .feature import extract_feature_from_csv, extract_feature_from_csvs_concat
+from .solver_selector import SolverSelector
 
 PERF_DIFF_THRESHOLD = 1e-1  # Threshold for considering performance differences
 
@@ -72,12 +73,15 @@ class PairwiseSVM(SVC):
         return super().decision_function(x)
 
 
-class PwcSelector:
-    def __init__(self, model_matrix, xg_flag, feature_csv_path=None):
+class PwcSelector(SolverSelector):
+    def __init__(
+        self, model_matrix, xg_flag, feature_csv_path=None, random_seed: int = 42
+    ):
         self.model_type = "XG" if xg_flag else "SVM"
         self.model_matrix = model_matrix
         self.solver_size = model_matrix.shape[0]
         self.feature_csv_path = feature_csv_path
+        self.random_seed = random_seed
 
     def save(self, save_dir):
         Path(save_dir).mkdir(parents=True, exist_ok=True)
@@ -109,10 +113,11 @@ class PwcSelector:
         )[::-1]
         return sorted_indices
 
-    def algorithm_select(self, instance_path, random_seed=42):
+    def algorithm_select(self, instance_path):
         """
         input instance path, output solver id
         """
+        random_seed = self.random_seed
         feature_csv_path = self.feature_csv_path
         if feature_csv_path is None:
             raise ValueError(
@@ -134,6 +139,7 @@ def train_pwc(
     xg_flag=False,
     feature_csv_path=None,
     svm_c: float = 1.0,
+    random_seed: int = 42,
 ):
     Path(save_dir).mkdir(parents=True, exist_ok=True)
     solver_size = multi_perf_data.num_solvers()
@@ -158,7 +164,12 @@ def train_pwc(
                     model = PairwiseXGBoost()
                 model.fit(inputs_array, labels_array, costs_array)
             model_matrix[i, j] = model
-    pwc_model = PwcSelector(model_matrix, xg_flag, feature_csv_path)
+    pwc_model = PwcSelector(
+        model_matrix,
+        xg_flag,
+        feature_csv_path,
+        random_seed=random_seed,
+    )
     pwc_model.save(save_dir)
 
 
@@ -192,6 +203,12 @@ def main():
         default=1.0,
         help="Regularization parameter C for SVM (default: 1.0)",
     )
+    parser.add_argument(
+        "--random-seed",
+        type=int,
+        default=42,
+        help="Random seed for solver selection tie-breaking (default: 42)",
+    )
 
     args = parser.parse_args()
     logging.basicConfig(
@@ -207,7 +224,14 @@ def main():
         f"Training performance parse: {len(train_dataset)} benchmarks and {train_dataset.num_solvers()} solvers from {args.perf_csv}"
     )
 
-    train_pwc(train_dataset, save_dir, xg_flag, args.feature_csv, svm_c=args.svm_c)
+    train_pwc(
+        train_dataset,
+        save_dir,
+        xg_flag,
+        args.feature_csv,
+        svm_c=args.svm_c,
+        random_seed=args.random_seed,
+    )
 
 
 if __name__ == "__main__":
