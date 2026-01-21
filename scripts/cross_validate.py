@@ -599,14 +599,20 @@ def main():
     logging.info(
         f"    Average PAR-2: {agg['train_avg_par2_mean']:.2f} ± {agg['train_avg_par2_std']:.2f}"
     )
-    logging.info("  SBS (Single Best Solver, for comparison):")
+    logging.info(
+        f"    Gap closed (solved): {agg['train_gap_cls_solved_mean']:.4f} ± {agg['train_gap_cls_solved_std']:.4f}"
+    )
+    logging.info(
+        f"    Gap closed (PAR-2): {agg['train_gap_cls_par2_mean']:.4f} ± {agg['train_gap_cls_par2_std']:.4f}"
+    )
+    logging.info("  SBS:")
     logging.info(
         f"    Solve rate: {agg['train_sbs_solve_rate_mean']:.2f}% ± {agg['train_sbs_solve_rate_std']:.2f}%"
     )
     logging.info(
         f"    Average PAR-2: {agg['train_sbs_avg_par2_mean']:.2f} ± {agg['train_sbs_avg_par2_std']:.2f}"
     )
-    logging.info("  VBS (Virtual Best Solver, upper bound):")
+    logging.info("  VBS:")
     logging.info(
         f"    Solve rate: {agg['train_vbs_solve_rate_mean']:.2f}% ± {agg['train_vbs_solve_rate_std']:.2f}%"
     )
@@ -622,14 +628,20 @@ def main():
     logging.info(
         f"    Average PAR-2: {agg['test_avg_par2_mean']:.2f} ± {agg['test_avg_par2_std']:.2f}"
     )
-    logging.info("  SBS (Single Best Solver, for comparison):")
+    logging.info(
+        f"    Gap closed (solved): {agg['test_gap_cls_solved_mean']:.4f} ± {agg['test_gap_cls_solved_std']:.4f}"
+    )
+    logging.info(
+        f"    Gap closed (PAR-2): {agg['test_gap_cls_par2_mean']:.4f} ± {agg['test_gap_cls_par2_std']:.4f}"
+    )
+    logging.info("  SBS:")
     logging.info(
         f"    Solve rate: {agg['test_sbs_solve_rate_mean']:.2f}% ± {agg['test_sbs_solve_rate_std']:.2f}%"
     )
     logging.info(
         f"    Average PAR-2: {agg['test_sbs_avg_par2_mean']:.2f} ± {agg['test_sbs_avg_par2_std']:.2f}"
     )
-    logging.info("  VBS (Virtual Best Solver, upper bound):")
+    logging.info("  VBS:")
     logging.info(
         f"    Solve rate: {agg['test_vbs_solve_rate_mean']:.2f}% ± {agg['test_vbs_solve_rate_std']:.2f}%"
     )
