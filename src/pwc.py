@@ -111,7 +111,7 @@ class PwcModel:
 
     def algorithm_select(self, instance_path, random_seed=42):
         """
-        input instance path, output list of tool-config ids; for cross validation
+        input instance path, output solver id
         """
         feature_csv_path = self.feature_csv_path
         if feature_csv_path is None:
