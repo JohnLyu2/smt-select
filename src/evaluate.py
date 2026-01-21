@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .performance import SingleSolverDataset
 from .parser import parse_performance_csv
-from .pwc import PwcModel, PairwiseSVM
+from .pwc import PwcSelector, PairwiseSVM
 
 
 def as_evaluate(as_model, multi_perf_data, write_csv_path=None):
@@ -105,7 +105,7 @@ def main():
 
     # Load model
     logging.info(f"Loading model from {args.model}")
-    as_model = PwcModel.load(args.model)
+    as_model = PwcSelector.load(args.model)
     logging.info(
         f"Loaded {as_model.model_type} model with {as_model.solver_size} solvers"
     )

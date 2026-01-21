@@ -72,7 +72,7 @@ class PairwiseSVM(SVC):
         return super().decision_function(x)
 
 
-class PwcModel:
+class PwcSelector:
     def __init__(self, model_matrix, xg_flag, feature_csv_path=None):
         self.model_type = "XG" if xg_flag else "SVM"
         self.model_matrix = model_matrix
@@ -116,7 +116,7 @@ class PwcModel:
         feature_csv_path = self.feature_csv_path
         if feature_csv_path is None:
             raise ValueError(
-                "feature_csv_path not set in PwcModel. "
+                "feature_csv_path not set in PwcSelector. "
                 "It must be provided during model creation or loading."
             )
         # Handle both single CSV path (str) and multiple CSV paths (list)
@@ -158,7 +158,7 @@ def train_pwc(
                     model = PairwiseXGBoost()
                 model.fit(inputs_array, labels_array, costs_array)
             model_matrix[i, j] = model
-    pwc_model = PwcModel(model_matrix, xg_flag, feature_csv_path)
+    pwc_model = PwcSelector(model_matrix, xg_flag, feature_csv_path)
     pwc_model.save(save_dir)
 
 

@@ -18,7 +18,7 @@ import numpy as np
 
 from src.performance import MultiSolverDataset
 from src.parser import parse_performance_csv
-from src.pwc import train_pwc, PwcModel
+from src.pwc import train_pwc, PwcSelector
 from src.evaluate import as_evaluate
 from src.feature import validate_feature_coverage
 
@@ -298,7 +298,7 @@ def cross_validate(
 
         # Load trained model
         model_path = model_save_dir / "model.joblib"
-        as_model = PwcModel.load(str(model_path))
+        as_model = PwcSelector.load(str(model_path))
 
         # Set feature CSV path if not already set
         if as_model.feature_csv_path is None:
