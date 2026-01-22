@@ -1,7 +1,11 @@
 import argparse
 import json
 import logging
+import os
 from pathlib import Path
+
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+
 
 from datasets import Dataset
 from setfit import SetFitModel, Trainer, TrainingArguments
