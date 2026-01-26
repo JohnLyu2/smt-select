@@ -11,6 +11,8 @@ For `all-MiniLM-L6-v2` (max token length: 256), 97.6% of descriptions are trunca
 
 ## Algorithm Selection Results: LLM-generated Descriptions + Pretrained Embedding Models
 
+SBS-VBS gap closed (%):
+
 |  | Train | Test |
 | --- | --- | --- |
 | synt | 95.3 | 32.0 |
