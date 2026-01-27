@@ -40,12 +40,12 @@ def find_benchmarks(
     output_file: Optional[str] = None,
 ) -> List[Dict]:
     """
-    Find non-incremental benchmarks for a logic in a specific evaluation.
+    Find non-incremental benchmarks for a logic.
 
     Args:
         db_path: Path to SQLite database
         logic: Logic string to filter by
-        evaluation_id: Specific evaluation ID to filter by (required)
+        evaluation_id: Optional specific evaluation ID to filter by
         output_file: Optional CSV file to write results to
 
     Returns:
@@ -55,48 +55,82 @@ def find_benchmarks(
     conn.row_factory = sqlite3.Row  # Enable column access by name
     cursor = conn.cursor()
 
-    if evaluation_id is None:
-        raise ValueError("evaluation_id is required")
-
-    # Build the query - filter by evaluation_id
-    query = """
-        SELECT DISTINCT
-            b.id AS benchmark_id,
-            b.name AS benchmark_name,
-            b.logic,
-            b.category,
-            b.size,
-            b.queryCount,
-            b.description,
-            q.id AS query_id,
-            q.idx AS query_index,
-            ev.id AS evaluation_id,
-            ev.name AS evaluation_name,
-            ev.date AS evaluation_date,
-            f.id AS family_id,
-            f.name AS family_name,
-            f.folderName AS family_folderName,
-            q.assertsCount,
-            q.declareFunCount,
-            q.declareConstCount,
-            q.declareSortCount,
-            q.defineFunCount,
-            q.defineFunRecCount,
-            q.constantFunCount,
-            q.defineSortCount,
-            q.declareDatatypeCount,
-            q.maxTermDepth
-        FROM Benchmarks b
-        INNER JOIN Queries q ON b.id = q.benchmark
-        INNER JOIN Ratings r ON q.id = r.query
-        INNER JOIN Evaluations ev ON r.evaluation = ev.id
-        LEFT JOIN Families f ON b.family = f.id
-        WHERE b.isIncremental = 0
-          AND b.logic = ?
-          AND ev.id = ?
-    """
-
-    params = [logic, evaluation_id]
+    # Build the query
+    if evaluation_id is not None:
+        # Filter by evaluation_id - this ensures we only get benchmarks that were actually evaluated
+        query = """
+            SELECT DISTINCT
+                b.id AS benchmark_id,
+                b.name AS benchmark_name,
+                b.logic,
+                b.category,
+                b.size,
+                b.queryCount,
+                b.description,
+                q.id AS query_id,
+                q.idx AS query_index,
+                ev.id AS evaluation_id,
+                ev.name AS evaluation_name,
+                ev.date AS evaluation_date,
+                f.id AS family_id,
+                f.name AS family_name,
+                f.folderName AS family_folderName,
+                q.assertsCount,
+                q.declareFunCount,
+                q.declareConstCount,
+                q.declareSortCount,
+                q.defineFunCount,
+                q.defineFunRecCount,
+                q.constantFunCount,
+                q.defineSortCount,
+                q.declareDatatypeCount,
+                q.maxTermDepth
+            FROM Benchmarks b
+            INNER JOIN Queries q ON b.id = q.benchmark
+            INNER JOIN Ratings r ON q.id = r.query
+            INNER JOIN Evaluations ev ON r.evaluation = ev.id
+            LEFT JOIN Families f ON b.family = f.id
+            WHERE b.isIncremental = 0
+              AND b.logic = ?
+              AND ev.id = ?
+        """
+        params = [logic, evaluation_id]
+    else:
+        # No evaluation filter - get all benchmarks for the logic in the database
+        query = """
+            SELECT DISTINCT
+                b.id AS benchmark_id,
+                b.name AS benchmark_name,
+                b.logic,
+                b.category,
+                b.size,
+                b.queryCount,
+                b.description,
+                q.id AS query_id,
+                q.idx AS query_index,
+                NULL AS evaluation_id,
+                NULL AS evaluation_name,
+                NULL AS evaluation_date,
+                f.id AS family_id,
+                f.name AS family_name,
+                f.folderName AS family_folderName,
+                q.assertsCount,
+                q.declareFunCount,
+                q.declareConstCount,
+                q.declareSortCount,
+                q.defineFunCount,
+                q.defineFunRecCount,
+                q.constantFunCount,
+                q.defineSortCount,
+                q.declareDatatypeCount,
+                q.maxTermDepth
+            FROM Benchmarks b
+            INNER JOIN Queries q ON b.id = q.benchmark
+            LEFT JOIN Families f ON b.family = f.id
+            WHERE b.isIncremental = 0
+              AND b.logic = ?
+        """
+        params = [logic]
 
     query += " ORDER BY b.id, q.idx"
 
@@ -159,7 +193,7 @@ def print_results(
     benchmarks: List[Dict],
     db_path: str,
     logic: str,
-    evaluation_id: int,
+    evaluation_id: Optional[int] = None,
 ):
     """Print summary to console."""
     if not benchmarks:
@@ -169,22 +203,40 @@ def print_results(
     unique_benchmark_count = len(set(b["benchmark_id"] for b in benchmarks))
     total_query_count = len(benchmarks)
 
-    # Get number of unique benchmarks in the evaluation for this logic
+    # Get total count of non-incremental benchmarks in database for this logic
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute(
-        """
-        SELECT COUNT(DISTINCT b.id)
-        FROM Benchmarks b
-        INNER JOIN Queries q ON b.id = q.benchmark
-        INNER JOIN Ratings r ON q.id = r.query
-        WHERE b.logic = ?
-          AND b.isIncremental = 0
-          AND r.evaluation = ?
-        """,
-        (logic, evaluation_id),
-    )
-    evaluation_benchmark_count = cursor.fetchone()[0]
+    
+    if evaluation_id is not None:
+        # Get number of unique benchmarks in the evaluation for this logic
+        cursor.execute(
+            """
+            SELECT COUNT(DISTINCT b.id)
+            FROM Benchmarks b
+            INNER JOIN Queries q ON b.id = q.benchmark
+            INNER JOIN Ratings r ON q.id = r.query
+            WHERE b.logic = ?
+              AND b.isIncremental = 0
+              AND r.evaluation = ?
+            """,
+            (logic, evaluation_id),
+        )
+        context_benchmark_count = cursor.fetchone()[0]
+        context_name = "evaluation"
+    else:
+        # Get total number of unique non-incremental benchmarks in the database for this logic
+        cursor.execute(
+            """
+            SELECT COUNT(DISTINCT id)
+            FROM Benchmarks
+            WHERE logic = ?
+              AND isIncremental = 0
+            """,
+            (logic,),
+        )
+        context_benchmark_count = cursor.fetchone()[0]
+        context_name = "database"
+    
     conn.close()
 
     # Get unique families
@@ -207,7 +259,7 @@ def print_results(
     print(
         f"  Found {unique_benchmark_count} unique benchmark(s) ({total_query_count} total queries)"
     )
-    print(f"  Out of {evaluation_benchmark_count} benchmark(s) in evaluation")
+    print(f"  Out of {context_benchmark_count} benchmark(s) in {context_name}")
     print(f"  Across {len(unique_families)} families")
     print(f"  With description: {len(unique_benchmarks_with_desc)} benchmark(s)")
     print(f"  Without description: {len(unique_benchmarks_without_desc)} benchmark(s)")
@@ -326,6 +378,11 @@ def main():
         action="store_true",
         help="Explicitly use the most recent evaluation (this is the default behavior if --evaluation is not specified)",
     )
+    parser.add_argument(
+        "--all-benchmarks",
+        action="store_true",
+        help="Find benchmarks across all evaluations/database (overrides --evaluation)",
+    )
     parser.add_argument("--output", "-o", help="Optional: Output JSON file path")
     parser.add_argument(
         "--list-logics",
@@ -353,52 +410,62 @@ def main():
             "--logic is required (unless using --list-logics or --list-evaluations)"
         )
 
-    # Determine evaluation ID - default to latest if not specified
-    evaluation_id = args.evaluation
-    if evaluation_id is None or args.latest_evaluation:
-        evaluation_id = get_latest_evaluation_id(args.db)
-        if evaluation_id is None:
-            parser.error("No evaluations found in database")
-        if args.latest_evaluation or args.evaluation is None:
-            print(f"Using most recent evaluation (ID: {evaluation_id})")
+    # Determine evaluation ID
+    evaluation_id = None
+    if not args.all_benchmarks:
+        evaluation_id = args.evaluation
+        if evaluation_id is None or args.latest_evaluation:
+            evaluation_id = get_latest_evaluation_id(args.db)
+            if evaluation_id is None:
+                parser.error("No evaluations found in database")
+            if args.latest_evaluation or args.evaluation is None:
+                print(f"Using most recent evaluation (ID: {evaluation_id})")
 
-    # Get evaluation name for display
-    conn = sqlite3.connect(args.db)
-    cursor = conn.cursor()
-    cursor.execute("SELECT name, date FROM Evaluations WHERE id = ?", (evaluation_id,))
-    eval_info = cursor.fetchone()
-    eval_name = eval_info[0] if eval_info else f"ID {evaluation_id}"
-    eval_date = eval_info[1] if eval_info and eval_info[1] else "N/A"
-
-    # Get total count of non-incremental benchmarks for this logic
-    cursor.execute(
-        "SELECT COUNT(*) FROM Benchmarks WHERE logic = ? AND isIncremental = 0",
-        (args.logic,),
-    )
-    total_benchmark_count = cursor.fetchone()[0]
-
-    # Get number of unique benchmarks in the evaluation for this logic
-    cursor.execute(
-        """
-        SELECT COUNT(DISTINCT b.id)
-        FROM Benchmarks b
-        INNER JOIN Queries q ON b.id = q.benchmark
-        INNER JOIN Ratings r ON q.id = r.query
-        WHERE b.logic = ?
-          AND b.isIncremental = 0
-          AND r.evaluation = ?
-        """,
-        (args.logic, evaluation_id),
-    )
-    evaluation_benchmark_count = cursor.fetchone()[0]
-    conn.close()
+    # Get evaluation info for display
+    eval_name = "All Benchmarks"
+    eval_date = "N/A"
+    if evaluation_id is not None:
+        conn = sqlite3.connect(args.db)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name, date FROM Evaluations WHERE id = ?", (evaluation_id,))
+        eval_info = cursor.fetchone()
+        eval_name = eval_info[0] if eval_info else f"ID {evaluation_id}"
+        eval_date = eval_info[1] if eval_info and eval_info[1] else "N/A"
+        
+        # Get number of unique benchmarks in the evaluation for this logic
+        cursor.execute(
+            """
+            SELECT COUNT(DISTINCT b.id)
+            FROM Benchmarks b
+            INNER JOIN Queries q ON b.id = q.benchmark
+            INNER JOIN Ratings r ON q.id = r.query
+            WHERE b.logic = ?
+              AND b.isIncremental = 0
+              AND r.evaluation = ?
+            """,
+            (args.logic, evaluation_id),
+        )
+        context_benchmark_count = cursor.fetchone()[0]
+        conn.close()
+    else:
+        # Get total count of non-incremental benchmarks for this logic
+        conn = sqlite3.connect(args.db)
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT COUNT(*) FROM Benchmarks WHERE logic = ? AND isIncremental = 0",
+            (args.logic,),
+        )
+        context_benchmark_count = cursor.fetchone()[0]
+        conn.close()
 
     print("Searching for non-incremental benchmarks:")
     print(f"  Logic: {args.logic}")
-    print(
-        f"  Evaluation benchmark size: {evaluation_benchmark_count} (from {total_benchmark_count} SMT-LIB benchmarks)"
-    )
-    print(f"  Evaluation: {eval_name} (ID: {evaluation_id}, Date: {eval_date})")
+    if evaluation_id is not None:
+        print(f"  Evaluation benchmark size: {context_benchmark_count}")
+        print(f"  Evaluation: {eval_name} (ID: {evaluation_id}, Date: {eval_date})")
+    else:
+        print(f"  Total database benchmarks for logic: {context_benchmark_count}")
+        print(f"  Scope: {eval_name}")
     print()
 
     try:
