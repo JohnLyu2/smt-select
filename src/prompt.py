@@ -223,9 +223,8 @@ def create_prompt_from_smt_file(
 
 ### Instructions
 1. Understand the instance by reading the SMT-LIB file content and its metadata. Also consider the function/constant/variable names and comments/annotations to infer the problem being encoded.
-2. Write a 2-3 sentence description (max 200 words) of what this instance encodes.
-3. Focus on the main problem type (e.g., verification, synthesis, scheduling, etc.), key constraints or properties being checked (e.g., overflow,fixpoint property, invariant, etc.), and any notable characteristics that may affect the solving difficulty (e.g., large number of variables, deep term depth, many quantifier alternations, etc.).
-4. Do NOT include administrative information such as the author/curator/translator names or specific paper titles.
+2. Focus on the main problem type (e.g., verification, synthesis, scheduling, etc.), source, key constraints or properties being checked (e.g., overflow,fixpoint property, invariant, etc.), and any notable characteristics that may affect the solving difficulty (e.g., large number of variables, deep term depth, many quantifier alternations, etc.).
+3. Write a 2-3 sentence high-level description (max 200 words) of the instance, with no need to mention specific function/constant/variable names.
 
 {smt_content}
 {basic_info_str}
