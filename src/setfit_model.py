@@ -60,9 +60,16 @@ def create_setfit_data(
             continue
 
         if multi_label:
-            label = multi_perf_data.get_solvers_solving_instance(path)
-            if not label:
+            solver_names = multi_perf_data.get_solvers_solving_instance(path)
+            if not solver_names:
                 continue
+            # Multi-hot encoding using BV_SOLVER2ID
+            label = [0] * len(BV_SOLVER2ID)
+            for name in solver_names:
+                if name in BV_SOLVER2ID:
+                    label[BV_SOLVER2ID[name]] = 1
+                else:
+                    logging.warning(f"Solver {name} not found in BV_SOLVER2ID mapping")
         else:
             solver_name = multi_perf_data.get_best_solver_for_instance(path)
             if solver_name is None:
@@ -286,10 +293,7 @@ def main() -> None:
     )
     logging.info("Total samples: %s", len(train_data["texts"]))
     if args.multi_label:
-        all_labels = set()
-        for label_list in train_data["labels"]:
-            all_labels.update(label_list)
-        logging.info("Unique labels: %s", len(all_labels))
+        logging.info("Multi-label mode enabled. Label vector length: %s", len(BV_SOLVER2ID))
     else:
         logging.info("Unique labels: %s", len(set(train_data["labels"])))
 
