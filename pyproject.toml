@@ -16,6 +16,7 @@ dependencies = [
     "datasets>=2.0.0",
     "torch>=2.0.0",
     "sentence-transformers>=2.0.0",
+    "transformers<5",
     "openai>=1.0.0",
     "tqdm>=4.66.0",
 ]
