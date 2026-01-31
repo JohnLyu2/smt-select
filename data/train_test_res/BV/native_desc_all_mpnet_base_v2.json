@@ -1,0 +1,33 @@
+{
+  "logic": "BV",
+  "model_type": "SVM",
+  "feature_csv": [
+    "data/features/native_desc/all_mpnet_base_v2/BV.csv"
+  ],
+  "train_csv": "data/perf_data/train/BV.CSV",
+  "test_csv": "data/perf_data/test/BV.CSV",
+  "train_metrics": {
+    "total_instances": 832,
+    "solved": 768,
+    "avg_par2": 199.4012,
+    "sbs_name": "cvc5",
+    "sbs_solved": 756,
+    "sbs_avg_par2": 249.1224,
+    "vbs_solved": 797,
+    "vbs_avg_par2": 110.8807,
+    "gap_cls_solved": 0.2927,
+    "gap_cls_par2": 0.3597
+  },
+  "test_metrics": {
+    "total_instances": 208,
+    "solved": 201,
+    "avg_par2": 104.899,
+    "sbs_name": "cvc5",
+    "sbs_solved": 196,
+    "sbs_avg_par2": 183.5039,
+    "vbs_solved": 205,
+    "vbs_avg_par2": 45.6051,
+    "gap_cls_solved": 0.5556,
+    "gap_cls_par2": 0.57
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "logic": "BV",
+  "model_type": "SVM",
+  "feature_csv": [
+    "data/features/syntactic/catalog1/BV.CSV",
+    "data/features/llm_desc/v1/setfit_minilm_l6_classify/BV.csv"
+  ],
+  "train_csv": "data/perf_data/train/BV.CSV",
+  "test_csv": "data/perf_data/test/BV.CSV",
+  "train_metrics": {
+    "total_instances": 832,
+    "solved": 790,
+    "avg_par2": 133.6148,
+    "sbs_name": "cvc5",
+    "sbs_solved": 756,
+    "sbs_avg_par2": 249.1224,
+    "vbs_solved": 797,
+    "vbs_avg_par2": 110.8807,
+    "gap_cls_solved": 0.8293,
+    "gap_cls_par2": 0.8355
+  },
+  "test_metrics": {
+    "total_instances": 208,
+    "solved": 198,
+    "avg_par2": 139.3682,
+    "sbs_name": "cvc5",
+    "sbs_solved": 196,
+    "sbs_avg_par2": 183.5039,
+    "vbs_solved": 205,
+    "vbs_avg_par2": 45.6051,
+    "gap_cls_solved": 0.2222,
+    "gap_cls_par2": 0.3201
+  }
+}
