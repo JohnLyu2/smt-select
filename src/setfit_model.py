@@ -28,6 +28,7 @@ def create_setfit_data(
     desc_json_path: str,
     timeout: float = 1200.0,
     include_all_solved: bool = False,
+    multi_label: bool = False,
 ) -> dict[str, list]:
     """
     Create SetFit training data from performance CSV and description JSON.
@@ -37,6 +38,7 @@ def create_setfit_data(
         desc_json_path: Path to description JSON file.
         timeout: Timeout value in seconds.
         include_all_solved: Whether to include instances solved by all solvers.
+        multi_label: Whether to return all solving solvers as labels (list of strings).
     Returns:
         Dict with keys: "texts", "labels", "paths".
     """
@@ -44,7 +46,7 @@ def create_setfit_data(
     multi_perf_data = parse_performance_csv(perf_csv_path, timeout)
 
     texts: list[str] = []
-    labels: list[str] = []
+    labels: list = []
     paths: list[str] = []
 
     for path in multi_perf_data.keys():
@@ -57,11 +59,15 @@ def create_setfit_data(
         if not include_all_solved and multi_perf_data.is_all_solved(path):
             continue
 
-        solver_name = multi_perf_data.get_best_solver_for_instance(path)
-        if solver_name is None:
-            continue
-
-        label = solver_name
+        if multi_label:
+            label = multi_perf_data.get_solvers_solving_instance(path)
+            if not label:
+                continue
+        else:
+            solver_name = multi_perf_data.get_best_solver_for_instance(path)
+            if solver_name is None:
+                continue
+            label = solver_name
 
         texts.append(description.strip())
         labels.append(label)
@@ -99,6 +105,8 @@ class SetfitSelector(SolverSelector):
         self._label_to_id = BV_SOLVER2ID
 
     def algorithm_select(self, instance_path: str | Path) -> int:
+        # TODO: This selector does not yet support multi-label models.
+        # It assumes a single-label prediction (string or int).
         instance_key = str(instance_path)
         description = self._desc_map.get(instance_key)
         if not description or not description.strip():
@@ -134,6 +142,7 @@ def train_setfit_model(
     output_dir: str | None = None,
     num_epochs: int = 1,
     batch_size: int = 16,
+    multi_label: bool = False,
 ) -> SetFitModel:
     if "texts" not in train_data or "labels" not in train_data:
         raise ValueError("Expected train_data to include 'texts' and 'labels' keys.")
@@ -159,11 +168,21 @@ def train_setfit_model(
     device = "cuda" if torch.cuda.is_available() else "cpu"
     logging.info("Using device: %s", device)
     logging.info("Base model: %s", model_name)
-    logging.info("Training specs: epochs=%s, batch_size=%s", num_epochs, batch_size)
+    logging.info("Training specs: epochs=%s, batch_size=%s, multi_label=%s", num_epochs, batch_size, multi_label)
+    
+    multi_target_strategy = "one-vs-rest" if multi_label else None
+    
     try:
-        model = SetFitModel.from_pretrained(model_name, device=device)
+        model = SetFitModel.from_pretrained(
+            model_name, 
+            device=device, 
+            multi_target_strategy=multi_target_strategy
+        )
     except TypeError:
-        model = SetFitModel.from_pretrained(model_name)
+        model = SetFitModel.from_pretrained(
+            model_name, 
+            multi_target_strategy=multi_target_strategy
+        )
         try:
             model.to(device)
         except Exception:
@@ -250,6 +269,11 @@ def main() -> None:
         action="store_true",
         help="Include instances solved by all solvers in training data.",
     )
+    parser.add_argument(
+        "--multi-label",
+        action="store_true",
+        help="Use multi-label training (all solvers that solve an instance).",
+    )
 
     args = parser.parse_args()
 
@@ -258,9 +282,16 @@ def main() -> None:
         args.desc_json,
         args.timeout,
         include_all_solved=args.include_all_solved,
+        multi_label=args.multi_label,
     )
     logging.info("Total samples: %s", len(train_data["texts"]))
-    logging.info("Unique labels: %s", len(set(train_data["labels"])))
+    if args.multi_label:
+        all_labels = set()
+        for label_list in train_data["labels"]:
+            all_labels.update(label_list)
+        logging.info("Unique labels: %s", len(all_labels))
+    else:
+        logging.info("Unique labels: %s", len(set(train_data["labels"])))
 
     if args.train_data_json:
         output_path = Path(args.train_data_json)
@@ -275,6 +306,7 @@ def main() -> None:
             args.desc_json,
             args.timeout,
             include_all_solved=args.include_all_solved,
+            multi_label=args.multi_label,
         )
 
     train_setfit_model(
@@ -284,6 +316,7 @@ def main() -> None:
         output_dir=args.model_dir,
         num_epochs=args.num_epochs,
         batch_size=args.batch_size,
+        multi_label=args.multi_label,
     )
 
 

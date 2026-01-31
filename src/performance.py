@@ -223,6 +223,23 @@ class MultiSolverDataset:
 
         return SingleSolverDataset(virtual_best_perf_dict, "VirtualBest", self._timeout)
 
+    def get_solvers_solving_instance(self, smt_path: str) -> list[str]:
+        """
+        Get all solver names that solved a specific instance.
+
+        Args:
+            smt_path: Instance path
+
+        Returns:
+            List of solver names that solved the instance
+        """
+        perf_list = self._dict.get(smt_path, [])
+        return [
+            self.get_solver_name(i)
+            for i, (is_solved, _) in enumerate(perf_list)
+            if is_solved == 1
+        ]
+
     def get_best_solver_for_instance(self, smt_path: str) -> Optional[str]:
         """
         Get the solver name with the best PAR-2 score for a specific instance.
