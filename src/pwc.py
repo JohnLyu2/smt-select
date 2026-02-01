@@ -55,6 +55,8 @@ class PairwiseXGBoost(xgb.XGBClassifier):
 class PairwiseSVM(SVC):
     def __init__(self, c_value: float = 1.0, **kwargs):
         self.c_value = c_value
+        # Enable probability estimates by default for fusion support
+        kwargs.setdefault("probability", True)
         super().__init__(C=c_value, **kwargs)
         self.scaler = StandardScaler()
 
@@ -71,6 +73,10 @@ class PairwiseSVM(SVC):
     def decision_function(self, x):
         x = self.scaler.transform(x)
         return super().decision_function(x)
+
+    def predict_proba(self, x):
+        x = self.scaler.transform(x)
+        return super().predict_proba(x)
 
 
 class PwcSelector(SolverSelector):
