@@ -14,20 +14,28 @@ _model_cache = {}
 
 def get_embedding_model(
     model_name: str = "sentence-transformers/all-mpnet-base-v2",
+    is_setfit: bool = False,
 ) -> SentenceTransformer:
     """
     Get or load an embedding model (cached for efficiency).
 
     Args:
         model_name: Name of the sentence transformer model to use
+        is_setfit: Whether the model is a SetFit model (extracts backbone)
 
     Returns:
         SentenceTransformer model instance
     """
     global _model_cache
-    if model_name not in _model_cache:
-        _model_cache[model_name] = SentenceTransformer(model_name)
-    return _model_cache[model_name]
+    cache_key = f"{model_name}:setfit={is_setfit}"
+    if cache_key not in _model_cache:
+        if is_setfit:
+            from setfit import SetFitModel
+            setfit_model = SetFitModel.from_pretrained(model_name)
+            _model_cache[cache_key] = setfit_model.model_body
+        else:
+            _model_cache[cache_key] = SentenceTransformer(model_name)
+    return _model_cache[cache_key]
 
 
 def encode_text(
@@ -36,6 +44,7 @@ def encode_text(
     normalize: bool = False,
     batch_size: int = 32,
     show_progress: bool = False,
+    is_setfit: bool = False,
 ) -> np.ndarray:
     """
     Transform text description(s) into embedding vector(s).
@@ -46,6 +55,7 @@ def encode_text(
         normalize: Whether to normalize embeddings to unit length
         batch_size: Batch size for processing multiple texts
         show_progress: Whether to show progress bar when encoding multiple texts
+        is_setfit: Whether the model is a SetFit model (extracts backbone)
 
     Returns:
         numpy array of embeddings:
@@ -61,7 +71,7 @@ def encode_text(
         >>> embeddings = encode_text(["Text 1", "Text 2", "Text 3"])
         >>> print(embeddings.shape)  # (3, 768)
     """
-    model = get_embedding_model(model_name)
+    model = get_embedding_model(model_name, is_setfit=is_setfit)
 
     # Handle single text vs list of texts
     is_single = isinstance(text, str)
@@ -90,6 +100,7 @@ def encode_all_desc(
     batch_size: int = 32,
     show_progress: bool = True,
     show_trunc_stats: bool = False,
+    is_setfit: bool = False,
 ) -> str | None:
     """
     Encode all benchmark descriptions from a JSON file and write to CSV.
@@ -103,6 +114,7 @@ def encode_all_desc(
         batch_size: Batch size for processing multiple texts
         show_progress: Whether to show progress bar when encoding
         show_trunc_stats: Whether to show truncation statistics only (no encoding performed) (default: False)
+        is_setfit: Whether the model is a SetFit model (extracts backbone)
 
     Returns:
         Path to the output CSV file, or None if show_trunc_stats is True (only statistics shown, no encoding performed)
@@ -148,7 +160,7 @@ def encode_all_desc(
         raise ValueError(f"No valid descriptions found in JSON file: {json_path}")
 
     # Check for truncation before encoding
-    model = get_embedding_model(model_name)
+    model = get_embedding_model(model_name, is_setfit=is_setfit)
     if model is None:
         raise ValueError(f"Failed to load model: {model_name}")
 
@@ -264,6 +276,7 @@ def encode_all_desc(
         normalize=normalize,
         batch_size=batch_size,
         show_progress=show_progress,
+        is_setfit=is_setfit,
     )
 
     # Get embedding dimension (embeddings is always 2D when encoding multiple texts)
@@ -343,6 +356,11 @@ Examples:
         action="store_true",
         help="Show truncation statistics and embedding is skipped",
     )
+    parser.add_argument(
+        "--setfit",
+        action="store_true",
+        help="Model is a SetFit model (extracts sentence transformer backbone)",
+    )
 
     args = parser.parse_args()
 
@@ -356,6 +374,7 @@ Examples:
             batch_size=args.batch_size,
             show_progress=not args.no_progress,
             show_trunc_stats=args.trunc_stats,
+            is_setfit=args.setfit,
         )
         print(f"Success! Embeddings saved to: {csv_path}")
     except FileNotFoundError as e:
