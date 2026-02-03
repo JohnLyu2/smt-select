@@ -1,4 +1,4 @@
-# Experiment Set Comparison: Test Gap Closed (Solved)
+# Experiment Set Comparison
 
 ## Overview
 
