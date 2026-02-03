@@ -55,15 +55,20 @@ class PairwiseXGBoost(xgb.XGBClassifier):
 class PairwiseSVM(SVC):
     def __init__(self, c_value: float = 1.0, **kwargs):
         self.c_value = c_value
-        # Enable probability estimates by default for fusion support
-        kwargs.setdefault("probability", True)
         super().__init__(C=c_value, **kwargs)
         self.scaler = StandardScaler()
+        self.decision_std_ = None  # Std of decision function on training data
 
     def fit(self, x, y, weights):
         x, y = check_X_y(x, y)
         x = self.scaler.fit_transform(x)
         super().fit(x, y, sample_weight=weights)
+        # Compute std of decision function on training data for standardization
+        train_decisions = super().decision_function(x)
+        self.decision_std_ = np.std(train_decisions)
+        # Avoid division by zero if all decisions are identical
+        if self.decision_std_ == 0:
+            self.decision_std_ = 1.0
         return self
 
     def predict(self, x):
@@ -74,9 +79,9 @@ class PairwiseSVM(SVC):
         x = self.scaler.transform(x)
         return super().decision_function(x)
 
-    def predict_proba(self, x):
-        x = self.scaler.transform(x)
-        return super().predict_proba(x)
+    def get_standardized_score(self, x):
+        """Get decision function score standardized by training std."""
+        return self.decision_function(x) / self.decision_std_
 
 
 class PwcSelector(SolverSelector):

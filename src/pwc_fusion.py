@@ -2,13 +2,13 @@
 Decision-level fusion for pairwise models.
 
 This module implements fusion of two pairwise models (syntactic and description)
-using probability-based scoring. See doc/fusion_method_selection.md for
-detailed rationale.
+using standardized hyperplane distance scoring. See doc/fusion_method_selection.md
+for detailed rationale.
 
 Fusion method:
-- fixed_alpha: Weighted average with fixed alpha (α * prob_synt + (1-α) * prob_desc)
+- fixed_alpha: Weighted average with fixed alpha (α * score_synt + (1-α) * score_desc)
 
-Note: Classifiers must support predict_proba (e.g., SVC with probability=True).
+Note: Classifiers must support get_standardized_score() (SVM decision function / std).
 """
 
 import numpy as np
@@ -21,15 +21,14 @@ from .feature import extract_feature_from_csv
 
 class PwcModelFusion:
     """
-    Fuses two pairwise models using probability-based fusion.
+    Fuses two pairwise models using standardized hyperplane distance fusion.
 
     Combines predictions from models trained on different feature types by:
-    1. Computing class probabilities from each model via predict_proba
-    2. Weighted linear combination: α * prob_synt + (1-α) * prob_desc
-    3. Voting based on combined probability (>0.5 → solver i wins)
+    1. Computing standardized decision scores (distance to hyperplane / std)
+    2. Weighted linear combination: α * score_synt + (1-α) * score_desc
+    3. Voting based on combined score (>0 → solver i wins)
 
-    Note: No standardization is needed since probabilities are already in [0, 1].
-    Classifiers must support predict_proba (e.g., SVC with probability=True).
+    Classifiers must support get_standardized_score() method.
     """
 
     def __init__(
@@ -64,9 +63,9 @@ class PwcModelFusion:
                 f"Models have different solver sizes: {model_synt.solver_size} vs {model_desc.solver_size}"
             )
 
-    def _get_probability(self, model, feature, i, j):
+    def _get_score(self, model, feature, i, j):
         """
-        Get probability that solver i wins over solver j.
+        Get standardized score indicating solver i vs solver j preference.
 
         Args:
             model: PwcModel (either syntactic or description)
@@ -75,36 +74,28 @@ class PwcModelFusion:
             j: Second solver index
 
         Returns:
-            Probability in [0, 1] that solver i wins (class 1)
+            Standardized score: positive means solver i wins, negative means solver j wins
         """
         classifier = model.model_matrix[i, j]
         feature_reshaped = feature.reshape(1, -1)
 
-        if hasattr(classifier, "predict_proba"):
-            probs = classifier.predict_proba(feature_reshaped)[0]
-            if len(probs) == 1:
-                # Only one class seen during training (degenerate case)
-                # Return 1.0 if only class 1, 0.0 if only class 0
-                return 1.0 if classifier.classes_[0] == 1 else 0.0
-            else:
-                # Find index of class 1 in classes_ array
-                # classes_ could be [0, 1] or [1, 0] depending on training order
-                class_1_idx = np.where(classifier.classes_ == 1)[0][0]
-                return probs[class_1_idx]  # Probability of class 1 (solver i wins)
+        if hasattr(classifier, "get_standardized_score"):
+            return classifier.get_standardized_score(feature_reshaped)[0]
         else:
-            # Fallback for classifiers without predict_proba
-            # Convert prediction {0,1} to probability {0.0, 1.0}
-            return float(classifier.predict(feature_reshaped)[0])
+            # Fallback for classifiers without get_standardized_score (e.g., DummyClassifier)
+            # Convert prediction {0,1} to score {-1.0, 1.0}
+            pred = classifier.predict(feature_reshaped)[0]
+            return 1.0 if pred == 1 else -1.0
 
     def _get_rank_lst(self, feature_synt, feature_desc, random_seed=42):
         """
-        Rank solvers using fused probability scores.
+        Rank solvers using fused standardized scores.
 
         For each pairwise comparison [i,j]:
-        1. Get probability from syntactic model
-        2. Get probability from description model
-        3. Combine: α * prob_synt + (1-α) * prob_desc
-        4. Vote based on combined probability (>0.5 → solver i wins)
+        1. Get standardized score from syntactic model
+        2. Get standardized score from description model
+        3. Combine: α * score_synt + (1-α) * score_desc
+        4. Vote based on combined score (>0 → solver i wins)
 
         Args:
             feature_synt: Syntactic feature vector
@@ -118,19 +109,19 @@ class PwcModelFusion:
 
         for i in range(self.solver_size):
             for j in range(i + 1, self.solver_size):
-                # Get probabilities from both models
-                prob_synt = self._get_probability(
+                # Get standardized scores from both models
+                score_synt = self._get_score(
                     self.model_synt, feature_synt, i, j
                 )
-                prob_desc = self._get_probability(
+                score_desc = self._get_score(
                     self.model_desc, feature_desc, i, j
                 )
 
                 # Weighted fusion
-                prob_combined = self.alpha * prob_synt + (1 - self.alpha) * prob_desc
+                score_combined = self.alpha * score_synt + (1 - self.alpha) * score_desc
 
-                # Vote based on combined probability
-                if prob_combined > 0.5:
+                # Vote based on combined score
+                if score_combined > 0:
                     votes[i] += 1
                 else:
                     votes[j] += 1
