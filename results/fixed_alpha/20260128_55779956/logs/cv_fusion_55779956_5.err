@@ -1,0 +1,265 @@
+2026-01-28 18:33:14,863 - INFO - Loading all instances from fold files in data/perf_data/folds/QF_NRA...
+2026-01-28 18:33:14,992 - INFO - Using syntactic features: data/features/syntactic/catalog0/QF_NRA.CSV
+2026-01-28 18:33:14,992 - INFO - Using description features: data/features/native_desc/all_mpnet_base_v2/QF_NRA.csv
+2026-01-28 18:33:14,992 - INFO - Validating feature coverage for syntactic features...
+2026-01-28 18:33:15,099 - INFO - Validating feature coverage for description features...
+2026-01-28 18:33:20,588 - INFO - Feature coverage validated: all 2482 instances have features
+2026-01-28 18:33:20,589 - INFO - Starting 4-fold cross-validation with fixed-alpha fusion on 2482 instances
+2026-01-28 18:33:20,589 - INFO - Alpha candidates: [0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
+2026-01-28 18:33:20,589 - INFO - 
+============================================================
+2026-01-28 18:33:20,589 - INFO - Outer Fold 1/4 (0.csv)
+2026-01-28 18:33:20,589 - INFO - ============================================================
+2026-01-28 18:33:20,589 - INFO - Loading test instances from 0.csv...
+2026-01-28 18:33:20,593 - INFO - Test instances: 621
+2026-01-28 18:33:20,593 - INFO - Train instances: 1861
+2026-01-28 18:33:20,636 - INFO - Training syntactic model on training set...
+2026-01-28 18:33:21,162 - INFO - Saved PWC_SVM model at /tmp/tmp_xnz91hq/synt/model.joblib
+2026-01-28 18:33:21,173 - INFO - Training description model on training set...
+2026-01-28 18:33:22,065 - INFO - Saved PWC_SVM model at /tmp/tmp_xnz91hq/desc/model.joblib
+2026-01-28 18:33:22,169 - INFO - Tuning alpha on full training set (1861 instances)
+2026-01-28 18:33:22,170 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:33:27,830 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:33:27,830 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:33:35,022 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:38:45,557 - INFO -   Alpha tuning results:
+2026-01-28 18:38:45,594 - INFO -     α=0.00: gap_cls_par2=0.6490
+2026-01-28 18:38:45,594 - INFO -     α=0.05: gap_cls_par2=0.6490
+2026-01-28 18:38:45,594 - INFO -     α=0.10: gap_cls_par2=0.6491
+2026-01-28 18:38:45,594 - INFO -     α=0.15: gap_cls_par2=0.6492
+2026-01-28 18:38:45,594 - INFO -     α=0.20: gap_cls_par2=0.6675
+2026-01-28 18:38:45,594 - INFO -     α=0.25: gap_cls_par2=0.6676
+2026-01-28 18:38:45,594 - INFO -     α=0.30: gap_cls_par2=0.6966
+2026-01-28 18:38:45,594 - INFO -     α=0.35: gap_cls_par2=0.7095
+2026-01-28 18:38:45,594 - INFO -     α=0.40: gap_cls_par2=0.7097
+2026-01-28 18:38:45,594 - INFO -     α=0.45: gap_cls_par2=0.7100
+2026-01-28 18:38:45,594 - INFO -     α=0.50: gap_cls_par2=0.7123
+2026-01-28 18:38:45,594 - INFO -     α=0.55: gap_cls_par2=0.7118
+2026-01-28 18:38:45,594 - INFO -     α=0.60: gap_cls_par2=0.7120
+2026-01-28 18:38:45,594 - INFO -     α=0.65: gap_cls_par2=0.7115
+2026-01-28 18:38:45,594 - INFO -     α=0.70: gap_cls_par2=0.7367
+2026-01-28 18:38:45,594 - INFO -     α=0.75: gap_cls_par2=0.7637 ← best
+2026-01-28 18:38:45,594 - INFO -     α=0.80: gap_cls_par2=0.6598
+2026-01-28 18:38:45,594 - INFO -     α=0.85: gap_cls_par2=0.6076
+2026-01-28 18:38:45,594 - INFO -     α=0.90: gap_cls_par2=0.5987
+2026-01-28 18:38:45,594 - INFO -     α=0.95: gap_cls_par2=0.5786
+2026-01-28 18:38:45,594 - INFO -     α=1.00: gap_cls_par2=0.5430
+2026-01-28 18:38:45,594 - INFO -   Selected α=0.75 (gap_cls_par2=0.7637)
+2026-01-28 18:38:45,594 - INFO - Creating fusion model with α=0.75...
+2026-01-28 18:38:45,594 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:38:51,268 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:38:51,268 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:38:58,483 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:38:58,485 - INFO - Evaluating fusion model on train set...
+2026-01-28 18:39:16,159 - INFO - Evaluating fusion model on test set...
+2026-01-28 18:39:22,002 - INFO - 
+Fold 1 Results (α=0.75):
+2026-01-28 18:39:22,002 - INFO -   Train Set:
+2026-01-28 18:39:22,002 - INFO -     Solved: 1747/1861
+2026-01-28 18:39:22,002 - INFO -     Solve rate: 93.87%
+2026-01-28 18:39:22,002 - INFO -     Average PAR-2: 165.44
+2026-01-28 18:39:22,002 - INFO -     Gap closed (PAR-2): 0.7637
+2026-01-28 18:39:22,002 - INFO -   Test Set:
+2026-01-28 18:39:22,002 - INFO -     Solved: 573/621
+2026-01-28 18:39:22,002 - INFO -     Solve rate: 92.27%
+2026-01-28 18:39:22,002 - INFO -     Average PAR-2: 199.04
+2026-01-28 18:39:22,002 - INFO -     Gap closed (PAR-2): 0.4654
+2026-01-28 18:39:22,005 - INFO - 
+============================================================
+2026-01-28 18:39:22,005 - INFO - Outer Fold 2/4 (1.csv)
+2026-01-28 18:39:22,005 - INFO - ============================================================
+2026-01-28 18:39:22,005 - INFO - Loading test instances from 1.csv...
+2026-01-28 18:39:22,008 - INFO - Test instances: 621
+2026-01-28 18:39:22,009 - INFO - Train instances: 1861
+2026-01-28 18:39:22,045 - INFO - Training syntactic model on training set...
+2026-01-28 18:39:22,534 - INFO - Saved PWC_SVM model at /tmp/tmp58bbclv9/synt/model.joblib
+2026-01-28 18:39:22,538 - INFO - Training description model on training set...
+2026-01-28 18:39:23,374 - INFO - Saved PWC_SVM model at /tmp/tmp58bbclv9/desc/model.joblib
+2026-01-28 18:39:23,477 - INFO - Tuning alpha on full training set (1861 instances)
+2026-01-28 18:39:23,478 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:39:29,094 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:39:29,094 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:39:36,376 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:44:42,845 - INFO -   Alpha tuning results:
+2026-01-28 18:44:42,858 - INFO -     α=0.00: gap_cls_par2=0.5938
+2026-01-28 18:44:42,858 - INFO -     α=0.05: gap_cls_par2=0.5939
+2026-01-28 18:44:42,858 - INFO -     α=0.10: gap_cls_par2=0.5940
+2026-01-28 18:44:42,858 - INFO -     α=0.15: gap_cls_par2=0.5944
+2026-01-28 18:44:42,858 - INFO -     α=0.20: gap_cls_par2=0.5995
+2026-01-28 18:44:42,858 - INFO -     α=0.25: gap_cls_par2=0.6163
+2026-01-28 18:44:42,858 - INFO -     α=0.30: gap_cls_par2=0.6182
+2026-01-28 18:44:42,858 - INFO -     α=0.35: gap_cls_par2=0.6586
+2026-01-28 18:44:42,858 - INFO -     α=0.40: gap_cls_par2=0.6514
+2026-01-28 18:44:42,858 - INFO -     α=0.45: gap_cls_par2=0.6532
+2026-01-28 18:44:42,858 - INFO -     α=0.50: gap_cls_par2=0.6535
+2026-01-28 18:44:42,858 - INFO -     α=0.55: gap_cls_par2=0.6537
+2026-01-28 18:44:42,859 - INFO -     α=0.60: gap_cls_par2=0.6419
+2026-01-28 18:44:42,859 - INFO -     α=0.65: gap_cls_par2=0.6571
+2026-01-28 18:44:42,859 - INFO -     α=0.70: gap_cls_par2=0.6447
+2026-01-28 18:44:42,859 - INFO -     α=0.75: gap_cls_par2=0.6913 ← best
+2026-01-28 18:44:42,859 - INFO -     α=0.80: gap_cls_par2=0.6820
+2026-01-28 18:44:42,859 - INFO -     α=0.85: gap_cls_par2=0.6667
+2026-01-28 18:44:42,859 - INFO -     α=0.90: gap_cls_par2=0.6014
+2026-01-28 18:44:42,859 - INFO -     α=0.95: gap_cls_par2=0.6138
+2026-01-28 18:44:42,859 - INFO -     α=1.00: gap_cls_par2=0.6089
+2026-01-28 18:44:42,859 - INFO -   Selected α=0.75 (gap_cls_par2=0.6913)
+2026-01-28 18:44:42,859 - INFO - Creating fusion model with α=0.75...
+2026-01-28 18:44:42,859 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:44:48,503 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:44:48,503 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:44:55,749 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:44:55,751 - INFO - Evaluating fusion model on train set...
+2026-01-28 18:45:15,139 - INFO - Evaluating fusion model on test set...
+2026-01-28 18:45:21,631 - INFO - 
+Fold 2 Results (α=0.75):
+2026-01-28 18:45:21,631 - INFO -   Train Set:
+2026-01-28 18:45:21,631 - INFO -     Solved: 1743/1861
+2026-01-28 18:45:21,632 - INFO -     Solve rate: 93.66%
+2026-01-28 18:45:21,632 - INFO -     Average PAR-2: 166.33
+2026-01-28 18:45:21,632 - INFO -     Gap closed (PAR-2): 0.6913
+2026-01-28 18:45:21,632 - INFO -   Test Set:
+2026-01-28 18:45:21,632 - INFO -     Solved: 575/621
+2026-01-28 18:45:21,632 - INFO -     Solve rate: 92.59%
+2026-01-28 18:45:21,632 - INFO -     Average PAR-2: 196.72
+2026-01-28 18:45:21,632 - INFO -     Gap closed (PAR-2): 0.6692
+2026-01-28 18:45:21,635 - INFO - 
+============================================================
+2026-01-28 18:45:21,635 - INFO - Outer Fold 3/4 (2.csv)
+2026-01-28 18:45:21,635 - INFO - ============================================================
+2026-01-28 18:45:21,635 - INFO - Loading test instances from 2.csv...
+2026-01-28 18:45:21,695 - INFO - Test instances: 620
+2026-01-28 18:45:21,695 - INFO - Train instances: 1862
+2026-01-28 18:45:21,726 - INFO - Training syntactic model on training set...
+2026-01-28 18:45:22,292 - INFO - Saved PWC_SVM model at /tmp/tmp6mqx_dw0/synt/model.joblib
+2026-01-28 18:45:22,296 - INFO - Training description model on training set...
+2026-01-28 18:45:23,209 - INFO - Saved PWC_SVM model at /tmp/tmp6mqx_dw0/desc/model.joblib
+2026-01-28 18:45:23,312 - INFO - Tuning alpha on full training set (1862 instances)
+2026-01-28 18:45:23,312 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:45:28,967 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:45:28,967 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:45:36,065 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:50:40,425 - INFO -   Alpha tuning results:
+2026-01-28 18:50:40,425 - INFO -     α=0.00: gap_cls_par2=0.6564
+2026-01-28 18:50:40,425 - INFO -     α=0.05: gap_cls_par2=0.6564
+2026-01-28 18:50:40,425 - INFO -     α=0.10: gap_cls_par2=0.6520
+2026-01-28 18:50:40,425 - INFO -     α=0.15: gap_cls_par2=0.6520
+2026-01-28 18:50:40,425 - INFO -     α=0.20: gap_cls_par2=0.6530
+2026-01-28 18:50:40,425 - INFO -     α=0.25: gap_cls_par2=0.6533
+2026-01-28 18:50:40,425 - INFO -     α=0.30: gap_cls_par2=0.6672
+2026-01-28 18:50:40,425 - INFO -     α=0.35: gap_cls_par2=0.6701
+2026-01-28 18:50:40,425 - INFO -     α=0.40: gap_cls_par2=0.6843
+2026-01-28 18:50:40,425 - INFO -     α=0.45: gap_cls_par2=0.6849
+2026-01-28 18:50:40,425 - INFO -     α=0.50: gap_cls_par2=0.6862
+2026-01-28 18:50:40,425 - INFO -     α=0.55: gap_cls_par2=0.6984
+2026-01-28 18:50:40,425 - INFO -     α=0.60: gap_cls_par2=0.7098
+2026-01-28 18:50:40,425 - INFO -     α=0.65: gap_cls_par2=0.6921
+2026-01-28 18:50:40,425 - INFO -     α=0.70: gap_cls_par2=0.7017
+2026-01-28 18:50:40,425 - INFO -     α=0.75: gap_cls_par2=0.7127
+2026-01-28 18:50:40,425 - INFO -     α=0.80: gap_cls_par2=0.7164 ← best
+2026-01-28 18:50:40,425 - INFO -     α=0.85: gap_cls_par2=0.6972
+2026-01-28 18:50:40,426 - INFO -     α=0.90: gap_cls_par2=0.6364
+2026-01-28 18:50:40,426 - INFO -     α=0.95: gap_cls_par2=0.6228
+2026-01-28 18:50:40,426 - INFO -     α=1.00: gap_cls_par2=0.5936
+2026-01-28 18:50:40,426 - INFO -   Selected α=0.80 (gap_cls_par2=0.7164)
+2026-01-28 18:50:40,426 - INFO - Creating fusion model with α=0.80...
+2026-01-28 18:50:40,426 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:50:46,098 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:50:46,098 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:50:53,224 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:50:53,225 - INFO - Evaluating fusion model on train set...
+2026-01-28 18:51:10,449 - INFO - Evaluating fusion model on test set...
+2026-01-28 18:51:16,386 - INFO - 
+Fold 3 Results (α=0.80):
+2026-01-28 18:51:16,386 - INFO -   Train Set:
+2026-01-28 18:51:16,386 - INFO -     Solved: 1736/1862
+2026-01-28 18:51:16,386 - INFO -     Solve rate: 93.23%
+2026-01-28 18:51:16,386 - INFO -     Average PAR-2: 180.57
+2026-01-28 18:51:16,386 - INFO -     Gap closed (PAR-2): 0.7164
+2026-01-28 18:51:16,386 - INFO -   Test Set:
+2026-01-28 18:51:16,386 - INFO -     Solved: 578/620
+2026-01-28 18:51:16,386 - INFO -     Solve rate: 93.23%
+2026-01-28 18:51:16,386 - INFO -     Average PAR-2: 175.54
+2026-01-28 18:51:16,386 - INFO -     Gap closed (PAR-2): 0.2733
+2026-01-28 18:51:16,389 - INFO - 
+============================================================
+2026-01-28 18:51:16,389 - INFO - Outer Fold 4/4 (3.csv)
+2026-01-28 18:51:16,389 - INFO - ============================================================
+2026-01-28 18:51:16,389 - INFO - Loading test instances from 3.csv...
+2026-01-28 18:51:16,418 - INFO - Test instances: 620
+2026-01-28 18:51:16,418 - INFO - Train instances: 1862
+2026-01-28 18:51:16,443 - INFO - Training syntactic model on training set...
+2026-01-28 18:51:16,964 - INFO - Saved PWC_SVM model at /tmp/tmp_wpd1sfd/synt/model.joblib
+2026-01-28 18:51:16,968 - INFO - Training description model on training set...
+2026-01-28 18:51:17,877 - INFO - Saved PWC_SVM model at /tmp/tmp_wpd1sfd/desc/model.joblib
+2026-01-28 18:51:17,983 - INFO - Tuning alpha on full training set (1862 instances)
+2026-01-28 18:51:17,983 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:51:23,841 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:51:23,842 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:51:30,946 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:56:57,028 - INFO -   Alpha tuning results:
+2026-01-28 18:56:57,029 - INFO -     α=0.00: gap_cls_par2=0.6352
+2026-01-28 18:56:57,029 - INFO -     α=0.05: gap_cls_par2=0.6352
+2026-01-28 18:56:57,029 - INFO -     α=0.10: gap_cls_par2=0.6342
+2026-01-28 18:56:57,029 - INFO -     α=0.15: gap_cls_par2=0.6395
+2026-01-28 18:56:57,029 - INFO -     α=0.20: gap_cls_par2=0.6396
+2026-01-28 18:56:57,029 - INFO -     α=0.25: gap_cls_par2=0.6404
+2026-01-28 18:56:57,029 - INFO -     α=0.30: gap_cls_par2=0.6551
+2026-01-28 18:56:57,029 - INFO -     α=0.35: gap_cls_par2=0.6334
+2026-01-28 18:56:57,029 - INFO -     α=0.40: gap_cls_par2=0.6492
+2026-01-28 18:56:57,029 - INFO -     α=0.45: gap_cls_par2=0.6505
+2026-01-28 18:56:57,029 - INFO -     α=0.50: gap_cls_par2=0.6832
+2026-01-28 18:56:57,029 - INFO -     α=0.55: gap_cls_par2=0.7063
+2026-01-28 18:56:57,029 - INFO -     α=0.60: gap_cls_par2=0.7068
+2026-01-28 18:56:57,029 - INFO -     α=0.65: gap_cls_par2=0.7179
+2026-01-28 18:56:57,029 - INFO -     α=0.70: gap_cls_par2=0.7029
+2026-01-28 18:56:57,029 - INFO -     α=0.75: gap_cls_par2=0.7612 ← best
+2026-01-28 18:56:57,029 - INFO -     α=0.80: gap_cls_par2=0.7226
+2026-01-28 18:56:57,029 - INFO -     α=0.85: gap_cls_par2=0.7402
+2026-01-28 18:56:57,029 - INFO -     α=0.90: gap_cls_par2=0.7385
+2026-01-28 18:56:57,029 - INFO -     α=0.95: gap_cls_par2=0.6161
+2026-01-28 18:56:57,029 - INFO -     α=1.00: gap_cls_par2=0.4937
+2026-01-28 18:56:57,029 - INFO -   Selected α=0.75 (gap_cls_par2=0.7612)
+2026-01-28 18:56:57,029 - INFO - Creating fusion model with α=0.75...
+2026-01-28 18:56:57,029 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:57:02,875 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:57:02,875 - INFO - Computing decision function statistics on training data...
+2026-01-28 18:57:09,983 - INFO - Computed statistics for 10 pairwise classifiers
+2026-01-28 18:57:09,984 - INFO - Evaluating fusion model on train set...
+2026-01-28 18:57:29,444 - INFO - Evaluating fusion model on test set...
+2026-01-28 18:57:35,590 - INFO - 
+Fold 4 Results (α=0.75):
+2026-01-28 18:57:35,590 - INFO -   Train Set:
+2026-01-28 18:57:35,590 - INFO -     Solved: 1747/1862
+2026-01-28 18:57:35,590 - INFO -     Solve rate: 93.82%
+2026-01-28 18:57:35,590 - INFO -     Average PAR-2: 165.50
+2026-01-28 18:57:35,590 - INFO -     Gap closed (PAR-2): 0.7612
+2026-01-28 18:57:35,590 - INFO -   Test Set:
+2026-01-28 18:57:35,590 - INFO -     Solved: 571/620
+2026-01-28 18:57:35,590 - INFO -     Solve rate: 92.10%
+2026-01-28 18:57:35,590 - INFO -     Average PAR-2: 204.95
+2026-01-28 18:57:35,590 - INFO -     Gap closed (PAR-2): 0.3832
+2026-01-28 18:57:35,597 - INFO - Saved summary to results/20260128_55779956/fusion/QF_NRA/summary.json
+2026-01-28 18:57:35,599 - INFO - 
+============================================================
+2026-01-28 18:57:35,599 - INFO - Cross-Validation Results Summary (Decision-Level Fusion)
+2026-01-28 18:57:35,599 - INFO - ============================================================
+2026-01-28 18:57:35,599 - INFO - Model type: Fusion_SVM_fixed_alpha
+2026-01-28 18:57:35,599 - INFO - Number of folds: 4
+2026-01-28 18:57:35,599 - INFO - Total instances: 2482
+2026-01-28 18:57:35,599 - INFO - 
+2026-01-28 18:57:35,599 - INFO - Alpha values per fold: ['0.75', '0.75', '0.80', '0.75']
+2026-01-28 18:57:35,599 - INFO - Alpha mean ± std: 0.76 ± 0.02
+2026-01-28 18:57:35,600 - INFO - 
+2026-01-28 18:57:35,600 - INFO - Test Set Performance:
+2026-01-28 18:57:35,600 - INFO -   Algorithm Selection (Fusion):
+2026-01-28 18:57:35,600 - INFO -     Solve rate: 92.55% ± 0.43%
+2026-01-28 18:57:35,600 - INFO -     Average PAR-2: 194.07 ± 11.11
+2026-01-28 18:57:35,600 - INFO -     Gap closed (solved): 0.4613 ± 0.1543
+2026-01-28 18:57:35,600 - INFO -     Gap closed (PAR-2): 0.4478 ± 0.1449
+2026-01-28 18:57:35,600 - INFO -   SBS (Single Best Solver):
+2026-01-28 18:57:35,600 - INFO -     Solve rate: 90.81% ± 1.03%
+2026-01-28 18:57:35,600 - INFO -     Average PAR-2: 236.91 ± 26.13
+2026-01-28 18:57:35,600 - INFO -   VBS (Virtual Best Solver):
+2026-01-28 18:57:35,600 - INFO -     Solve rate: 94.40% ± 0.55%
+2026-01-28 18:57:35,600 - INFO -     Average PAR-2: 144.93 ± 14.68
+2026-01-28 18:57:35,600 - INFO - ============================================================

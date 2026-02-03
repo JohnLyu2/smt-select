@@ -1,0 +1,19 @@
+Job started at: Wed Jan 28 06:32:33 PM EST 2026
+Job Array ID: 55779956
+Task ID: 6
+Running on node: nc31110
+Logic: QF_SLIA
+
+Python version: Python 3.11.4
+
+========================================================================
+Fixed-Alpha Fusion Cross-Validation for: QF_SLIA
+========================================================================
+
+Configuration:
+  - Folds dir: data/perf_data/folds/QF_SLIA
+  - Syntactic features: data/features/syntactic/catalog0/QF_SLIA.CSV
+  - Description features: data/features/native_desc/all_mpnet_base_v2/QF_SLIA.csv
+  - Results directory: results/20260128_55779956/fusion/QF_SLIA
+========================================================================
+
