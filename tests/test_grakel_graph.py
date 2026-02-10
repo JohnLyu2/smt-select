@@ -51,12 +51,7 @@ def test_smt_graph_to_grakel_two_graphs():
         mode="w", suffix=".smt2", delete=False
     ) as f2:
         f2.write(
-            "(set-logic QF_LIA)\n"
-            "(declare-const a Int)(declare-const b Int)\n"
-            "(assert (and (<= a 1) (<= b 2)))\n"
-            "(check-sat)\n"
-        )
-        path2 = Path(f2.name)
+            "(set-logic QF_LIA)\n"n
     try:
         d1 = smt_to_graph(path1)
         d2 = smt_to_graph(path2)
