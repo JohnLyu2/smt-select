@@ -1,0 +1,33 @@
+{
+  "logic": "QF_NRA",
+  "model_type": "Fusion_SVM",
+  "alpha": 0.8,
+  "feature_csv_synt": "data/features/syntactic/catalog0/QF_NRA.CSV",
+  "feature_csv_desc": "data/features/native_desc/all_mpnet_base_v2/QF_NRA.csv",
+  "train_csv": "data/perf_data/train/QF_NRA.CSV",
+  "test_csv": "data/perf_data/test/QF_NRA.CSV",
+  "train_metrics": {
+    "total_instances": 2482,
+    "solved": 2319,
+    "avg_par2": 174.2106,
+    "sbs_name": "Z3alpha",
+    "sbs_solved": 2254,
+    "sbs_avg_par2": 236.9238,
+    "vbs_solved": 2343,
+    "vbs_avg_par2": 144.9379,
+    "gap_cls_solved": 0.7303,
+    "gap_cls_par2": 0.6818
+  },
+  "test_metrics": {
+    "total_instances": 621,
+    "solved": 581,
+    "avg_par2": 174.1271,
+    "sbs_name": "Z3alpha",
+    "sbs_solved": 558,
+    "sbs_avg_par2": 262.223,
+    "vbs_solved": 589,
+    "vbs_avg_par2": 134.3811,
+    "gap_cls_solved": 0.7419,
+    "gap_cls_par2": 0.6891
+  }
+}

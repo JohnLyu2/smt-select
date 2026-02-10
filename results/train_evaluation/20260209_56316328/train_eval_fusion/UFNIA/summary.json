@@ -1,0 +1,33 @@
+{
+  "logic": "UFNIA",
+  "model_type": "Fusion_SVM",
+  "alpha": 1.0,
+  "feature_csv_synt": "data/features/syntactic/catalog0/UFNIA.CSV",
+  "feature_csv_desc": "data/features/native_desc/all_mpnet_base_v2/UFNIA.csv",
+  "train_csv": "data/perf_data/train/UFNIA.CSV",
+  "test_csv": "data/perf_data/test/UFNIA.CSV",
+  "train_metrics": {
+    "total_instances": 5023,
+    "solved": 2990,
+    "avg_par2": 1005.3863,
+    "sbs_name": "cvc5",
+    "sbs_solved": 2946,
+    "sbs_avg_par2": 1026.745,
+    "vbs_solved": 3006,
+    "vbs_avg_par2": 996.8043,
+    "gap_cls_solved": 0.7333,
+    "gap_cls_par2": 0.7134
+  },
+  "test_metrics": {
+    "total_instances": 1256,
+    "solved": 746,
+    "avg_par2": 1007.0362,
+    "sbs_name": "cvc5",
+    "sbs_solved": 742,
+    "sbs_avg_par2": 1016.5938,
+    "vbs_solved": 753,
+    "vbs_avg_par2": 992.1579,
+    "gap_cls_solved": 0.3636,
+    "gap_cls_par2": 0.3911
+  }
+}

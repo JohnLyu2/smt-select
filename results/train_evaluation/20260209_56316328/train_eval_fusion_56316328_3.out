@@ -1,0 +1,41 @@
+Job started at: Mon Feb  9 01:27:06 AM EST 2026
+Job Array ID: 56316328
+Task ID: 3
+Running on node: nc30541
+Logic: QF_IDL
+Alpha: 0.95
+
+
+============================================================
+Algorithm Selection Fusion Results for QF_IDL
+============================================================
+Model: Fusion_SVM
+Alpha: 0.95
+Train CSV: data/perf_data/train/QF_IDL.CSV
+Test CSV:  data/perf_data/test/QF_IDL.CSV
+
+Train Set Performance:
+  Total instances: 966
+  Solved:          880/966
+  Average PAR-2:   261.2174
+  Gap Closed (Solved): 0.9556
+  Gap Closed (PAR-2):  0.9126
+  SBS (Solver: Z3alpha) Solved: 837, PAR-2: 368.4988
+  VBS Solved:      882, PAR-2: 250.9488
+
+Test Set Performance:
+  Total instances: 242
+  Solved:          216/242
+  Average PAR-2:   296.5041
+  Gap Closed (Solved): 0.6667
+  Gap Closed (PAR-2):  0.6284
+  SBS (Solver: Z3alpha) Solved: 210, PAR-2: 356.3038
+  VBS Solved:      219, PAR-2: 261.1378
+
+============================================================
+
+========================================================================
+Completed successfully for QF_IDL!
+Results: results/20260209_56316328/train_eval_fusion/QF_IDL/summary.json
+========================================================================
+Job finished at: Mon Feb  9 01:28:31 AM EST 2026

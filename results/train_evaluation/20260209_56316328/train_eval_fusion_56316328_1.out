@@ -1,0 +1,41 @@
+Job started at: Mon Feb  9 01:27:06 AM EST 2026
+Job Array ID: 56316328
+Task ID: 1
+Running on node: nc30512
+Logic: ALIA
+Alpha: 0.95
+
+
+============================================================
+Algorithm Selection Fusion Results for ALIA
+============================================================
+Model: Fusion_SVM
+Alpha: 0.95
+Train CSV: data/perf_data/train/ALIA.CSV
+Test CSV:  data/perf_data/test/ALIA.CSV
+
+Train Set Performance:
+  Total instances: 1229
+  Solved:          311/1229
+  Average PAR-2:   1808.7942
+  Gap Closed (Solved): 0.9868
+  Gap Closed (PAR-2):  0.9830
+  SBS (Solver: iProver) Solved: 236, PAR-2: 1958.2855
+  VBS Solved:      312, PAR-2: 1806.2053
+
+Test Set Performance:
+  Total instances: 308
+  Solved:          72/308
+  Average PAR-2:   1864.6387
+  Gap Closed (Solved): 0.6250
+  Gap Closed (PAR-2):  0.6210
+  SBS (Solver: iProver) Solved: 62, PAR-2: 1944.8533
+  VBS Solved:      78, PAR-2: 1815.6779
+
+============================================================
+
+========================================================================
+Completed successfully for ALIA!
+Results: results/20260209_56316328/train_eval_fusion/ALIA/summary.json
+========================================================================
+Job finished at: Mon Feb  9 01:28:25 AM EST 2026

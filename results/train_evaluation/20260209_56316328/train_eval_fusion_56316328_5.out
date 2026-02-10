@@ -1,0 +1,41 @@
+Job started at: Mon Feb  9 01:27:06 AM EST 2026
+Job Array ID: 56316328
+Task ID: 5
+Running on node: nc31102
+Logic: QF_NRA
+Alpha: 0.8
+
+
+============================================================
+Algorithm Selection Fusion Results for QF_NRA
+============================================================
+Model: Fusion_SVM
+Alpha: 0.8
+Train CSV: data/perf_data/train/QF_NRA.CSV
+Test CSV:  data/perf_data/test/QF_NRA.CSV
+
+Train Set Performance:
+  Total instances: 2482
+  Solved:          2319/2482
+  Average PAR-2:   174.2106
+  Gap Closed (Solved): 0.7303
+  Gap Closed (PAR-2):  0.6818
+  SBS (Solver: Z3alpha) Solved: 2254, PAR-2: 236.9238
+  VBS Solved:      2343, PAR-2: 144.9379
+
+Test Set Performance:
+  Total instances: 621
+  Solved:          581/621
+  Average PAR-2:   174.1271
+  Gap Closed (Solved): 0.7419
+  Gap Closed (PAR-2):  0.6891
+  SBS (Solver: Z3alpha) Solved: 558, PAR-2: 262.2230
+  VBS Solved:      589, PAR-2: 134.3811
+
+============================================================
+
+========================================================================
+Completed successfully for QF_NRA!
+Results: results/20260209_56316328/train_eval_fusion/QF_NRA/summary.json
+========================================================================
+Job finished at: Mon Feb  9 01:28:57 AM EST 2026

@@ -1,0 +1,41 @@
+Job started at: Mon Feb  9 01:27:07 AM EST 2026
+Job Array ID: 56316328
+Task ID: 6
+Running on node: nc31102
+Logic: QF_SLIA
+Alpha: 0.95
+
+
+============================================================
+Algorithm Selection Fusion Results for QF_SLIA
+============================================================
+Model: Fusion_SVM
+Alpha: 0.95
+Train CSV: data/perf_data/train/QF_SLIA.CSV
+Test CSV:  data/perf_data/test/QF_SLIA.CSV
+
+Train Set Performance:
+  Total instances: 18977
+  Solved:          18955/18977
+  Average PAR-2:   5.3054
+  Gap Closed (Solved): 0.9941
+  Gap Closed (PAR-2):  0.9796
+  SBS (Solver: Z3-Noodler) Solved: 18617, PAR-2: 46.8723
+  VBS Solved:      18957, PAR-2: 4.4400
+
+Test Set Performance:
+  Total instances: 4745
+  Solved:          4741/4745
+  Average PAR-2:   4.1723
+  Gap Closed (Solved): 0.9762
+  Gap Closed (PAR-2):  0.9643
+  SBS (Solver: Z3-Noodler) Solved: 4659, PAR-2: 44.3359
+  VBS Solved:      4743, PAR-2: 2.6837
+
+============================================================
+
+========================================================================
+Completed successfully for QF_SLIA!
+Results: results/20260209_56316328/train_eval_fusion/QF_SLIA/summary.json
+========================================================================
+Job finished at: Mon Feb  9 01:43:48 AM EST 2026

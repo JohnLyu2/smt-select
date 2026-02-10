@@ -1,0 +1,33 @@
+{
+  "logic": "QF_LIA",
+  "model_type": "Fusion_SVM",
+  "alpha": 0.65,
+  "feature_csv_synt": "data/features/syntactic/catalog0/QF_LIA.CSV",
+  "feature_csv_desc": "data/features/native_desc/all_mpnet_base_v2/QF_LIA.csv",
+  "train_csv": "data/perf_data/train/QF_LIA.CSV",
+  "test_csv": "data/perf_data/test/QF_LIA.CSV",
+  "train_metrics": {
+    "total_instances": 3860,
+    "solved": 3770,
+    "avg_par2": 71.2373,
+    "sbs_name": "OpenSMT",
+    "sbs_solved": 3612,
+    "sbs_avg_par2": 215.0488,
+    "vbs_solved": 3784,
+    "vbs_avg_par2": 56.4854,
+    "gap_cls_solved": 0.9186,
+    "gap_cls_par2": 0.907
+  },
+  "test_metrics": {
+    "total_instances": 965,
+    "solved": 941,
+    "avg_par2": 69.7866,
+    "sbs_name": "Yices2",
+    "sbs_solved": 887,
+    "sbs_avg_par2": 205.6588,
+    "vbs_solved": 942,
+    "vbs_avg_par2": 61.5929,
+    "gap_cls_solved": 0.9818,
+    "gap_cls_par2": 0.9431
+  }
+}

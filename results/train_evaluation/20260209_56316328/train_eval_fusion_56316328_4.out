@@ -1,0 +1,41 @@
+Job started at: Mon Feb  9 01:27:06 AM EST 2026
+Job Array ID: 56316328
+Task ID: 4
+Running on node: nc30541
+Logic: QF_LIA
+Alpha: 0.65
+
+
+============================================================
+Algorithm Selection Fusion Results for QF_LIA
+============================================================
+Model: Fusion_SVM
+Alpha: 0.65
+Train CSV: data/perf_data/train/QF_LIA.CSV
+Test CSV:  data/perf_data/test/QF_LIA.CSV
+
+Train Set Performance:
+  Total instances: 3860
+  Solved:          3770/3860
+  Average PAR-2:   71.2373
+  Gap Closed (Solved): 0.9186
+  Gap Closed (PAR-2):  0.9070
+  SBS (Solver: OpenSMT) Solved: 3612, PAR-2: 215.0488
+  VBS Solved:      3784, PAR-2: 56.4854
+
+Test Set Performance:
+  Total instances: 965
+  Solved:          941/965
+  Average PAR-2:   69.7866
+  Gap Closed (Solved): 0.9818
+  Gap Closed (PAR-2):  0.9431
+  SBS (Solver: Yices2) Solved: 887, PAR-2: 205.6588
+  VBS Solved:      942, PAR-2: 61.5929
+
+============================================================
+
+========================================================================
+Completed successfully for QF_LIA!
+Results: results/20260209_56316328/train_eval_fusion/QF_LIA/summary.json
+========================================================================
+Job finished at: Mon Feb  9 01:30:11 AM EST 2026
