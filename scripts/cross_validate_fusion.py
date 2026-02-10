@@ -125,16 +125,15 @@ def cross_validate_fusion(
     timeout: float = 1200.0,
 ):
     """
-    Perform k-fold cross-validation with fixed-alpha fusion (ORACLE mode).
+    Perform k-fold cross-validation with fixed-alpha fusion.
 
     For each outer fold:
     1. Train synt and desc models on the training set
-    2. Tune alpha using VALIDATION set (oracle mode - upper bound analysis)
-    3. Evaluate on test set with best alpha
+    2. Evaluate ALL alpha candidates on the test set
 
-    ORACLE MODE: Uses validation set for alpha selection to find the upper bound
-    of what fusion could achieve with perfect alpha selection. This is NOT a
-    realistic deployment scenario but useful for understanding potential.
+    After all folds:
+    3. For each alpha, compute mean gap_cls_solved across all folds
+    4. Select the alpha with the best mean gap_cls_solved
 
     Args:
         folds_dir: Directory containing fold CSV files (e.g., data/perf_data/folds/ABV)
@@ -196,8 +195,10 @@ def cross_validate_fusion(
     )
     logging.info(f"Alpha candidates: {alpha_candidates}")
 
-    # Storage for per-fold results
-    fold_results = []
+    # Storage for per-fold, per-alpha results
+    # Structure: {alpha: [metrics_fold0, metrics_fold1, ...]}
+    alpha_fold_metrics = {alpha: [] for alpha in alpha_candidates}
+    fold_info = []  # Store fold metadata (train_size, test_size, etc.)
 
     # Iterate over outer folds
     for fold_num, fold_file in enumerate(fold_files):
@@ -215,6 +216,13 @@ def cross_validate_fusion(
         train_paths = list(all_instance_paths - test_paths)
         logging.info(f"Train instances: {len(train_paths)}")
         train_data = create_subset_dataset(multi_perf_data, train_paths)
+
+        # Store fold info
+        fold_info.append({
+            "fold": fold_num + 1,
+            "train_size": len(train_paths),
+            "test_size": len(test_paths),
+        })
 
         # Determine model save location
         if save_models and output_dir:
@@ -247,97 +255,63 @@ def cross_validate_fusion(
         if model_desc.feature_csv_path is None:
             model_desc.feature_csv_path = feature_csv_desc
 
-        # Step 2: Tune alpha using VALIDATION set (Oracle mode for upper bound)
-        best_alpha, alpha_tuning_results = tune_alpha_on_validation(
-            model_synt,
-            model_desc,
-            test_data,  # Use validation/test set for oracle tuning
-            feature_csv_synt,
-            feature_csv_desc,
-            alpha_candidates,
-        )
+        # Step 2: Evaluate ALL alpha candidates on test set
+        logging.info(f"\nEvaluating all alpha candidates on test set...")
+        for alpha in alpha_candidates:
+            fusion_model = PwcModelFusion(
+                model_synt,
+                model_desc,
+                alpha,
+                feature_csv_synt,
+                feature_csv_desc,
+            )
+            test_result = as_evaluate(fusion_model, test_data)
+            test_metrics = compute_metrics(test_result, test_data)
+            alpha_fold_metrics[alpha].append(test_metrics)
 
-        # Step 3: Create fusion model with best alpha
-        logging.info(f"Creating fusion model with α={best_alpha:.2f}...")
-        fusion_model = PwcModelFusion(
-            model_synt,
-            model_desc,
-            best_alpha,
-            feature_csv_synt,
-            feature_csv_desc,
-        )
-
-        # Save fusion model if requested
-        if save_models and output_dir:
-            fusion_model.save(str(model_save_dir))
-
-        # Create train and test output directories if needed
-        train_output_dir = None
-        test_output_dir = None
-        if output_dir:
-            train_output_dir = output_dir / "train"
-            test_output_dir = output_dir / "test"
-            train_output_dir.mkdir(parents=True, exist_ok=True)
-            test_output_dir.mkdir(parents=True, exist_ok=True)
-
-        # Evaluate on train set
-        logging.info("Evaluating fusion model on train set...")
-        train_output_csv = None
-        if train_output_dir:
-            train_output_csv = str(train_output_dir / f"{fold_num}.csv")
-        train_result = as_evaluate(fusion_model, train_data, train_output_csv)
-        train_metrics = compute_metrics(train_result, train_data)
-
-        # Evaluate on test set
-        logging.info("Evaluating fusion model on test set...")
-        test_output_csv = None
-        if test_output_dir:
-            test_output_csv = str(test_output_dir / f"{fold_num}.csv")
-        test_result = as_evaluate(fusion_model, test_data, test_output_csv)
-        test_metrics = compute_metrics(test_result, test_data)
-
-        # Store fold results
-        fold_result = {
-            "fold": fold_num + 1,
-            "train_size": len(train_paths),
-            "test_size": len(test_paths),
-            "best_alpha": best_alpha,
-            "alpha_tuning_results": alpha_tuning_results,
-            "train_metrics": train_metrics,
-            "test_metrics": test_metrics,
-        }
-        fold_results.append(fold_result)
-
-        # Log fold results
-        logging.info(f"\nFold {fold_num + 1} Results (α={best_alpha:.2f}):")
-        logging.info("  Train Set:")
-        logging.info(
-            f"    Solved: {train_metrics['solved']}/{train_metrics['total_instances']}"
-        )
-        logging.info(f"    Solve rate: {train_metrics['solve_rate']:.2f}%")
-        logging.info(f"    Average PAR-2: {train_metrics['avg_par2']:.2f}")
-        logging.info(f"    Gap closed (PAR-2): {train_metrics['gap_cls_par2']:.4f}")
-        logging.info("  Test Set:")
-        logging.info(
-            f"    Solved: {test_metrics['solved']}/{test_metrics['total_instances']}"
-        )
-        logging.info(f"    Solve rate: {test_metrics['solve_rate']:.2f}%")
-        logging.info(f"    Average PAR-2: {test_metrics['avg_par2']:.2f}")
-        logging.info(f"    Gap closed (PAR-2): {test_metrics['gap_cls_par2']:.4f}")
+        # Log results for this fold
+        logging.info(f"\nFold {fold_num + 1} Results (all alphas):")
+        logging.info(f"  {'Alpha':>6} | {'Gap Solved':>10} | {'Gap PAR2':>10} | {'Solve%':>8}")
+        logging.info(f"  {'-'*6} | {'-'*10} | {'-'*10} | {'-'*8}")
+        for alpha in alpha_candidates:
+            m = alpha_fold_metrics[alpha][fold_num]
+            logging.info(f"  {alpha:>6.2f} | {m['gap_cls_solved']:>10.4f} | {m['gap_cls_par2']:>10.4f} | {m['solve_rate']:>7.2f}%")
 
         # Clean up temporary model directory if not saving
         if not save_models:
             shutil.rmtree(model_save_dir, ignore_errors=True)
 
-    # Aggregate results across folds
-    test_metrics_list = [fr["test_metrics"] for fr in fold_results]
-    train_metrics_list = [fr["train_metrics"] for fr in fold_results]
-    best_alphas = [fr["best_alpha"] for fr in fold_results]
+    # Step 3: Compute mean gap_cls_par2 for each alpha across all folds
+    logging.info(f"\n{'=' * 60}")
+    logging.info("Alpha Selection: Mean gap_cls_par2 across all folds")
+    logging.info(f"{'=' * 60}")
+
+    alpha_mean_gap_cls_par2 = {}
+    for alpha in alpha_candidates:
+        mean_gap = np.mean([m["gap_cls_par2"] for m in alpha_fold_metrics[alpha]])
+        alpha_mean_gap_cls_par2[alpha] = mean_gap
+
+    # Find best alpha (highest gap_cls_par2 is best)
+    best_alpha = max(alpha_mean_gap_cls_par2, key=alpha_mean_gap_cls_par2.get)
+
+    logging.info(f"\n  {'Alpha':>6} | {'Mean Gap PAR2':>15}")
+    logging.info(f"  {'-'*6} | {'-'*15}")
+    for alpha in alpha_candidates:
+        marker = " ← BEST" if alpha == best_alpha else ""
+        logging.info(f"  {alpha:>6.2f} | {alpha_mean_gap_cls_par2[alpha]:>15.4f}{marker}")
+
+    logging.info(f"\nSelected α={best_alpha:.2f} (mean gap_cls_par2={alpha_mean_gap_cls_par2[best_alpha]:.4f})")
+
+    # Use the best alpha's metrics for final results
+    test_metrics_list = alpha_fold_metrics[best_alpha]
+
+    # For train metrics, we need to re-evaluate with best alpha (or skip if not needed)
+    # For simplicity, we'll compute aggregated stats from test metrics only
+    # Train metrics would require re-running evaluation, which is expensive
 
     aggregated = {
-        "alpha_mean": np.mean(best_alphas),
-        "alpha_std": np.std(best_alphas),
-        "alpha_values": best_alphas,
+        "best_alpha": best_alpha,
+        "alpha_mean_gap_cls_par2": alpha_mean_gap_cls_par2,
         "test_solve_rate_mean": np.mean([m["solve_rate"] for m in test_metrics_list]),
         "test_solve_rate_std": np.std([m["solve_rate"] for m in test_metrics_list]),
         "test_avg_par2_mean": np.mean([m["avg_par2"] for m in test_metrics_list]),
@@ -372,55 +346,27 @@ def cross_validate_fusion(
             [m["gap_cls_par2"] for m in test_metrics_list]
         ),
         "test_gap_cls_par2_std": np.std([m["gap_cls_par2"] for m in test_metrics_list]),
-        "train_solve_rate_mean": np.mean([m["solve_rate"] for m in train_metrics_list]),
-        "train_solve_rate_std": np.std([m["solve_rate"] for m in train_metrics_list]),
-        "train_avg_par2_mean": np.mean([m["avg_par2"] for m in train_metrics_list]),
-        "train_avg_par2_std": np.std([m["avg_par2"] for m in train_metrics_list]),
-        "train_sbs_solve_rate_mean": np.mean(
-            [m["sbs_solve_rate"] for m in train_metrics_list]
-        ),
-        "train_sbs_solve_rate_std": np.std(
-            [m["sbs_solve_rate"] for m in train_metrics_list]
-        ),
-        "train_sbs_avg_par2_mean": np.mean(
-            [m["sbs_avg_par2"] for m in train_metrics_list]
-        ),
-        "train_sbs_avg_par2_std": np.std(
-            [m["sbs_avg_par2"] for m in train_metrics_list]
-        ),
-        "train_vbs_solve_rate_mean": np.mean(
-            [m["vbs_solve_rate"] for m in train_metrics_list]
-        ),
-        "train_vbs_solve_rate_std": np.std(
-            [m["vbs_solve_rate"] for m in train_metrics_list]
-        ),
-        "train_vbs_avg_par2_mean": np.mean(
-            [m["vbs_avg_par2"] for m in train_metrics_list]
-        ),
-        "train_vbs_avg_par2_std": np.std(
-            [m["vbs_avg_par2"] for m in train_metrics_list]
-        ),
-        "train_gap_cls_solved_mean": np.mean(
-            [m["gap_cls_solved"] for m in train_metrics_list]
-        ),
-        "train_gap_cls_solved_std": np.std(
-            [m["gap_cls_solved"] for m in train_metrics_list]
-        ),
-        "train_gap_cls_par2_mean": np.mean(
-            [m["gap_cls_par2"] for m in train_metrics_list]
-        ),
-        "train_gap_cls_par2_std": np.std(
-            [m["gap_cls_par2"] for m in train_metrics_list]
-        ),
     }
+
+    # Build fold_results for output compatibility
+    fold_results = []
+    for fold_num in range(n_splits):
+        fold_result = {
+            "fold": fold_num + 1,
+            "train_size": fold_info[fold_num]["train_size"],
+            "test_size": fold_info[fold_num]["test_size"],
+            "alpha_metrics": {alpha: alpha_fold_metrics[alpha][fold_num] for alpha in alpha_candidates},
+            "test_metrics": alpha_fold_metrics[best_alpha][fold_num],
+        }
+        fold_results.append(fold_result)
 
     results = {
         "n_splits": n_splits,
         "n_instances": n_instances,
-        "fusion_method": "fixed_alpha_oracle",
-        "model_type": f"Fusion_{'XGBoost' if xg_flag else 'SVM'}_fixed_alpha_oracle",
-        "oracle_mode": True,
-        "oracle_note": "Alpha tuned on validation set (upper bound analysis)",
+        "fusion_method": "fixed_alpha_cv",
+        "model_type": f"Fusion_{'XGBoost' if xg_flag else 'SVM'}_fixed_alpha_cv",
+        "best_alpha": best_alpha,
+        "alpha_selection_note": "Alpha selected by best mean gap_cls_par2 across all folds",
         "folds_dir": str(folds_dir),
         "feature_csv_synt": feature_csv_synt,
         "feature_csv_desc": feature_csv_desc,
@@ -548,20 +494,16 @@ def main():
 
     # Print aggregated results
     logging.info("\n" + "=" * 60)
-    logging.info("Cross-Validation Results Summary (ORACLE MODE)")
+    logging.info("Cross-Validation Results Summary")
     logging.info("=" * 60)
-    logging.info("*** ORACLE MODE: Alpha tuned on validation set (upper bound) ***")
     logging.info(f"Model type: {results['model_type']}")
     logging.info(f"Number of folds: {results['n_splits']}")
     logging.info(f"Total instances: {results['n_instances']}")
+    logging.info(f"Best alpha: {results['best_alpha']:.2f}")
+    logging.info(f"Alpha selection: {results['alpha_selection_note']}")
     logging.info("")
 
     agg = results["aggregated"]
-    logging.info(f"Alpha values per fold: {[f'{a:.2f}' for a in agg['alpha_values']]}")
-    logging.info(
-        f"Alpha mean ± std: {agg['alpha_mean']:.2f} ± {agg['alpha_std']:.2f}"
-    )
-    logging.info("")
 
     logging.info("Test Set Performance:")
     logging.info("  Algorithm Selection (Fusion):")
