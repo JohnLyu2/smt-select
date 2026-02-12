@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 
 from .performance import SingleSolverDataset
-from .perf_parser import parse_performance_csv
+from .performance import parse_performance_csv
 from .pwc import PwcSelector
 from .setfit_model import SetfitSelector
 

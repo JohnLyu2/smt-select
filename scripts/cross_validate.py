@@ -17,7 +17,7 @@ from pathlib import Path
 import numpy as np
 
 from src.performance import MultiSolverDataset
-from src.perf_parser import parse_performance_csv
+from src.performance import parse_performance_csv
 from src.pwc import train_pwc, PwcSelector
 from src.evaluate import as_evaluate
 from src.feature import validate_feature_coverage

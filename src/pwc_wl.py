@@ -14,7 +14,7 @@ from grakel.kernels import WeisfeilerLehman
 from sklearn.svm import SVC
 
 from .graph_rep import smt_to_graph, smt_graph_to_grakel
-from .perf_parser import parse_performance_csv
+from .performance import parse_performance_csv
 from .performance import MultiSolverDataset
 from .solver_selector import SolverSelector
 
