@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 import numpy as np
 
-from src.performance import parse_performance_csv
+from src.performance import parse_performance_csv, parse_performance_json
 from src.pwc import train_pwc, PwcSelector
 from src.evaluate import as_evaluate
 from src.feature import validate_feature_coverage
@@ -93,6 +93,12 @@ def main():
         help="Logic to process (e.g., BV, ABV, QF_LIA)",
     )
     parser.add_argument(
+        "--split-dir",
+        type=str,
+        default=None,
+        help="Directory containing train.json and test.json (e.g. data/cp26/performance_splits/smtcomp24/ABV/seed0). If set, overrides default train/test paths.",
+    )
+    parser.add_argument(
         "--feature-csv",
         type=str,
         required=True,
@@ -155,29 +161,45 @@ def main():
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
 
-    # Resolve performance CSV paths
+    # Resolve performance train/test paths
     logic = args.logic
-    train_csv = Path(f"data/perf_data/train/{logic}.CSV")
-    if not train_csv.exists():
-        train_csv = Path(f"data/perf_data/train/{logic}.csv")
+    if args.split_dir:
+        split_dir = Path(args.split_dir)
+        train_path = split_dir / "train.json"
+        test_path = split_dir / "test.json"
+        if not train_path.exists():
+            train_path = split_dir / "train.CSV"
+        if not train_path.exists():
+            train_path = split_dir / "train.csv"
+        if not test_path.exists():
+            test_path = split_dir / "test.CSV"
+        if not test_path.exists():
+            test_path = split_dir / "test.csv"
+    else:
+        train_path = Path(f"data/perf_data/train/{logic}.CSV")
+        if not train_path.exists():
+            train_path = Path(f"data/perf_data/train/{logic}.csv")
+        test_path = Path(f"data/perf_data/test/{logic}.CSV")
+        if not test_path.exists():
+            test_path = Path(f"data/perf_data/test/{logic}.csv")
 
-    test_csv = Path(f"data/perf_data/test/{logic}.CSV")
-    if not test_csv.exists():
-        test_csv = Path(f"data/perf_data/test/{logic}.csv")
-
-    if not train_csv.exists():
-        logging.error(f"Training CSV not found: {train_csv}")
+    if not train_path.exists():
+        logging.error(f"Training file not found: {train_path}")
+        sys.exit(1)
+    if not test_path.exists():
+        logging.error(f"Test file not found: {test_path}")
         sys.exit(1)
 
-    if not test_csv.exists():
-        logging.error(f"Test CSV not found: {test_csv}")
-        sys.exit(1)
+    def load_perf(path: Path):
+        s = str(path)
+        if path.suffix.lower() == ".json":
+            return parse_performance_json(s, args.timeout)
+        return parse_performance_csv(s, args.timeout)
 
-    # Load performance data
-    logging.info(f"Loading training data from {train_csv}...")
-    train_data = parse_performance_csv(str(train_csv), args.timeout)
-    logging.info(f"Loading test data from {test_csv}...")
-    test_data = parse_performance_csv(str(test_csv), args.timeout)
+    logging.info(f"Loading training data from {train_path}...")
+    train_data = load_perf(train_path)
+    logging.info(f"Loading test data from {test_path}...")
+    test_data = load_perf(test_path)
 
     all_instance_paths = set(train_data.keys()) | set(test_data.keys())
 
@@ -233,8 +255,8 @@ def main():
         "logic": logic,
         "model_type": "XGBoost" if args.xg else "SVM",
         "feature_csv": args.feature_csv,
-        "train_csv": str(train_csv),
-        "test_csv": str(test_csv),
+        "train_csv": str(train_path),
+        "test_csv": str(test_path),
         "train_metrics": train_metrics,
         "test_metrics": test_metrics,
     }
