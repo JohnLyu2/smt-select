@@ -1,6 +1,7 @@
 """Data structures for performance and solver data."""
 
 import csv
+import json
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
@@ -430,6 +431,63 @@ def parse_performance_csv(csv_path: str, timeout: float) -> MultiSolverDataset:
                     results.append((0, 0.0))
 
             multi_perf_dict[path] = results
+
+    return MultiSolverDataset(multi_perf_dict, solver_dict, timeout)
+
+
+def parse_performance_json(json_path: str, timeout: float) -> MultiSolverDataset:
+    """
+    Parse a performance JSON file (e.g. from data/cp26/raw_data/smtcomp24_performance)
+    and create a MultiSolverDataset.
+
+    Expects format: { benchmark_path: { solver_name: { "result", "wallclock_time", ... } } }.
+    Uses wallclock_time; an instance is solved only if result is "sat" or "unsat".
+
+    Args:
+        json_path: Path to the JSON file
+        timeout: Timeout value in seconds (used for PAR-2 etc.)
+
+    Returns:
+        A MultiSolverDataset with (is_solved, wallclock_time) per solver.
+    """
+    with open(json_path, encoding="utf-8") as f:
+        data = json.load(f)
+
+    if not isinstance(data, dict):
+        raise ValueError("JSON root must be an object")
+
+    # Deterministic solver order: union of all solver names, sorted
+    solver_set: set[str] = set()
+    for bench in data.values():
+        if isinstance(bench, dict):
+            solver_set.update(bench.keys())
+    solver_names = sorted(solver_set)
+
+    # Ensure all benchmarks use same solver set (fill missing with 0, 0.0)
+    solver_dict: Dict[int, str] = {i: name for i, name in enumerate(solver_names)}
+    multi_perf_dict: Dict[str, List[Tuple[int, float]]] = {}
+
+    for path, solvers in data.items():
+        if not isinstance(solvers, dict):
+            continue
+        row: List[Tuple[int, float]] = []
+        for name in solver_names:
+            run = solvers.get(name)
+            if run is None or not isinstance(run, dict):
+                row.append((0, 0.0))
+                continue
+            result = run.get("result")
+            wc = run.get("wallclock_time")
+            if result is None or wc is None:
+                row.append((0, 0.0))
+                continue
+            solved = 1 if str(result).lower() in ("sat", "unsat") else 0
+            try:
+                wc_time = float(wc)
+            except (TypeError, ValueError):
+                wc_time = 0.0
+            row.append((solved, wc_time))
+        multi_perf_dict[path] = row
 
     return MultiSolverDataset(multi_perf_dict, solver_dict, timeout)
 
