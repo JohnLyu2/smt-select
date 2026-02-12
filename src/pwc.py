@@ -10,7 +10,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler
 
-from .parser import parse_performance_csv
+from .perf_parser import parse_performance_csv
 from .feature import extract_feature_from_csv, extract_feature_from_csvs_concat
 from .solver_selector import SolverSelector
 

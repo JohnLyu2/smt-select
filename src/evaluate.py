@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 
 from .performance import SingleSolverDataset
-from .parser import parse_performance_csv
+from .perf_parser import parse_performance_csv
 from .pwc import PwcSelector
 from .setfit_model import SetfitSelector
 
@@ -49,9 +49,7 @@ def as_evaluate(as_model, multi_perf_data, write_csv_path=None):
         logging.debug(f"Evaluated {instance_path}: selected solver {selected}")
     return SingleSolverDataset(
         perf_dict,
-        "AS",  # TODO: add AS name from as_model
-        multi_perf_data.get_timeout(),
-    )
+        "AS",  # TODO: add AS name from as_model)
 
 
 def main():
@@ -82,16 +80,16 @@ def main():
         help="Path to the performance CSV file",
     )
     parser.add_argument(
-        "--timeout",
-        type=float,
-        default=1200.0,
-        help="Timeout value in seconds (default: 1200.0)",
-    )
-    parser.add_argument(
         "--output-csv",
         type=str,
         default=None,
         help="Optional path to write evaluation results CSV",
+    )
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=1200.0,
+        help="Timeout in seconds for PAR-2 (default: 1200.0)",
     )
     parser.add_argument(
         "--log-level",
@@ -126,18 +124,7 @@ def main():
         as_model = PwcSelector.load(args.pwc_model)
         logging.info(
             f"Loaded {as_model.model_type} model with {as_model.solver_size} solvers"
-        )
-
-        # Set feature CSV path if not already set or if override is provided
-        if args.feature_csv is not None:
-            as_model.feature_csv_path = args.feature_csv
-            logging.info(f"Using feature CSV: {args.feature_csv}")
-        elif as_model.feature_csv_path is None:
-            raise ValueError(
-                "feature_csv_path not set in model and --feature-csv not provided. "
-                "Please provide --feature-csv argument."
-            )
-        else:
+        ))
             logging.info(f"Using feature CSV from model: {as_model.feature_csv_path}")
 
     # Load performance data
@@ -153,10 +140,7 @@ def main():
 
     # Print statistics
     solved_count = result_dataset.get_solved_count()
-    total_count = len(result_dataset)
-    solve_rate = (solved_count / total_count * 100) if total_count > 0 else 0.0
-
-    # Calculate average PAR-2 for algorithm selection
+    total_count = len(result_dataset))n
     total_par2_as = sum(result_dataset.get_par2(path) for path in result_dataset.keys())
     avg_par2_as = total_par2_as / total_count if total_count > 0 else 0.0
 

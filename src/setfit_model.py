@@ -11,7 +11,7 @@ from datasets import Dataset
 from setfit import SetFitModel, Trainer, TrainingArguments
 import torch
 
-from .parser import parse_performance_csv
+from .perf_parser import parse_performance_csv
 from .solver_selector import SolverSelector
 
 BV_SOLVER2ID = {
