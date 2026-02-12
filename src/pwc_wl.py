@@ -26,6 +26,7 @@ PERF_DIFF_THRESHOLD = 1e-1  # Threshold for considering performance differences
 
 
 def _timeout_handler(_signum: int, _frame: object) -> None:
+    signal.alarm(0)  # cancel so no second SIGALRM during unwind (z3 __del__ etc.)
     raise TimeoutError("Graph build timed out")
 
 
@@ -42,7 +43,7 @@ def _suppress_z3_destructor_noise() -> None:
 
 
 def build_smt_graph_timeout(smt_path: str | Path, timeout_sec: int) -> Graph | None:
-    """Build a GraKel graph for the SMT instance with a timeout. Returns None on timeout."""
+    """Build a GraKel graph for the SMT instance with a timeout. Returns None on timeout/error."""
     path = Path(smt_path)
     signal.signal(signal.SIGALRM, _timeout_handler)
     signal.alarm(timeout_sec)
@@ -52,24 +53,24 @@ def build_smt_graph_timeout(smt_path: str | Path, timeout_sec: int) -> Graph | N
         signal.alarm(0)
         return graph
     except TimeoutError:
-        logging.info(
+        logging.debug(
             "Timeout (%ds) while building graph for %s", timeout_sec, smt_path
         )
         _suppress_z3_destructor_noise()
         return None
     except RecursionError:
-        logging.info(
+        logging.debug(
             "Recursion limit exceeded while building graph for %s", smt_path
         )
         _suppress_z3_destructor_noise()
         return None
     except Exception as e:
         if "recursion" in str(e).lower():
-            logging.info(
+            logging.debug(
                 "Recursion limit exceeded while building graph for %s", smt_path
             )
         else:
-            logging.info("Error building graph for %s: %s", smt_path, e)
+            logging.debug("Error building graph for %s: %s", smt_path, e)
         _suppress_z3_destructor_noise()
         return None
     finally:
@@ -88,6 +89,7 @@ def generate_graph_dict(
             graph_dict[p] = g
         else:
             failed_list.append(p)
+            _suppress_z3_destructor_noise()
     logging.info(
         "Graphs: %d built, %d failed (of %d instances)",
         len(graph_dict),
@@ -220,8 +222,10 @@ class PwcWlSelector(SolverSelector):
         path = Path(instance_path)
         graph = build_smt_graph_timeout(path, self.graph_timeout)
         if graph is None:
+            _suppress_z3_destructor_noise()
             return self.timeout_solver_ids[0]
         rank = self._get_rank_lst(graph)
+        _suppress_z3_destructor_noise()
         return rank[0]
 
 
