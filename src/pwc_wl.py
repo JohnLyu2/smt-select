@@ -3,14 +3,18 @@
 from __future__ import annotations
 
 import argparse
+import gc
 import logging
+import os
 import signal
+import sys
 from pathlib import Path
 
 import joblib
 import numpy as np
 from grakel import Graph
 from grakel.kernels import WeisfeilerLehman
+from sklearn.dummy import DummyClassifier
 from sklearn.svm import SVC
 
 from .graph_rep import smt_to_graph, smt_graph_to_grakel
@@ -23,6 +27,18 @@ PERF_DIFF_THRESHOLD = 1e-1  # Threshold for considering performance differences
 
 def _timeout_handler(_signum: int, _frame: object) -> None:
     raise TimeoutError("Graph build timed out")
+
+
+def _suppress_z3_destructor_noise() -> None:
+    """Run GC with stderr suppressed to avoid z3 AstRef.__del__ messages after timeout."""
+    devnull = open(os.devnull, "w")
+    old = sys.stderr
+    try:
+        sys.stderr = devnull
+        gc.collect()
+    finally:
+        sys.stderr = old
+        devnull.close()
 
 
 def build_smt_graph_timeout(smt_path: str | Path, timeout_sec: int) -> Graph | None:
@@ -39,6 +55,22 @@ def build_smt_graph_timeout(smt_path: str | Path, timeout_sec: int) -> Graph | N
         logging.info(
             "Timeout (%ds) while building graph for %s", timeout_sec, smt_path
         )
+        _suppress_z3_destructor_noise()
+        return None
+    except RecursionError:
+        logging.info(
+            "Recursion limit exceeded while building graph for %s", smt_path
+        )
+        _suppress_z3_destructor_noise()
+        return None
+    except Exception as e:
+        if "recursion" in str(e).lower():
+            logging.info(
+                "Recursion limit exceeded while building graph for %s", smt_path
+            )
+        else:
+            logging.info("Error building graph for %s: %s", smt_path, e)
+        _suppress_z3_destructor_noise()
         return None
     finally:
         signal.alarm(0)
@@ -47,22 +79,22 @@ def build_smt_graph_timeout(smt_path: str | Path, timeout_sec: int) -> Graph | N
 def generate_graph_dict(
     instance_paths: list[str], timeout_sec: int
 ) -> tuple[dict[str, Graph], list[str]]:
-    """Build graphs for each instance. Returns (path -> graph, list of paths that timed out)."""
+    """Build graphs for each instance. Returns (path -> graph, list of paths that failed: timeout/recursion/error)."""
     graph_dict: dict[str, Graph] = {}
-    timeout_list: list[str] = []
+    failed_list: list[str] = []
     for p in instance_paths:
         g = build_smt_graph_timeout(p, timeout_sec)
         if g is not None:
             graph_dict[p] = g
         else:
-            timeout_list.append(p)
+            failed_list.append(p)
     logging.info(
-        "Graphs: %d built, %d timed out (of %d instances)",
+        "Graphs: %d built, %d failed (of %d instances)",
         len(graph_dict),
-        len(timeout_list),
+        len(failed_list),
         len(instance_paths),
     )
-    return graph_dict, timeout_list
+    return graph_dict, failed_list
 
 
 def generate_labels_for_config_pair(
@@ -203,10 +235,10 @@ def train_pwc_wl(
     Path(save_dir).mkdir(parents=True, exist_ok=True)
     solver_size = multi_perf_data.num_solvers()
     instance_paths = list(multi_perf_data.keys())
-    graph_dict, timeout_list = generate_graph_dict(instance_paths, graph_timeout)
+    graph_dict, failed_list = generate_graph_dict(instance_paths, graph_timeout)
     if not graph_dict:
         raise ValueError(
-            "No graphs could be built (all timed out?). Increase --graph-timeout or check instances."
+            "No graphs could be built (all failed: timeout/recursion/error?). Increase --graph-timeout or check instances."
         )
     train_paths = list(graph_dict.keys())
     train_graphs = [graph_dict[p] for p in train_paths]
@@ -229,11 +261,16 @@ def train_pwc_wl(
             if len(indices) == 0:
                 continue
             sub = k_mat_np[np.ix_(indices, indices)]
-            svm_ij = SVC(kernel="precomputed")
-            svm_ij.fit(sub, label_arr, sample_weight=cost_arr)
+            unique_labels = np.unique(label_arr)
+            if len(unique_labels) == 1:
+                svm_ij = DummyClassifier(strategy="constant", constant=int(unique_labels[0]))
+                svm_ij.fit(sub, label_arr)
+            else:
+                svm_ij = SVC(kernel="precomputed")
+                svm_ij.fit(sub, label_arr, sample_weight=cost_arr)
             svm_matrix[i][j] = svm_ij
 
-    timeout_solver_ids = sorted_timeout_solvers(multi_perf_data, timeout_list)
+    timeout_solver_ids = sorted_timeout_solvers(multi_perf_data, failed_list)
     solver_id_dict = multi_perf_data.get_solver_id_dict()
 
     model = PwcWlSelector(
