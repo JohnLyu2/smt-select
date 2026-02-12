@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """
-Train an algorithm selection model on a training CSV and evaluate on training and test CSVs.
-Target logic is specified via --logic argument.
-Performance files are expected at:
-  - data/perf_data/train/{logic}.CSV
-  - data/perf_data/test/{logic}.CSV
+Train an algorithm selection model and evaluate on train and test sets.
+Specify --train-file and --test-file (JSON).
 """
 
 import argparse
@@ -16,8 +13,9 @@ import sys
 from pathlib import Path
 import numpy as np
 
-from src.performance import parse_performance_csv, parse_performance_json
+from src.performance import parse_performance_json
 from src.pwc import train_pwc, PwcSelector
+from src.pwc_wl import train_pwc_wl, PwcWlSelector
 from src.evaluate import as_evaluate
 from src.feature import validate_feature_coverage
 
@@ -87,23 +85,48 @@ def main():
         description="Train and evaluate algorithm selection model on pre-split train/test data"
     )
     parser.add_argument(
-        "--logic",
+        "--train-file",
         type=str,
         required=True,
-        help="Logic to process (e.g., BV, ABV, QF_LIA)",
+        help="Path to training performance JSON file.",
     )
     parser.add_argument(
-        "--split-dir",
+        "--test-file",
         type=str,
-        default=None,
-        help="Directory containing train.json and test.json (e.g. data/cp26/performance_splits/smtcomp24/ABV/seed0). If set, overrides default train/test paths.",
+        required=True,
+        help="Path to test performance JSON file.",
+    )
+    parser.add_argument(
+        "--model-type",
+        type=str,
+        choices=["pwc", "wl"],
+        default="pwc",
+        help="Model type: pwc (feature-based) or wl (graph-kernel). Default: pwc.",
     )
     parser.add_argument(
         "--feature-csv",
         type=str,
-        required=True,
+        default=None,
         nargs="+",
-        help="Path(s) to the features CSV file(s). Can specify multiple files to concatenate features.",
+        help="Path(s) to the features CSV file(s). Required for --model-type pwc.",
+    )
+    parser.add_argument(
+        "--wl-iter",
+        type=int,
+        default=2,
+        help="Weisfeiler-Lehman iteration count for --model-type wl (default: 2)",
+    )
+    parser.add_argument(
+        "--graph-timeout",
+        type=int,
+        default=10,
+        help="Graph build timeout in seconds for --model-type wl (default: 10)",
+    )
+    parser.add_argument(
+        "--benchmark-root",
+        type=str,
+        default=None,
+        help="Root directory for instance paths; required for --model-type wl when paths are relative (e.g. ABV/...).",
     )
     parser.add_argument(
         "--timeout",
@@ -161,28 +184,8 @@ def main():
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
 
-    # Resolve performance train/test paths
-    logic = args.logic
-    if args.split_dir:
-        split_dir = Path(args.split_dir)
-        train_path = split_dir / "train.json"
-        test_path = split_dir / "test.json"
-        if not train_path.exists():
-            train_path = split_dir / "train.CSV"
-        if not train_path.exists():
-            train_path = split_dir / "train.csv"
-        if not test_path.exists():
-            test_path = split_dir / "test.CSV"
-        if not test_path.exists():
-            test_path = split_dir / "test.csv"
-    else:
-        train_path = Path(f"data/perf_data/train/{logic}.CSV")
-        if not train_path.exists():
-            train_path = Path(f"data/perf_data/train/{logic}.csv")
-        test_path = Path(f"data/perf_data/test/{logic}.CSV")
-        if not test_path.exists():
-            test_path = Path(f"data/perf_data/test/{logic}.csv")
-
+    train_path = Path(args.train_file)
+    test_path = Path(args.test_file)
     if not train_path.exists():
         logging.error(f"Training file not found: {train_path}")
         sys.exit(1)
@@ -190,27 +193,47 @@ def main():
         logging.error(f"Test file not found: {test_path}")
         sys.exit(1)
 
-    def load_perf(path: Path):
-        s = str(path)
-        if path.suffix.lower() == ".json":
-            return parse_performance_json(s, args.timeout)
-        return parse_performance_csv(s, args.timeout)
-
     logging.info(f"Loading training data from {train_path}...")
-    train_data = load_perf(train_path)
+    train_data = parse_performance_json(str(train_path), args.timeout)
     logging.info(f"Loading test data from {test_path}...")
-    test_data = load_perf(test_path)
+    test_data = parse_performance_json(str(test_path), args.timeout)
 
-    all_instance_paths = set(train_data.keys()) | set(test_data.keys())
-
-    # Validate feature coverage
-    logging.info("Validating feature coverage...")
-    missing_instances, _ = validate_feature_coverage(all_instance_paths, args.feature_csv)
-    if missing_instances:
-        logging.error(
-            f"ERROR: {len(missing_instances)} instance(s) are missing features in provided feature CSV(s)."
+    use_wl = args.model_type == "wl"
+    if use_wl:
+        if args.feature_csv is not None:
+            logging.warning("--feature-csv is ignored for --model-type wl")
+        if args.benchmark_root:
+            root = Path(args.benchmark_root).resolve()
+            if not root.is_dir():
+                logging.error(f"--benchmark-root is not a directory: {root}")
+                sys.exit(1)
+            train_dict = {str(root / p): train_data[p] for p in train_data.keys()}
+            test_dict = {str(root / p): test_data[p] for p in test_data.keys()}
+            train_data = type(train_data)(
+                train_dict,
+                train_data.get_solver_id_dict(),
+                train_data.get_timeout(),
+            )
+            test_data = type(test_data)(
+                test_dict,
+                test_data.get_solver_id_dict(),
+                test_data.get_timeout(),
+            )
+            logging.info(f"Instance paths rebased under benchmark root: {root}")
+    else:
+        if args.feature_csv is None:
+            logging.error("--feature-csv is required for --model-type pwc")
+            sys.exit(1)
+        all_instance_paths = set(train_data.keys()) | set(test_data.keys())
+        logging.info("Validating feature coverage...")
+        missing_instances, _ = validate_feature_coverage(
+            all_instance_paths, args.feature_csv
         )
-        sys.exit(1)
+        if missing_instances:
+            logging.error(
+                f"ERROR: {len(missing_instances)} instance(s) are missing features."
+            )
+            sys.exit(1)
 
     # Setup save directory
     temp_dir = None
@@ -222,23 +245,31 @@ def main():
         model_save_dir = Path(temp_dir)
 
     # Train model
-    logging.info(f"Training {'XGBoost' if args.xg else 'SVM'} model...")
-    train_pwc(
-        train_data,
-        save_dir=str(model_save_dir),
-        xg_flag=args.xg,
-        feature_csv_path=args.feature_csv,
-        svm_c=args.svm_c,
-        random_seed=args.random_seed,
-    )
-
-    # Load trained model
-    model_path = model_save_dir / "model.joblib"
-    as_model = PwcSelector.load(str(model_path))
-
-    # Ensure feature_csv_path is set in model (for inference)
-    if as_model.feature_csv_path is None:
-        as_model.feature_csv_path = args.feature_csv
+    if use_wl:
+        logging.info(
+            f"Training WL model (wl_iter={args.wl_iter}, graph_timeout={args.graph_timeout}s)..."
+        )
+        train_pwc_wl(
+            train_data,
+            wl_iter=args.wl_iter,
+            save_dir=str(model_save_dir),
+            graph_timeout=args.graph_timeout,
+        )
+        as_model = PwcWlSelector.load(str(model_save_dir / "model.joblib"))
+    else:
+        logging.info(f"Training {'XGBoost' if args.xg else 'SVM'} model...")
+        train_pwc(
+            train_data,
+            save_dir=str(model_save_dir),
+            xg_flag=args.xg,
+            feature_csv_path=args.feature_csv,
+            svm_c=args.svm_c,
+            random_seed=args.random_seed,
+        )
+        model_path = model_save_dir / "model.joblib"
+        as_model = PwcSelector.load(str(model_path))
+        if as_model.feature_csv_path is None:
+            as_model.feature_csv_path = args.feature_csv
 
     # Evaluate on Train Set
     logging.info("Evaluating on training set...")
@@ -250,24 +281,23 @@ def main():
     test_result_dataset = as_evaluate(as_model, test_data)
     test_metrics = compute_metrics(test_result_dataset, test_data)
 
-    # Summary results
+    model_type_label = "WL" if use_wl else ("XGBoost" if args.xg else "SVM")
     results = {
-        "logic": logic,
-        "model_type": "XGBoost" if args.xg else "SVM",
+        "model_type": model_type_label,
         "feature_csv": args.feature_csv,
-        "train_csv": str(train_path),
-        "test_csv": str(test_path),
+        "train_file": str(train_path),
+        "test_file": str(test_path),
         "train_metrics": train_metrics,
         "test_metrics": test_metrics,
     }
 
     # Print summary
     print("\n" + "=" * 60)
-    print(f"Algorithm Selection Results for {logic}")
+    print("Algorithm Selection Results")
     print("=" * 60)
     print(f"Model: {results['model_type']}")
-    print(f"Train CSV: {results['train_csv']}")
-    print(f"Test CSV:  {results['test_csv']}")
+    print(f"Train file: {results['train_file']}")
+    print(f"Test file:  {results['test_file']}")
     
     for name, metrics in [("Train", train_metrics), ("Test", test_metrics)]:
         print(f"\n{name} Set Performance:")
