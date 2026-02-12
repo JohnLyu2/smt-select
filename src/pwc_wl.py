@@ -20,9 +20,8 @@ from sklearn.svm import SVC
 from .graph_rep import smt_to_graph, smt_graph_to_grakel
 from .performance import parse_performance_csv
 from .performance import MultiSolverDataset
+from .performance import PERF_DIFF_THRESHOLD
 from .solver_selector import SolverSelector
-
-PERF_DIFF_THRESHOLD = 1e-1  # Threshold for considering performance differences
 
 
 def _timeout_handler(_signum: int, _frame: object) -> None:

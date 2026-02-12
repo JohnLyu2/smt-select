@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
+PERF_DIFF_THRESHOLD = 1e-1  # Threshold for considering performance differences
+
 
 class MultiSolverDataset:
     """A data structure for performance data across multiple solvers."""
@@ -271,6 +273,53 @@ class MultiSolverDataset:
             return None
 
         return self.get_solver_name(best_solver_id)
+
+    def check_dominance(self, threshold: float | None = None) -> list[str]:
+        """
+        Find solvers that are dominated by some other solver.
+
+        Solver A dominates solver B if A's PAR-2 score is no worse than B's (within
+        threshold) on every instance (where both have data), and strictly better on
+        at least one instance. "No worse" means par2(A) <= par2(B) + threshold.
+
+        Args:
+            threshold: Performance threshold in PAR-2 seconds. A is considered no worse
+                than B on an instance when par2(A) <= par2(B) + threshold.
+                Defaults to PERF_DIFF_THRESHOLD (1e-1), same as in pwc_wl.
+
+        Returns:
+            List of solver names that are dominated by at least one other solver.
+        """
+        if threshold is None:
+            threshold = PERF_DIFF_THRESHOLD
+        dominated: list[str] = []
+        n = self.num_solvers()
+
+        for j in range(n):
+            for i in range(n):
+                if i == j:
+                    continue
+                # Check if solver i dominates solver j
+                all_no_worse = True
+                at_least_one_strictly_better = False
+                for path in self.keys():
+                    par2_i = self.get_par2(path, i)
+                    par2_j = self.get_par2(path, j)
+                    if par2_i is None or par2_j is None:
+                        continue
+                    if par2_i > par2_j + threshold:
+                        all_no_worse = False
+                        break
+                    if par2_i < par2_j:
+                        at_least_one_strictly_better = True
+
+                if all_no_worse and at_least_one_strictly_better:
+                    name = self.get_solver_name(j)
+                    if name is not None and name not in dominated:
+                        dominated.append(name)
+                    break
+
+        return dominated
 
 
 class SingleSolverDataset:
