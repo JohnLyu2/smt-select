@@ -22,7 +22,7 @@ from src.pwc import train_pwc, PwcSelector
 from src.pwc_fusion import PwcModelFusion
 from src.evaluate import as_evaluate
 from src.feature import validate_feature_coverage
-from ..train_evaluate import compute_metrics
+from scripts.train_evaluate import compute_metrics
 
 
 def main():
