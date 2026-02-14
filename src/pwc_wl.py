@@ -18,8 +18,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.svm import SVC
 
 from .graph_rep import smt_to_graph, smt_graph_to_grakel
-from .performance import parse_performance_csv
-from .performance import MultiSolverDataset
+from .performance import parse_performance_json, MultiSolverDataset
 from .performance import PERF_DIFF_THRESHOLD
 from .solver_selector import SolverSelector
 
@@ -293,10 +292,10 @@ def main() -> None:
         description="Train WL-based pairwise algorithm selection model"
     )
     parser.add_argument(
-        "--perf-csv",
+        "--perf-json",
         type=str,
         required=True,
-        help="Path to the performance CSV",
+        help="Path to the performance JSON (e.g. train.json or test.json from splits)",
     )
     parser.add_argument(
         "--save-dir",
@@ -307,20 +306,26 @@ def main() -> None:
     parser.add_argument(
         "--wl-iter",
         type=int,
-        default=3,
-        help="Weisfeiler-Lehman iteration count (default: 3)",
+        default=2,
+        help="Weisfeiler-Lehman iteration count (default: 2)",
     )
     parser.add_argument(
         "--graph-timeout",
         type=int,
         default=10,
-        help="Timeout in seconds for graph build per instance (default: 10)",
+        help="Graph build timeout in seconds (default: 10)",
     )
     parser.add_argument(
         "--timeout",
         type=float,
         default=1200.0,
-        help="PAR-2 timeout in seconds (default: 1200.0)",
+        help="Timeout value in seconds (default: 1200.0)",
+    )
+    parser.add_argument(
+        "--benchmark-root",
+        type=str,
+        default=None,
+        help="Root directory for instance paths; required when paths are relative (e.g. ABV/...).",
     )
     args = parser.parse_args()
 
@@ -329,12 +334,23 @@ def main() -> None:
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
 
-    multi_perf_data = parse_performance_csv(args.perf_csv, args.timeout)
+    multi_perf_data = parse_performance_json(args.perf_json, args.timeout)
+    if args.benchmark_root:
+        root = Path(args.benchmark_root).resolve()
+        if not root.is_dir():
+            raise ValueError(f"--benchmark-root is not a directory: {root}")
+        rebased = {str(root / p): multi_perf_data[p] for p in multi_perf_data.keys()}
+        multi_perf_data = MultiSolverDataset(
+            rebased,
+            multi_perf_data.get_solver_id_dict(),
+            multi_perf_data.get_timeout(),
+        )
+        logging.info("Instance paths rebased under benchmark root: %s", root)
     logging.info(
         "Training: %d instances, %d solvers from %s",
         len(multi_perf_data),
         multi_perf_data.num_solvers(),
-        args.perf_csv,
+        args.perf_json,
     )
     train_pwc_wl(
         multi_perf_data,
