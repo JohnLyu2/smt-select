@@ -21,7 +21,7 @@ import logging
 import sys
 from pathlib import Path
 
-from scripts.cross_validate_fusion import cross_validate_fusion
+from .cross_validate_fusion import cross_validate_fusion
 
 # Default directories
 DEFAULT_FOLDS_BASE_DIR = Path("data/perf_data/folds")
