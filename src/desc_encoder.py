@@ -151,7 +151,7 @@ def encode_all_desc(
         if not description or not description.strip():
             logic = benchmark.get("logic", "unknown")
             family = benchmark.get("family", "unknown")
-            description = f"This a {logic} benchmark from the family {family}"
+            description = f"This is a {logic} benchmark from the family {family}"
 
         paths.append(smtlib_path)
         descriptions.append(description.strip())
@@ -376,7 +376,8 @@ Examples:
             show_trunc_stats=args.trunc_stats,
             is_setfit=args.setfit,
         )
-        print(f"Success! Embeddings saved to: {csv_path}")
+        if csv_path is not None:
+            print(f"Success! Embeddings saved to: {csv_path}")
     except FileNotFoundError as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
