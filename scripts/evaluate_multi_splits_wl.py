@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
 """
-Evaluate algorithm selection over multiple train/test splits using WL (Weisfeiler-Lehman) kernel.
+Evaluate WL-based PWC over multiple train/test splits (evaluate_multi_splits_wl).
 
-Expects --splits-dir to point at a division folder containing seed subdirs, e.g.:
-  data/cp26/performance_splits/smtcomp24/ABV/
-    seed0/train.json, test.json
-    seed10/train.json, test.json
-    ...
+Uses a WL feature directory (--wl-dir) containing level_0.csv, level_1.csv, ...
+and failed_paths.txt. Expects --splits-dir to point at a division folder with
+seed subdirs (seed0/train.json, test.json, ...).
 
-For each split (seed):
-  1. Load train.json and test.json (performance JSON format).
-  2. Train a WL-based pairwise model on the train set (graphs from SMT instances).
+For each split:
+  1. Load train.json and test.json.
+  2. Train PWC with train_wl_pwc(wl_dir=..., wl_iter=...).
   3. Evaluate on train and test sets.
   4. Compute metrics (solve rate, PAR-2, gap closed vs SBS/VBS).
 
-Results are aggregated across splits (mean ± std) and optionally saved to summary.json.
-No feature CSV is required; WL builds graphs from instance paths in the performance data.
+Results are aggregated across splits and optionally saved to summary.json.
 """
 
 import argparse
@@ -29,21 +26,20 @@ from pathlib import Path
 import numpy as np
 
 from src.evaluate import as_evaluate
-from src.performance import parse_performance_json, MultiSolverDataset
-from src.pwc_wl import PwcWlSelector, train_pwc_wl
+from src.feature import validate_feature_coverage
+from src.performance import parse_performance_json
+from src.pwc import (
+    PwcSelector,
+    WL_FAILED_PATHS_FILENAME,
+    train_wl_pwc,
+    _load_path_list,
+    _wl_level_csv_paths,
+)
 
 
 def compute_metrics(result_dataset, multi_perf_data):
     """
     Compute evaluation metrics for a result dataset.
-    Handles edge case where SBS and VBS are identical (no division by zero).
-
-    Args:
-        result_dataset: SingleSolverDataset with algorithm selection results
-        multi_perf_data: MultiSolverDataset for comparison metrics
-
-    Returns:
-        Dictionary of metrics (no solve_rate fields; gap_cls_* used for aggregation).
     """
     total_count = len(result_dataset)
     solved_count = result_dataset.get_solved_count()
@@ -88,10 +84,7 @@ def compute_metrics(result_dataset, multi_perf_data):
 
 
 def discover_seed_dirs(splits_dir: Path) -> list[tuple[int, Path]]:
-    """
-    Find seed subdirectories under splits_dir that contain train.json and test.json.
-    Returns list of (seed_value, seed_dir_path) sorted by seed value.
-    """
+    """Find seed subdirs under splits_dir with train.json and test.json."""
     out: list[tuple[int, Path]] = []
     pattern = re.compile(r"^seed(\d+)$")
     for sub in splits_dir.iterdir():
@@ -107,75 +100,78 @@ def discover_seed_dirs(splits_dir: Path) -> list[tuple[int, Path]]:
 
 def evaluate_multi_splits_wl(
     splits_dir: Path,
+    wl_dir: str | Path,
+    wl_iter: int,
     *,
-    wl_iter: int = 2,
-    graph_timeout: int = 10,
     save_models: bool = False,
     output_dir: Path | None = None,
     timeout: float = 1200.0,
-    benchmark_root: Path | str | None = None,
+    svm_c: float = 1.0,
+    random_seed: int = 42,
 ) -> dict:
     """
-    Run train/test evaluation for each split (seed) using WL kernel, then aggregate metrics.
-
-    Args:
-        splits_dir: Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/ABV)
-        wl_iter: Weisfeiler-Lehman iteration count
-        graph_timeout: Timeout in seconds for building graph per instance
-        save_models: Save model per split (requires output_dir)
-        output_dir: Where to write summary.json and optional per-split outputs
-        timeout: PAR-2 timeout in seconds for performance data
-        benchmark_root: Root directory for instance paths; use when JSON paths are relative (e.g. ABV/...).
-
-    Returns:
-        Dict with division, n_seeds, per-split results, and aggregated metrics.
+    Run train/test evaluation for each split using WL features from wl_dir.
     """
     splits_dir = Path(splits_dir).resolve()
+    wl_dir = Path(wl_dir).resolve()
     if not splits_dir.is_dir():
         raise ValueError(f"Splits directory does not exist: {splits_dir}")
+    if not wl_dir.is_dir():
+        raise ValueError(f"WL directory does not exist: {wl_dir}")
 
     division = splits_dir.name
     seed_entries = discover_seed_dirs(splits_dir)
     if not seed_entries:
         raise ValueError(
             f"No seed dirs (seedN with train.json and test.json) found in {splits_dir}"
+    )
+
+    feature_csv_paths = _wl_level_csv_paths(wl_dir, wl_iter)
+    first_seed_dir = seed_entries[0][1]
+    train_data_0 = parse_performance_json(str(first_seed_dir / "train.json"), timeout)
+    test_data_0 = parse_performance_json(str(first_seed_dir / "test.json"), timeout)
+    all_instance_paths = set(train_data_0.keys()) | set(test_data_0.keys())
+
+    failed_paths_file = wl_dir / WL_FAILED_PATHS_FILENAME
+    failed_set = set(_load_path_list(failed_paths_file)) if failed_paths_file.exists() else set()
+    instances_requiring_features = all_instance_paths - failed_set
+    if failed_set:
+        logging.info("%d instances in WL failed list (use fallback solver)", len(failed_set))
+
+    logging.info("Validating feature coverage for %d instances...", len(instances_requiring_features))
+    missing_instances, instance_missing_in_csvs = validate_feature_coverage(
+        instances_requiring_features, feature_csv_paths
+    )
+    if missing_instances:
+        error_msg = (
+            f"ERROR: {len(missing_instances)} instance(s) missing in ALL feature CSV(s).\n"
+            f"  Missing (first 10): {list(missing_instances)[:10]}"
         )
+        logging.error(error_msg)
+        raise ValueError(error_msg)
+    if instance_missing_in_csvs:
+        error_msg = (
+            f"ERROR: {len(instance_missing_in_csvs)} instance(s) missing in some CSV(s)."
+        )
+        logging.error(error_msg)
+        raise ValueError(error_msg)
 
     n_seeds = len(seed_entries)
-    logging.info(
-        f"Starting WL evaluation over {n_seeds} splits for division {division} "
-        f"(wl_iter={wl_iter}, graph_timeout={graph_timeout}s)"
-    )
+    logging.info("Starting WL evaluation over %d splits for division %s", n_seeds, division)
 
     seed_results: list[dict] = []
 
     for seed_val, seed_dir in seed_entries:
-        logging.info(f"\n{'=' * 60}")
-        logging.info(f"Seed {seed_val} ({seed_dir.name})")
-        logging.info(f"{'=' * 60}")
+        logging.info("\n%s", "=" * 60)
+        logging.info("Seed %s (%s)", seed_val, seed_dir.name)
+        logging.info("%s", "=" * 60)
 
         train_path = seed_dir / "train.json"
         test_path = seed_dir / "test.json"
         train_data = parse_performance_json(str(train_path), timeout)
         test_data = parse_performance_json(str(test_path), timeout)
-        if benchmark_root is not None:
-            root = Path(benchmark_root).resolve()
-            if not root.is_dir():
-                raise ValueError(f"--benchmark-root is not a directory: {root}")
-            train_data = MultiSolverDataset(
-                {str(root / p): train_data[p] for p in train_data.keys()},
-                train_data.get_solver_id_dict(),
-                train_data.get_timeout(),
-            )
-            test_data = MultiSolverDataset(
-                {str(root / p): test_data[p] for p in test_data.keys()},
-                test_data.get_solver_id_dict(),
-                test_data.get_timeout(),
-            )
-            if seed_val == seed_entries[0][0]:
-                logging.info("Instance paths rebased under benchmark root: %s", root)
 
-        logging.info(f"Train instances: {len(train_data)}, Test instances: {len(test_data)}")
+        logging.info("Train instances: %d, Test instances: %d", len(train_data), len(test_data))
 
         if save_models and output_dir:
             model_save_dir = output_dir / "models" / f"seed{seed_val}"
@@ -183,14 +179,16 @@ def evaluate_multi_splits_wl(
         else:
             model_save_dir = Path(tempfile.mkdtemp())
 
-        train_pwc_wl(
+        train_wl_pwc(
             train_data,
+            save_dir=model_save_dir,
+            wl_dir=wl_dir,
             wl_iter=wl_iter,
-            save_dir=str(model_save_dir),
-            graph_timeout=graph_timeout,
+            svm_c=svm_c,
+            random_seed=random_seed,
         )
 
-        as_model = PwcWlSelector.load(str(model_save_dir / "model.joblib"))
+        as_model = PwcSelector.load(str(model_save_dir / "model.joblib"))
 
         train_output_csv = None
         test_output_csv = None
@@ -222,12 +220,12 @@ def evaluate_multi_splits_wl(
         train_sr = (train_metrics["solved"] / n_train * 100) if n_train else 0
         test_sr = (test_metrics["solved"] / n_test * 100) if n_test else 0
         logging.info(
-            f"  Train: solved {train_metrics['solved']}/{n_train}, "
-            f"solve_rate {train_sr:.2f}%, gap_cls_par2 {train_metrics['gap_cls_par2']:.4f}"
+            "  Train: solved %d/%d, solve_rate %.2f%%, gap_cls_par2 %.4f",
+            train_metrics["solved"], n_train, train_sr, train_metrics["gap_cls_par2"],
         )
         logging.info(
-            f"  Test:  solved {test_metrics['solved']}/{n_test}, "
-            f"solve_rate {test_sr:.2f}%, gap_cls_par2 {test_metrics['gap_cls_par2']:.4f}"
+            "  Test:  solved %d/%d, solve_rate %.2f%%, gap_cls_par2 %.4f",
+            test_metrics["solved"], n_test, test_sr, test_metrics["gap_cls_par2"],
         )
 
         if not save_models:
@@ -266,10 +264,9 @@ def evaluate_multi_splits_wl(
         "n_seeds": n_seeds,
         "seed_values": [s for s, _ in seed_entries],
         "model_type": "WL",
-        "wl_iter": wl_iter,
-        "graph_timeout": graph_timeout,
-        "benchmark_root": str(benchmark_root) if benchmark_root is not None else None,
         "splits_dir": str(splits_dir),
+        "wl_dir": str(wl_dir),
+        "wl_iter": wl_iter,
         "seeds": seed_results,
         "aggregated": aggregated,
     }
@@ -293,38 +290,38 @@ def evaluate_multi_splits_wl(
 
         with open(summary_path, "w") as f:
             json.dump(to_python(results), f, indent=2)
-        logging.info(f"Saved summary to {summary_path}")
+        logging.info("Saved summary to %s", summary_path)
 
     return results
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Evaluate WL-based algorithm selection over multiple train/test splits (per seed)"
+        description="Evaluate WL-based PWC over multiple train/test splits"
     )
     parser.add_argument(
         "--splits-dir",
         type=str,
         required=True,
-        help="Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/ABV)",
+        help="Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/BV)",
     )
     parser.add_argument(
-        "--timeout",
-        type=float,
-        default=1200.0,
-        help="PAR-2 timeout in seconds (default: 1200)",
+        "--wl-dir",
+        type=str,
+        required=True,
+        help="WL feature directory (level_0.csv, level_1.csv, ..., failed_paths.txt)",
     )
     parser.add_argument(
         "--wl-iter",
         type=int,
         default=2,
-        help="Weisfeiler-Lehman iteration count (default: 2)",
+        help="WL iteration count; uses level_0.csv .. level_{wl_iter}.csv (default: 2)",
     )
     parser.add_argument(
-        "--graph-timeout",
-        type=int,
-        default=10,
-        help="Timeout in seconds for graph build per instance (default: 10)",
+        "--timeout",
+        type=float,
+        default=1200.0,
+        help="Timeout in seconds (default: 1200)",
     )
     parser.add_argument(
         "--output-dir",
@@ -338,10 +335,16 @@ def main():
         help="Save model per split (requires --output-dir)",
     )
     parser.add_argument(
-        "--benchmark-root",
-        type=str,
-        default=None,
-        help="Root directory for instance paths; required when paths are relative (e.g. ABV/...).",
+        "--svm-c",
+        type=float,
+        default=1.0,
+        help="SVM C (default: 1.0)",
+    )
+    parser.add_argument(
+        "--random-seed",
+        type=int,
+        default=42,
+        help="Random seed for tie-breaking (default: 42)",
     )
     parser.add_argument(
         "--log-level",
@@ -363,29 +366,34 @@ def main():
 
     results = evaluate_multi_splits_wl(
         Path(args.splits_dir),
-        wl_iter=args.wl_iter,
-        graph_timeout=args.graph_timeout,
+        Path(args.wl_dir),
+        args.wl_iter,
         save_models=args.save_models,
         output_dir=output_dir,
         timeout=args.timeout,
-        benchmark_root=Path(args.benchmark_root) if args.benchmark_root else None,
+        svm_c=args.svm_c,
+        random_seed=args.random_seed,
     )
 
     agg = results["aggregated"]
     logging.info("\n" + "=" * 60)
-    logging.info("Multi-splits summary (WL) — %s", results["division"])
+    logging.info("Multi-splits WL summary — %s", results["division"])
     logging.info("=" * 60)
-    logging.info("Model: %s (wl_iter=%s, graph_timeout=%ss)", results["model_type"], results["wl_iter"], results["graph_timeout"])
+    logging.info("Model: %s (wl_dir=%s, wl_iter=%s)", results["model_type"], results["wl_dir"], results["wl_iter"])
     logging.info("Splits (seeds): %s", results["seed_values"])
     logging.info("")
     tr = agg["train"]
-    logging.info("Train: gap_cls_solved %.4f ± %.4f, gap_cls_par2 %.4f ± %.4f",
-                 tr["gap_cls_solved_mean"], tr["gap_cls_solved_std"],
-                 tr["gap_cls_par2_mean"], tr["gap_cls_par2_std"])
+    logging.info(
+        "Train: gap_cls_solved %.4f ± %.4f, gap_cls_par2 %.4f ± %.4f",
+        tr["gap_cls_solved_mean"], tr["gap_cls_solved_std"],
+        tr["gap_cls_par2_mean"], tr["gap_cls_par2_std"],
+    )
     t = agg["test"]
-    logging.info("Test:  gap_cls_solved %.4f ± %.4f, gap_cls_par2 %.4f ± %.4f",
-                 t["gap_cls_solved_mean"], t["gap_cls_solved_std"],
-                 t["gap_cls_par2_mean"], t["gap_cls_par2_std"])
+    logging.info(
+        "Test:  gap_cls_solved %.4f ± %.4f, gap_cls_par2 %.4f ± %.4f",
+        t["gap_cls_solved_mean"], t["gap_cls_solved_std"],
+        t["gap_cls_par2_mean"], t["gap_cls_par2_std"],
+    )
     logging.info("=" * 60)
 
 

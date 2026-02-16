@@ -100,13 +100,6 @@ def main():
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
         help="Logging level (default: INFO)",
     )
-    parser.add_argument(
-        "--feature-csv",
-        type=str,
-        default=None,
-        help="Path to the features CSV file (required if model doesn't have it set)",
-    )
-
     args = parser.parse_args()
 
     # Setup logging
@@ -127,16 +120,6 @@ def main():
         logging.info(
             f"Loaded {as_model.model_type} model with {as_model.solver_size} solvers"
         )
-        if args.feature_csv is not None:
-            as_model.feature_csv_path = args.feature_csv
-            logging.info(f"Using feature CSV: {args.feature_csv}")
-        elif as_model.feature_csv_path is None:
-            raise ValueError(
-                "feature_csv_path not set in model and --feature-csv not provided. "
-                "Please provide --feature-csv argument."
-            )
-        else:
-            logging.info(f"Using feature CSV from model: {as_model.feature_csv_path}")
 
     # Load performance data
     logging.info(f"Loading performance data from {args.perf_csv}")
