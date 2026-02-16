@@ -11,34 +11,67 @@ from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler
 
 from .performance import parse_performance_csv
-from .feature import extract_feature_from_csv, extract_feature_from_csvs_concat
+from .feature import (
+    extract_feature_from_csv,
+    extract_feature_from_csvs_concat,
+)
 from .solver_selector import SolverSelector
+from .pwc_wl import sorted_timeout_solvers
 
 PERF_DIFF_THRESHOLD = 1e-1  # Threshold for considering performance differences
 
 
-# now the target func is par2
-def create_pairwise_samples(multi_perf_data, solver0_id, solver1_id, feature_csv_path):
+def _load_path_list(value: str | Path | None) -> list[str]:
+    """Path to file (one path per line) → list of paths. None → []."""
+    if value is None:
+        return []
+    with open(value, encoding="utf-8") as f:
+        return [p.strip() for p in f if p.strip()]
+
+
+def _wl_level_csv_paths(wl_dir: str | Path, wl_iter: int) -> list[str]:
+    """Paths to level_0.csv through level_{wl_iter}.csv under wl_dir (as in wl_feature output)."""
+    base = Path(wl_dir)
+    return [str(base / f"level_{i}.csv") for i in range(wl_iter + 1)]
+
+
+def create_pairwise_samples(
+    multi_perf_data,
+    solver0_id,
+    solver1_id,
+    feature_csv_path,
+    failed_instance_path: str | Path | None = None,
+):
+    """Build pairwise (feature, label, cost) for training. Skip paths in failed_instance_path (path to file, one path per line)."""
+    failed_paths = _load_path_list(failed_instance_path)
+    failed_set = set(failed_paths)
     inputs = []
     labels = []
     costs = []
     for instance_path in multi_perf_data.keys():
+        if str(instance_path) in failed_set:
+            continue
         # Handle both single CSV path (str) and multiple CSV paths (list)
-        if isinstance(feature_csv_path, list):
-            feature = extract_feature_from_csvs_concat(instance_path, feature_csv_path)
-        else:
-            feature = extract_feature_from_csv(instance_path, feature_csv_path)
+        try:
+            if isinstance(feature_csv_path, list):
+                feature = extract_feature_from_csvs_concat(instance_path, feature_csv_path)
+            else:
+                feature = extract_feature_from_csv(instance_path, feature_csv_path)
+        except KeyError:
+            continue
         par2_0 = multi_perf_data.get_par2(instance_path, solver0_id)
         par2_1 = multi_perf_data.get_par2(instance_path, solver1_id)
+        if par2_0 is None or par2_1 is None:
+            continue
         label = 1 if par2_0 < par2_1 else 0  # label 1 represents solver0 is better
         cost = abs(par2_0 - par2_1)
-        if cost > PERF_DIFF_THRESHOLD:  # if the performance difference is 0, ignore
+        if cost > PERF_DIFF_THRESHOLD:
             inputs.append(feature)
             labels.append(label)
             costs.append(cost)
-    inputs_array = np.array(inputs)
-    labels_array = np.array(labels)
-    costs_array = np.array(costs)
+    inputs_array = np.array(inputs) if inputs else np.empty((0, 0))
+    labels_array = np.array(labels) if labels else np.array([], dtype=int)
+    costs_array = np.array(costs) if costs else np.array([])
     return inputs_array, labels_array, costs_array
 
 
@@ -75,13 +108,22 @@ class PairwiseSVM(SVC):
 
 class PwcSelector(SolverSelector):
     def __init__(
-        self, model_matrix, xg_flag, feature_csv_path=None, random_seed: int = 42
+        self,
+        model_matrix,
+        xg_flag,
+        feature_csv_path,
+        random_seed: int = 42,
+        timeout_solver_ids: list[int] | None = None,
+        failed_instance_paths: str | Path | None = None,
     ):
         self.model_type = "XG" if xg_flag else "SVM"
         self.model_matrix = model_matrix
         self.solver_size = model_matrix.shape[0]
         self.feature_csv_path = feature_csv_path
         self.random_seed = random_seed
+        self.timeout_solver_ids = list(timeout_solver_ids) if timeout_solver_ids else []
+        paths = _load_path_list(failed_instance_paths)
+        self._failed_set = set(paths)
 
     def save(self, save_dir):
         Path(save_dir).mkdir(parents=True, exist_ok=True)
@@ -115,22 +157,33 @@ class PwcSelector(SolverSelector):
 
     def algorithm_select(self, instance_path):
         """
-        input instance path, output solver id
+        input instance path, output solver id.
+        If instance is in failed list → use fallback (timeout_solver_ids[0]).
+        Else extract feature; if not available, raise KeyError.
         """
         random_seed = self.random_seed
         feature_csv_path = self.feature_csv_path
+        path_str = str(instance_path)
+        if path_str in self._failed_set:
+            if self.timeout_solver_ids:
+                return self.timeout_solver_ids[0]
+            raise ValueError(
+                "Instance is in failed list but timeout_solver_ids is empty."
+            )
         if feature_csv_path is None:
             raise ValueError(
                 "feature_csv_path not set in PwcSelector. "
                 "It must be provided during model creation or loading."
             )
-        # Handle both single CSV path (str) and multiple CSV paths (list)
         if isinstance(feature_csv_path, list):
             feature = extract_feature_from_csvs_concat(instance_path, feature_csv_path)
         else:
             feature = extract_feature_from_csv(instance_path, feature_csv_path)
         selected_id = self._get_rank_lst(feature, random_seed)[0]
         return selected_id
+
+
+WL_FAILED_PATHS_FILENAME = "failed_paths.txt"
 
 
 def train_pwc(
@@ -140,9 +193,16 @@ def train_pwc(
     feature_csv_path=None,
     svm_c: float = 1.0,
     random_seed: int = 42,
+    timeout_instance_paths: str | Path | None = None,
 ):
+    """
+    Train pairwise selector. timeout_instance_paths: path to file (e.g. timeout{N}_failed_paths.txt)
+    listing instance paths to exclude from training; used for failback solver ranking.
+    """
     Path(save_dir).mkdir(parents=True, exist_ok=True)
+    paths = _load_path_list(timeout_instance_paths)
     solver_size = multi_perf_data.num_solvers()
+    timeout_solver_ids = sorted_timeout_solvers(multi_perf_data, paths)
 
     model_matrix = np.empty((solver_size, solver_size), dtype=object)
     model_matrix[:] = None
@@ -153,10 +213,14 @@ def train_pwc(
                 inputs_array,
                 labels_array,
                 costs_array,
-            ) = create_pairwise_samples(multi_perf_data, i, j, feature_csv_path)
+            ) = create_pairwise_samples(
+                multi_perf_data, i, j, feature_csv_path, failed_instance_path=timeout_instance_paths
+            )
+            if len(labels_array) == 0:
+                continue
             unique_labels = np.unique(labels_array)
             if len(unique_labels) == 1:
-                model = DummyClassifier(strategy="constant", constant=unique_labels[0])
+                model = DummyClassifier(strategy="constant", constant=int(unique_labels[0]))
                 model.fit(inputs_array, labels_array)
             else:
                 model = PairwiseSVM(c_value=svm_c)
@@ -169,8 +233,39 @@ def train_pwc(
         xg_flag,
         feature_csv_path,
         random_seed=random_seed,
+        timeout_solver_ids=timeout_solver_ids,
+        failed_instance_paths=timeout_instance_paths,
     )
     pwc_model.save(save_dir)
+
+
+def train_wl_pwc(
+    multi_perf_data,
+    save_dir: str | Path,
+    wl_dir: str | Path,
+    wl_iter: int,
+    xg_flag: bool = False,
+    svm_c: float = 1.0,
+    random_seed: int = 42,
+) -> None:
+    """
+    Train PWC using WL feature CSVs under wl_dir (level_0.csv .. level_{wl_iter}.csv)
+    and failed-paths file wl_dir/failed_paths.txt. Saves a PwcSelector to save_dir.
+    """
+    wl_dir = Path(wl_dir)
+    feature_csv_paths = _wl_level_csv_paths(wl_dir, wl_iter)
+    fp_file = wl_dir / WL_FAILED_PATHS_FILENAME
+    timeout_instance_paths = str(fp_file) if fp_file.exists() else None
+
+    train_pwc(
+        multi_perf_data,
+        save_dir,
+        xg_flag=xg_flag,
+        feature_csv_path=feature_csv_paths,
+        svm_c=svm_c,
+        random_seed=random_seed,
+        timeout_instance_paths=timeout_instance_paths,
+    )
 
 
 def main():
@@ -209,6 +304,12 @@ def main():
         default=42,
         help="Random seed for solver selection tie-breaking (default: 42)",
     )
+    parser.add_argument(
+        "--timeout-instances",
+        type=str,
+        default=None,
+        help="Path to file listing instance paths (one per line) to treat as timeout/missing; used for failback solver ranking. Optional.",
+    )
 
     args = parser.parse_args()
     logging.basicConfig(
@@ -219,6 +320,14 @@ def main():
     save_dir = args.save_dir
     timeout = args.timeout
     train_dataset = parse_performance_csv(args.perf_csv, timeout)
+
+    if args.timeout_instances:
+        n = len(_load_path_list(args.timeout_instances))
+        logging.info(
+            "Timeout/missing instance paths: %d from %s",
+            n,
+            args.timeout_instances,
+        )
 
     logging.info(
         f"Training performance parse: {len(train_dataset)} benchmarks and {train_dataset.num_solvers()} solvers from {args.perf_csv}"
@@ -231,6 +340,7 @@ def main():
         args.feature_csv,
         svm_c=args.svm_c,
         random_seed=args.random_seed,
+        timeout_instance_paths=args.timeout_instances,
     )
 
 
