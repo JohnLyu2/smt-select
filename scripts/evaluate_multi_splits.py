@@ -311,6 +311,27 @@ def evaluate_multi_splits(
             json.dump(to_python(results), f, indent=2)
         logging.info(f"Saved summary to {summary_path}")
 
+    agg = results["aggregated"]
+    logging.info("\n" + "=" * 60)
+    logging.info("Multi-splits summary — %s", results["division"])
+    logging.info("=" * 60)
+    logging.info("Model: %s", results["model_type"])
+    logging.info("Splits (seeds): %s", results["seed_values"])
+    logging.info("")
+    tr = agg["train"]
+    logging.info(
+        "Train: gap_cls_solved %.4f ± %.4f, gap_cls_par2 %.4f ± %.4f",
+        tr["gap_cls_solved_mean"], tr["gap_cls_solved_std"],
+        tr["gap_cls_par2_mean"], tr["gap_cls_par2_std"],
+    )
+    t = agg["test"]
+    logging.info(
+        "Test:  gap_cls_solved %.4f ± %.4f, gap_cls_par2 %.4f ± %.4f",
+        t["gap_cls_solved_mean"], t["gap_cls_solved_std"],
+        t["gap_cls_par2_mean"], t["gap_cls_par2_std"],
+    )
+    logging.info("=" * 60)
+
     return results
 
 
@@ -383,7 +404,7 @@ def main():
     if output_dir:
         output_dir.mkdir(parents=True, exist_ok=True)
 
-    results = evaluate_multi_splits(
+    evaluate_multi_splits(
         Path(args.splits_dir),
         args.feature_csv,
         xg_flag=args.xg,
@@ -393,23 +414,6 @@ def main():
         svm_c=args.svm_c,
         random_seed=args.random_seed,
     )
-
-    agg = results["aggregated"]
-    logging.info("\n" + "=" * 60)
-    logging.info("Multi-splits summary — %s", results["division"])
-    logging.info("=" * 60)
-    logging.info("Model: %s", results["model_type"])
-    logging.info("Splits (seeds): %s", results["seed_values"])
-    logging.info("")
-    tr = agg["train"]
-    logging.info("Train: gap_cls_solved %.4f ± %.4f, gap_cls_par2 %.4f ± %.4f",
-                 tr["gap_cls_solved_mean"], tr["gap_cls_solved_std"],
-                 tr["gap_cls_par2_mean"], tr["gap_cls_par2_std"])
-    t = agg["test"]
-    logging.info("Test:  gap_cls_solved %.4f ± %.4f, gap_cls_par2 %.4f ± %.4f",
-                 t["gap_cls_solved_mean"], t["gap_cls_solved_std"],
-                 t["gap_cls_par2_mean"], t["gap_cls_par2_std"])
-    logging.info("=" * 60)
 
 
 if __name__ == "__main__":

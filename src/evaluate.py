@@ -9,10 +9,11 @@ from .pwc import PwcSelector
 from .setfit_model import SetfitSelector
 
 
-def as_evaluate(as_model, multi_perf_data, write_csv_path=None):
+def as_evaluate(as_model, multi_perf_data, write_csv_path=None, show_progress=False):
     """
     Evaluate the performance of the algorithm selection model based on the provided multi_perf_data;
-    If write_csv_path is not None, write the result to the csv file
+    If write_csv_path is not None, write the result to the csv file.
+    If show_progress is True, show a tqdm progress bar over instances.
     """
     if write_csv_path is not None:
         with Path(write_csv_path).open(mode="w", newline="") as csv_file:
@@ -26,7 +27,11 @@ def as_evaluate(as_model, multi_perf_data, write_csv_path=None):
                 ]
             )
     perf_dict = {}
-    for instance_path in multi_perf_data.keys():
+    instance_paths = list(multi_perf_data.keys())
+    if show_progress:
+        from tqdm import tqdm
+        instance_paths = tqdm(instance_paths, desc="Evaluating", unit="instance")
+    for instance_path in instance_paths:
         # before = time.perf_counter()
         selected = as_model.algorithm_select(instance_path)
         # after = time.perf_counter()

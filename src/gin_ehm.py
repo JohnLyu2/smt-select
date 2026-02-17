@@ -1,18 +1,25 @@
-"""GIN empirical hardness model: model, vocab, data conversion, and selector."""
+"""GIN empirical hardness model: model, vocab, data conversion, training, and selector."""
 
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset
+from torch.utils.data import DataLoader, Dataset
 from torch_geometric.data import Batch, Data
 from torch_geometric.nn import GINConv, global_mean_pool
 
-from .graph_rep import smt_graph_to_gin, build_smt_graph_dict_timeout, _suppress_z3_destructor_noise
+from .graph_rep import (
+    smt_graph_to_gin,
+    build_smt_graph_dict_timeout,
+    generate_graph_dicts,
+    _suppress_z3_destructor_noise,
+)
 from .performance import MultiSolverDataset
+from .pwc_wl import sorted_fallback_solvers
 from .solver_selector import SolverSelector
 
 # Index for node types not in the vocabulary (e.g. at inference time).
@@ -269,3 +276,119 @@ class GINSelector(SolverSelector):
             fallback_solver_ids=fallback_solver_ids,
             graph_timeout=graph_timeout,
         )
+
+
+def _collate_gin_regression(batch):
+    """Collate (Data, y, mask) list into (Batch, y stacked, mask stacked)."""
+    data_list = [b[0] for b in batch]
+    y_list = [b[1] for b in batch]
+    mask_list = [b[2] for b in batch]
+    return (
+        Batch.from_data_list(data_list),
+        torch.stack(y_list),
+        torch.stack(mask_list),
+    )
+
+
+def _masked_mse_loss(
+    pred: torch.Tensor, target: torch.Tensor, mask: torch.Tensor
+) -> torch.Tensor:
+    """MSE over elements where mask > 0; normalize by sum(mask)."""
+    diff = (pred - target) ** 2
+    masked = diff * mask
+    total = masked.sum()
+    count = mask.sum().clamp(min=1e-8)
+    return total / count
+
+
+def train_gin_regression(
+    multi_perf_data: MultiSolverDataset,
+    save_dir: str | Path,
+    *,
+    graph_timeout: int = 10,
+    hidden_dim: int = 64,
+    num_layers: int = 3,
+    num_epochs: int = 50,
+    batch_size: int = 32,
+    lr: float = 1e-3,
+    dropout: float = 0.1,
+    device: str | None = None,
+) -> None:
+    """
+    Build graphs, vocab, dataset; train GINMultiHeadEHM; save model, vocab, config, failed_paths.
+    """
+    save_dir = Path(save_dir)
+    save_dir.mkdir(parents=True, exist_ok=True)
+    if device is None:
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    instance_paths = list(multi_perf_data.keys())
+    K = multi_perf_data.num_solvers()
+    logging.info("Building graphs for %d instances (timeout=%ds)...", len(instance_paths), graph_timeout)
+    graph_by_path, failed_list = generate_graph_dicts(instance_paths, graph_timeout)
+    if not graph_by_path:
+        raise ValueError(
+            "No graphs could be built. Increase --graph-timeout or check instances."
+        )
+
+    train_paths = list(graph_by_path.keys())
+    graph_dicts = [graph_by_path[p] for p in train_paths]
+    vocab = build_vocabulary_from_graph_dicts(graph_dicts)
+    num_node_types = vocab.num_types()
+
+    samples = build_gin_samples(train_paths, graph_by_path, multi_perf_data, vocab)
+    dataset = GINRegressionDataset(samples)
+    loader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        collate_fn=_collate_gin_regression,
+    )
+
+    model = GINMultiHeadEHM(
+        num_node_types=num_node_types,
+        num_heads=K,
+        hidden_dim=hidden_dim,
+        num_layers=num_layers,
+        dropout=dropout,
+    ).to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+    for epoch in range(num_epochs):
+        model.train()
+        total_loss = 0.0
+        n_batches = 0
+        for batch_data, y, mask in loader:
+            batch_data = batch_data.to(device)
+            y = y.to(device)
+            mask = mask.to(device)
+            optimizer.zero_grad()
+            pred = model.forward_data(batch_data)
+            loss = _masked_mse_loss(pred, y, mask)
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item()
+            n_batches += 1
+        avg_loss = total_loss / n_batches if n_batches else 0.0
+        if (epoch + 1) % 10 == 0 or epoch == 0:
+            logging.info("Epoch %d/%d train loss %.4f", epoch + 1, num_epochs, avg_loss)
+
+    fallback_solver_ids = sorted_fallback_solvers(multi_perf_data, failed_list)
+    config = {
+        "num_node_types": num_node_types,
+        "num_heads": K,
+        "hidden_dim": hidden_dim,
+        "num_layers": num_layers,
+        "graph_timeout": graph_timeout,
+        "timeout": multi_perf_data.get_timeout(),
+        "fallback_solver_ids": fallback_solver_ids,
+    }
+    with open(save_dir / "config.json", "w") as f:
+        json.dump(config, f, indent=2)
+    torch.save(model.state_dict(), save_dir / "model.pt")
+    with open(save_dir / "vocab.json", "w") as f:
+        json.dump({"type_names": vocab.type_names()}, f)
+    with open(save_dir / "failed_paths.txt", "w") as f:
+        for p in failed_list:
+            f.write(p + "\n")
+    logging.info("Saved model, vocab, config, failed_paths to %s", save_dir)
