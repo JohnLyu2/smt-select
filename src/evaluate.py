@@ -9,7 +9,7 @@ from .pwc import PwcSelector
 from .setfit_model import SetfitSelector
 
 
-def as_evaluate(as_model, multi_perf_data, write_csv_path=None, show_progress=False):
+def as_evaluate(as_model, multi_perf_data, write_csv_path=None, show_progress=True):
     """
     Evaluate the performance of the algorithm selection model based on the provided multi_perf_data;
     If write_csv_path is not None, write the result to the csv file.
