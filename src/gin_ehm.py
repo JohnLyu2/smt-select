@@ -1,13 +1,17 @@
-"""GIN model and data conversion (PAR2 prediction for algorithm selection)."""
+"""GIN empirical hardness model: model, vocab, data conversion, and selector."""
 
 from __future__ import annotations
+
+import json
+from pathlib import Path
 
 import torch
 import torch.nn as nn
 from torch_geometric.data import Batch, Data
 from torch_geometric.nn import GINConv, global_mean_pool
 
-from .graph_rep import smt_graph_to_gin
+from .graph_rep import smt_graph_to_gin, build_smt_graph_dict_timeout, _suppress_z3_destructor_noise
+from .solver_selector import SolverSelector
 
 # Index for node types not in the vocabulary (e.g. at inference time).
 UNK_TYPE_INDEX = 0
@@ -148,3 +152,74 @@ class GINMultiHeadEHM(torch.nn.Module):
     def forward_data(self, data: Batch) -> torch.Tensor:
         """Forward pass from a PyG Batch; returns (batch_size, num_heads)."""
         return self.forward(data.x, data.edge_index, data.batch)
+
+
+class GINSelector(SolverSelector):
+    """
+    Algorithm selector using a GIN multi-head regressor: predict PAR2 for each
+    solver and return the solver with lowest predicted PAR2. Uses fallback
+    solver for instances where graph build fails (timeout/error).
+    """
+
+    def __init__(
+        self,
+        model: GINMultiHeadEHM,
+        vocabulary: NodeVocabulary,
+        fallback_solver_ids: list[int],
+        graph_timeout: int,
+        device: str | None = None,
+    ) -> None:
+        self.model = model
+        self.vocabulary = vocabulary
+        self.fallback_solver_ids = list(fallback_solver_ids)
+        self.graph_timeout = graph_timeout
+        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.model.to(self.device)
+        self.model.eval()
+
+    def algorithm_select(self, instance_path: str | Path) -> int:
+        path = Path(instance_path)
+        graph_dict = build_smt_graph_dict_timeout(path, self.graph_timeout)
+        if graph_dict is None:
+            _suppress_z3_destructor_noise()
+            return self.fallback_solver_ids[0]
+        data = graph_dict_to_gin_data(graph_dict, self.vocabulary)
+        batch = Batch.from_data_list([data])
+        batch = batch.to(self.device)
+        with torch.no_grad():
+            pred = self.model.forward_data(batch)  # (1, K)
+        pred_np = pred[0].cpu().numpy()
+        selected = int(pred_np.argmin())
+        _suppress_z3_destructor_noise()
+        return selected
+
+    @staticmethod
+    def load(load_path: str | Path) -> GINSelector:
+        """Load from a directory containing config.json, model.pt, vocab.json, failed_paths.txt."""
+        load_path = Path(load_path)
+        with open(load_path / "config.json") as f:
+            config = json.load(f)
+        with open(load_path / "vocab.json") as vf:
+            vocab_data = json.load(vf)
+        type_names = vocab_data["type_names"]
+        vocabulary = NodeVocabulary()
+        for t in type_names:
+            vocabulary.add_type(t)
+        vocabulary.freeze()
+
+        model = GINMultiHeadEHM(
+            num_node_types=config["num_node_types"],
+            num_heads=config["num_heads"],
+            hidden_dim=config["hidden_dim"],
+            num_layers=config["num_layers"],
+            dropout=0.0,
+        )
+        model.load_state_dict(torch.load(load_path / "model.pt", map_location="cpu", weights_only=True))
+        fallback_solver_ids = config.get("fallback_solver_ids", config.get("timeout_solver_ids"))
+        graph_timeout = config["graph_timeout"]
+        return GINSelector(
+            model=model,
+            vocabulary=vocabulary,
+            fallback_solver_ids=fallback_solver_ids,
+            graph_timeout=graph_timeout,
+        )
