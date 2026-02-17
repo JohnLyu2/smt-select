@@ -7,10 +7,12 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
+from torch.utils.data import Dataset
 from torch_geometric.data import Batch, Data
 from torch_geometric.nn import GINConv, global_mean_pool
 
 from .graph_rep import smt_graph_to_gin, build_smt_graph_dict_timeout, _suppress_z3_destructor_noise
+from .performance import MultiSolverDataset
 from .solver_selector import SolverSelector
 
 # Index for node types not in the vocabulary (e.g. at inference time).
@@ -91,6 +93,50 @@ def graph_dict_to_gin_data(
     else:
         edge_index = torch.tensor(edge_list, dtype=torch.long).t().contiguous()
     return Data(x=x, edge_index=edge_index)
+
+
+def build_gin_samples(
+    instance_paths: list[str],
+    graph_dict_by_path: dict[str, dict],
+    multi_perf_data: MultiSolverDataset,
+    vocabulary: NodeVocabulary,
+) -> list[tuple[Data, torch.Tensor, torch.Tensor]]:
+    """
+    Build list of (Data, y, mask) for instances that have a graph.
+    y and mask have shape (K,). mask[s] = 1.0 if PAR2 is available. Only includes paths in graph_dict_by_path.
+    """
+    K = multi_perf_data.num_solvers()
+    samples: list[tuple[Data, torch.Tensor, torch.Tensor]] = []
+    for path in instance_paths:
+        graph_dict = graph_dict_by_path.get(path)
+        if graph_dict is None:
+            continue
+        data = graph_dict_to_gin_data(graph_dict, vocabulary)
+        y = torch.zeros(K, dtype=torch.float32)
+        mask = torch.zeros(K, dtype=torch.float32)
+        for s in range(K):
+            par2 = multi_perf_data.get_par2(path, s)
+            if par2 is not None:
+                y[s] = par2
+                mask[s] = 1.0
+        samples.append((data, y, mask))
+    return samples
+
+
+class GINRegressionDataset(Dataset):
+    """Torch Dataset of (Data, y, mask) for GIN multi-head PAR2 regression. Use custom collate to batch."""
+
+    def __init__(
+        self,
+        samples: list[tuple[Data, torch.Tensor, torch.Tensor]],
+    ) -> None:
+        self.samples = samples
+
+    def __len__(self) -> int:
+        return len(self.samples)
+
+    def __getitem__(self, idx: int) -> tuple:
+        return self.samples[idx]
 
 
 class GINMultiHeadEHM(torch.nn.Module):
