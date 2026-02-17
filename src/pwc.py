@@ -16,7 +16,7 @@ from .feature import (
     extract_feature_from_csvs_concat,
 )
 from .solver_selector import SolverSelector
-from .pwc_wl import sorted_timeout_solvers
+from .pwc_wl import sorted_fallback_solvers
 
 PERF_DIFF_THRESHOLD = 1e-1  # Threshold for considering performance differences
 
@@ -113,7 +113,7 @@ class PwcSelector(SolverSelector):
         xg_flag,
         feature_csv_path,
         random_seed: int = 42,
-        timeout_solver_ids: list[int] | None = None,
+        fallback_solver_ids: list[int] | None = None,
         failed_instance_paths: str | Path | None = None,
     ):
         self.model_type = "XG" if xg_flag else "SVM"
@@ -121,7 +121,7 @@ class PwcSelector(SolverSelector):
         self.solver_size = model_matrix.shape[0]
         self.feature_csv_path = feature_csv_path
         self.random_seed = random_seed
-        self.timeout_solver_ids = list(timeout_solver_ids) if timeout_solver_ids else []
+        self.fallback_solver_ids = list(fallback_solver_ids) if fallback_solver_ids else []
         paths = _load_path_list(failed_instance_paths)
         self._failed_set = set(paths)
 
@@ -158,17 +158,17 @@ class PwcSelector(SolverSelector):
     def algorithm_select(self, instance_path):
         """
         input instance path, output solver id.
-        If instance is in failed list → use fallback (timeout_solver_ids[0]).
+        If instance is in failed list → use fallback (fallback_solver_ids[0]).
         Else extract feature; if not available, raise KeyError.
         """
         random_seed = self.random_seed
         feature_csv_path = self.feature_csv_path
         path_str = str(instance_path)
         if path_str in self._failed_set:
-            if self.timeout_solver_ids:
-                return self.timeout_solver_ids[0]
+            if self.fallback_solver_ids:
+                return self.fallback_solver_ids[0]
             raise ValueError(
-                "Instance is in failed list but timeout_solver_ids is empty."
+                "Instance is in failed list but fallback_solver_ids is empty."
             )
         if feature_csv_path is None:
             raise ValueError(
@@ -202,7 +202,7 @@ def train_pwc(
     Path(save_dir).mkdir(parents=True, exist_ok=True)
     paths = _load_path_list(timeout_instance_paths)
     solver_size = multi_perf_data.num_solvers()
-    timeout_solver_ids = sorted_timeout_solvers(multi_perf_data, paths)
+    fallback_solver_ids = sorted_fallback_solvers(multi_perf_data, paths)
 
     model_matrix = np.empty((solver_size, solver_size), dtype=object)
     model_matrix[:] = None
@@ -233,7 +233,7 @@ def train_pwc(
         xg_flag,
         feature_csv_path,
         random_seed=random_seed,
-        timeout_solver_ids=timeout_solver_ids,
+        fallback_solver_ids=fallback_solver_ids,
         failed_instance_paths=timeout_instance_paths,
     )
     pwc_model.save(save_dir)

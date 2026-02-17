@@ -69,19 +69,18 @@ def generate_labels_for_config_pair(
     return indices, np.array(labels), np.array(costs)
 
 
-def sorted_timeout_solvers(
+def sorted_fallback_solvers(
     multi_perf_data: MultiSolverDataset,
-    timeout_paths: list[str],
+    failed_paths: list[str],
 ) -> list[int]:
     """
-    Rank solvers by average PAR-2 over the given paths (for instances that timed out
-    during graph build). Returns solver ids from best to worst.
+    Rank solvers by average PAR-2 over the given paths (for instances that failed
+    graph build). Returns solver ids from best to worst, used as fallback order.
     """
-    if not timeout_paths:
-        # No timeouts: rank over full dataset
+    if not failed_paths:
         paths = list(multi_perf_data.keys())
     else:
-        paths = timeout_paths
+        paths = failed_paths
     n_solvers = multi_perf_data.num_solvers()
     if n_solvers == 0:
         return []
@@ -109,7 +108,7 @@ class PwcWlSelector(SolverSelector):
         indice_matrix: np.ndarray,
         kernel: WeisfeilerLehman,
         graph_timeout: int,
-        timeout_solver_ids: list[int],
+        fallback_solver_ids: list[int],
         wl_iter: int,
         solver_id_dict: dict[int, str],
         random_seed: int = 42,
@@ -119,7 +118,7 @@ class PwcWlSelector(SolverSelector):
         self.indice_matrix = indice_matrix
         self.kernel = kernel
         self.graph_timeout = graph_timeout
-        self.timeout_solver_ids = timeout_solver_ids
+        self.fallback_solver_ids = fallback_solver_ids
         self.wl_iter = wl_iter
         self.solver_id_dict = solver_id_dict
         self.random_seed = random_seed
@@ -165,7 +164,7 @@ class PwcWlSelector(SolverSelector):
         graph = build_smt_graph_timeout(path, self.graph_timeout)
         if graph is None:
             _suppress_z3_destructor_noise()
-            return self.timeout_solver_ids[0]
+            return self.fallback_solver_ids[0]
         rank = self._get_rank_lst(graph)
         _suppress_z3_destructor_noise()
         return rank[0]
@@ -216,7 +215,7 @@ def train_pwc_wl(
                 svm_ij.fit(sub, label_arr, sample_weight=cost_arr)
             svm_matrix[i][j] = svm_ij
 
-    timeout_solver_ids = sorted_timeout_solvers(multi_perf_data, failed_list)
+    fallback_solver_ids = sorted_fallback_solvers(multi_perf_data, failed_list)
     solver_id_dict = multi_perf_data.get_solver_id_dict()
 
     model = PwcWlSelector(
@@ -224,7 +223,7 @@ def train_pwc_wl(
         indice_matrix,
         wl_kernel,
         graph_timeout,
-        timeout_solver_ids,
+        fallback_solver_ids,
         wl_iter,
         solver_id_dict,
     )
