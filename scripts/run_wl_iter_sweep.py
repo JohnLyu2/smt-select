@@ -116,7 +116,9 @@ def main() -> None:
     for wl_iter in iterations:
         output_dir = results_base / str(wl_iter)
         output_dir.mkdir(parents=True, exist_ok=True)
+        logging.info("\n" + "=" * 60)
         logging.info("Running wl_iter=%d -> %s", wl_iter, output_dir)
+        logging.info("=" * 60)
         evaluate_multi_splits_wl(
             splits_dir,
             wl_dir,

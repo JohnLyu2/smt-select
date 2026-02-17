@@ -124,6 +124,14 @@ def save_wl_features_to_dir(
             "Increase graph_timeout or check instance paths."
         )
 
+    # Write failed paths before WL extraction so it exists even if extraction fails (e.g. OOM).
+    failed_paths_file = output_dir / "failed_paths.txt"
+    with open(failed_paths_file, "w", encoding="utf-8") as f:
+        for p in failed_list:
+            f.write(_path_for_csv(p, benchmark_root) + "\n")
+    if failed_list:
+        logging.info("Wrote %s: %d failed paths", failed_paths_file.name, len(failed_list))
+
     train_paths = list(graph_dict.keys())
     train_graphs = [graph_dict[p] for p in train_paths]
 
@@ -150,13 +158,6 @@ def save_wl_features_to_dir(
                         row[f"wl_{j}"] = F[i, j]
                 writer.writerow(row)
         logging.info("Wrote %s: %d rows, %d dims", csv_path.name, n_rows, n_features)
-
-    failed_paths_file = output_dir / "failed_paths.txt"
-    with open(failed_paths_file, "w", encoding="utf-8") as f:
-        for p in failed_list:
-            f.write(_path_for_csv(p, benchmark_root) + "\n")
-    if failed_list:
-        logging.info("Wrote %s: %d failed paths", failed_paths_file.name, len(failed_list))
 
     return len(train_paths), failed_list
 
