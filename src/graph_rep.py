@@ -1,5 +1,10 @@
 """Build a graph representation of an SMT instance from its formula AST using Z3."""
 
+import gc
+import logging
+import os
+import signal
+import sys
 from pathlib import Path
 
 from grakel import Graph
@@ -151,3 +156,98 @@ def smt_graph_to_grakel(graph_dict: dict) -> Graph:
         undirected_edges.append((u, v))
         undirected_edges.append((v, u))
     return Graph(undirected_edges, node_labels=node_labels)
+
+
+def smt_graph_to_gin(graph_dict: dict) -> dict:
+    """
+    Convert the internal graph dict from smt_to_graph() to a GIN-ready structure.
+
+    Node labels are taken from nodes[nid]["type"] (e.g. "bvmul", "forall",
+    "const", "bound_var"). Edges are made undirected by including both
+    (u, v) and (v, u); the argument index from the internal format is dropped.
+
+    Args:
+        graph_dict: Dict returned by smt_to_graph() with keys "nodes", "edges".
+
+    Returns:
+        A dict with:
+          - "node_types": list[str] — node_types[i] is the type of node id i
+            (nodes are ordered by id 0..n-1).
+          - "edges": list[tuple[int, int]] — undirected edges (u, v) and (v, u).
+    """
+    nodes = graph_dict["nodes"]
+    raw_edges = graph_dict["edges"]
+    node_ids = sorted(nodes.keys())
+    node_types = [nodes[nid]["type"] for nid in node_ids]
+    undirected_edges: list[tuple[int, int]] = []
+    for u, v, _ in raw_edges:
+        undirected_edges.append((u, v))
+        undirected_edges.append((v, u))
+    return {"node_types": node_types, "edges": undirected_edges}
+
+
+def _graph_timeout_handler(_signum: int, _frame: object) -> None:
+    signal.alarm(0)
+    raise TimeoutError("Graph build timed out")
+
+
+def _suppress_z3_destructor_noise() -> None:
+    """Run GC with stderr suppressed to avoid z3 AstRef.__del__ messages after timeout."""
+    devnull = open(os.devnull, "w")
+    old = sys.stderr
+    try:
+        sys.stderr = devnull
+        gc.collect()
+    finally:
+        sys.stderr = old
+        devnull.close()
+
+
+def build_smt_graph_dict_timeout(smt_path: str | Path, timeout_sec: int) -> dict | None:
+    """Build raw graph dict (smt_to_graph) with timeout. Returns None on timeout/error."""
+    path = Path(smt_path)
+    signal.signal(signal.SIGALRM, _graph_timeout_handler)
+    signal.alarm(timeout_sec)
+    try:
+        graph_dict = smt_to_graph(path)
+        signal.alarm(0)
+        return graph_dict
+    except TimeoutError:
+        logging.debug("Timeout (%ds) while building graph for %s", timeout_sec, smt_path)
+        _suppress_z3_destructor_noise()
+        return None
+    except RecursionError:
+        logging.debug("Recursion limit exceeded while building graph for %s", smt_path)
+        _suppress_z3_destructor_noise()
+        return None
+    except Exception as e:
+        if "recursion" in str(e).lower():
+            logging.debug("Recursion limit exceeded while building graph for %s", smt_path)
+        else:
+            logging.debug("Error building graph for %s: %s", smt_path, e)
+        _suppress_z3_destructor_noise()
+        return None
+    finally:
+        signal.alarm(0)
+
+
+def generate_graph_dicts(
+    instance_paths: list[str], timeout_sec: int
+) -> tuple[dict[str, dict], list[str]]:
+    """Build graph dicts for each instance. Returns (path -> graph_dict, failed_paths)."""
+    graph_by_path: dict[str, dict] = {}
+    failed_list: list[str] = []
+    for p in instance_paths:
+        g = build_smt_graph_dict_timeout(p, timeout_sec)
+        if g is not None:
+            graph_by_path[p] = g
+        else:
+            failed_list.append(p)
+            _suppress_z3_destructor_noise()
+    logging.info(
+        "Graphs: %d built, %d failed (of %d instances)",
+        len(graph_by_path),
+        len(failed_list),
+        len(instance_paths),
+    )
+    return graph_by_path, failed_list

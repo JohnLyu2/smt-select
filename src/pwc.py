@@ -244,16 +244,22 @@ def train_wl_pwc(
     save_dir: str | Path,
     wl_dir: str | Path,
     wl_iter: int,
+    feature_csv_path: str | Path | None = None,
     xg_flag: bool = False,
     svm_c: float = 1.0,
     random_seed: int = 42,
 ) -> None:
     """
-    Train PWC using WL feature CSVs under wl_dir (level_0.csv .. level_{wl_iter}.csv)
-    and failed-paths file wl_dir/failed_paths.txt. Saves a PwcSelector to save_dir.
+    Train PWC using WL feature CSVs under wl_dir (level_0.csv .. level_{wl_iter}.csv),
+    optionally concatenated with an extra feature CSV. Uses failed-paths file
+    wl_dir/failed_paths.txt. Saves a PwcSelector to save_dir.
     """
     wl_dir = Path(wl_dir)
-    feature_csv_paths = _wl_level_csv_paths(wl_dir, wl_iter)
+    wl_paths = _wl_level_csv_paths(wl_dir, wl_iter)
+    if feature_csv_path is not None:
+        feature_csv_paths = wl_paths + [str(feature_csv_path)]
+    else:
+        feature_csv_paths = wl_paths
     fp_file = wl_dir / WL_FAILED_PATHS_FILENAME
     timeout_instance_paths = str(fp_file) if fp_file.exists() else None
 
@@ -305,10 +311,10 @@ def main():
         help="Random seed for solver selection tie-breaking (default: 42)",
     )
     parser.add_argument(
-        "--timeout-instances",
+        "--failed-instances",
         type=str,
         default=None,
-        help="Path to file listing instance paths (one per line) to treat as timeout/missing; used for failback solver ranking. Optional.",
+        help="Path to file listing failed instance paths (one per line, e.g. timeout10_failed_paths.txt); excluded from training and used for failback solver ranking.",
     )
 
     args = parser.parse_args()
@@ -321,12 +327,12 @@ def main():
     timeout = args.timeout
     train_dataset = parse_performance_csv(args.perf_csv, timeout)
 
-    if args.timeout_instances:
-        n = len(_load_path_list(args.timeout_instances))
+    if args.failed_instances:
+        n = len(_load_path_list(args.failed_instances))
         logging.info(
-            "Timeout/missing instance paths: %d from %s",
+            "Failed instance paths: %d from %s",
             n,
-            args.timeout_instances,
+            args.failed_instances,
         )
 
     logging.info(
@@ -340,7 +346,7 @@ def main():
         args.feature_csv,
         svm_c=args.svm_c,
         random_seed=args.random_seed,
-        timeout_instance_paths=args.timeout_instances,
+        timeout_instance_paths=args.failed_instances,
     )
 
 

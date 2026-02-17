@@ -3,11 +3,7 @@
 from __future__ import annotations
 
 import argparse
-import gc
 import logging
-import os
-import signal
-import sys
 from pathlib import Path
 
 import joblib
@@ -17,62 +13,10 @@ from grakel.kernels import WeisfeilerLehman
 from sklearn.dummy import DummyClassifier
 from sklearn.svm import SVC
 
-from .graph_rep import smt_to_graph, smt_graph_to_grakel
 from .performance import parse_performance_json, MultiSolverDataset
 from .performance import PERF_DIFF_THRESHOLD
 from .solver_selector import SolverSelector
-
-
-def _timeout_handler(_signum: int, _frame: object) -> None:
-    signal.alarm(0)  # cancel so no second SIGALRM during unwind (z3 __del__ etc.)
-    raise TimeoutError("Graph build timed out")
-
-
-def _suppress_z3_destructor_noise() -> None:
-    """Run GC with stderr suppressed to avoid z3 AstRef.__del__ messages after timeout."""
-    devnull = open(os.devnull, "w")
-    old = sys.stderr
-    try:
-        sys.stderr = devnull
-        gc.collect()
-    finally:
-        sys.stderr = old
-        devnull.close()
-
-
-def build_smt_graph_timeout(smt_path: str | Path, timeout_sec: int) -> Graph | None:
-    """Build a GraKel graph for the SMT instance with a timeout. Returns None on timeout/error."""
-    path = Path(smt_path)
-    signal.signal(signal.SIGALRM, _timeout_handler)
-    signal.alarm(timeout_sec)
-    try:
-        graph_dict = smt_to_graph(path)
-        graph = smt_graph_to_grakel(graph_dict)
-        signal.alarm(0)
-        return graph
-    except TimeoutError:
-        logging.debug(
-            "Timeout (%ds) while building graph for %s", timeout_sec, smt_path
-        )
-        _suppress_z3_destructor_noise()
-        return None
-    except RecursionError:
-        logging.debug(
-            "Recursion limit exceeded while building graph for %s", smt_path
-        )
-        _suppress_z3_destructor_noise()
-        return None
-    except Exception as e:
-        if "recursion" in str(e).lower():
-            logging.debug(
-                "Recursion limit exceeded while building graph for %s", smt_path
-            )
-        else:
-            logging.debug("Error building graph for %s: %s", smt_path, e)
-        _suppress_z3_destructor_noise()
-        return None
-    finally:
-        signal.alarm(0)
+from .wl_feature import build_smt_graph_timeout, _suppress_z3_destructor_noise
 
 
 def generate_graph_dict(

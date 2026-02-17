@@ -1,26 +1,39 @@
-"""Save Weisfeiler-Lehman features for instance paths from a CSV or performance JSON.
+"""Save Weisfeiler-Lehman features for instance paths from a performance JSON.
 
-Input can be:
-- A performance JSON (e.g. data/cp26/raw_data/smtcomp24_performance/BV.json).
-  Instance paths are the top-level keys; --benchmark-root is required.
-- A CSV with a path column. Use --benchmark-root if paths are relative.
+Input: performance JSON (e.g. data/cp26/raw_data/smtcomp24_performance/BV.json).
+Instance paths are the top-level keys; --benchmark-root is required.
 
 Builds SMT graphs, fits WL, extracts per-level features. Saves one CSV per WL
-level (level_0.csv, level_1.csv, ...) and timeout{N}_failed_paths.txt.
+level (level_0.csv, level_1.csv, ...) and failed_paths.txt.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import json
 import logging
 from pathlib import Path
 
 import numpy as np
+import scipy.sparse
+from grakel import Graph
 from grakel.kernels import WeisfeilerLehman
+from tqdm import tqdm
 
-from .performance import parse_performance_json
-from .pwc_wl import generate_graph_dict
+from .graph_rep import (
+    build_smt_graph_dict_timeout,
+    smt_graph_to_grakel,
+    _suppress_z3_destructor_noise,
+)
+
+
+def build_smt_graph_timeout(smt_path: str | Path, timeout_sec: int) -> Graph | None:
+    """Build a GraKel graph for the SMT instance with a timeout. Returns None on timeout/error."""
+    graph_dict = build_smt_graph_dict_timeout(smt_path, timeout_sec)
+    if graph_dict is None:
+        return None
+    return smt_graph_to_grakel(graph_dict)
 
 
 def _normalize_path(path: str) -> str:
@@ -31,51 +44,33 @@ def _normalize_path(path: str) -> str:
 def paths_from_performance_json(
     json_path: str | Path,
     benchmark_root: str | Path,
-    timeout: float = 1200.0,
 ) -> list[str]:
-    """Read instance paths from a performance JSON via parse_performance_json; rebase with benchmark_root."""
-    multi_perf = parse_performance_json(str(json_path), timeout)
+    """Read instance paths (top-level keys) from a performance JSON; rebase with benchmark_root."""
+    with open(json_path, encoding="utf-8") as f:
+        data = json.load(f)
+    if not isinstance(data, dict):
+        raise ValueError("Performance JSON root must be an object")
     root = Path(benchmark_root).resolve()
-    return [str(root / _normalize_path(p)) for p in multi_perf.keys()]
+    return [str(root / _normalize_path(p)) for p in data if isinstance(data.get(p), dict)]
 
 
 def extract_wl_features_from_fitted(
     wl_kernel: WeisfeilerLehman,
-) -> dict[int, np.ndarray]:
-    """Extract per-level feature matrices from a fitted WeisfeilerLehman kernel."""
-    features: dict[int, np.ndarray] = {}
+) -> dict[int, np.ndarray | scipy.sparse.spmatrix]:
+    """Extract per-level feature matrices from a fitted WeisfeilerLehman kernel.
+
+    Keeps sparse matrices sparse to avoid huge allocations; callers must write
+    row-by-row (densify one row at a time) when writing CSVs.
+    """
+    features: dict[int, np.ndarray | scipy.sparse.spmatrix] = {}
     for level, base in wl_kernel.X.items():
+        logging.debug("Extracting level %d", level)
         X = base.X
-        if hasattr(X, "toarray"):
-            X = X.toarray()
-        features[level] = np.asarray(X, dtype=np.float64)
+        if scipy.sparse.issparse(X):
+            features[level] = X
+        else:
+            features[level] = np.asarray(X, dtype=np.float64)
     return features
-
-
-def paths_from_csv(
-    csv_path: str | Path,
-    path_column: str = "path",
-    benchmark_root: str | Path | None = None,
-) -> list[str]:
-    """Read instance paths from a CSV (one path per row in path_column)."""
-    csv_path = Path(csv_path)
-    if not csv_path.exists():
-        raise FileNotFoundError(f"CSV not found: {csv_path}")
-    paths: list[str] = []
-    with open(csv_path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        if path_column not in (reader.fieldnames or []):
-            raise ValueError(
-                f"CSV must have column '{path_column}'. Found: {reader.fieldnames}"
-            )
-        for row in reader:
-            p = _normalize_path(row[path_column])
-            if not p:
-                continue
-            if benchmark_root is not None:
-                p = str(Path(benchmark_root) / p)
-            paths.append(p)
-    return paths
 
 
 def _path_for_csv(path: str, benchmark_root: str | Path | None) -> str:
@@ -101,15 +96,28 @@ def save_wl_features_to_dir(
     Build graphs for instance_paths, fit WL, save one CSV per level and a failed-paths list.
 
     output_dir: directory to write into (created if needed).
-    Level CSVs: level_0.csv, level_1.csv, ... Failed paths: timeout{graph_timeout}_failed_paths.txt.
+    Level CSVs: level_0.csv, level_1.csv, ... Failed paths: failed_paths.txt.
     Paths in CSVs and failed_paths are relative to benchmark_root when set.
     Returns (number of rows written, list of failed paths as stored in file).
     """
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    failed_prefix = f"timeout{graph_timeout}"
 
-    graph_dict, failed_list = generate_graph_dict(instance_paths, graph_timeout)
+    graph_dict: dict[str, Graph] = {}
+    failed_list: list[str] = []
+    for p in tqdm(instance_paths, desc="Building graphs", unit="instance"):
+        g = build_smt_graph_timeout(p, graph_timeout)
+        if g is not None:
+            graph_dict[p] = g
+        else:
+            failed_list.append(p)
+            _suppress_z3_destructor_noise()
+    logging.info(
+        "Graphs: %d built, %d failed (of %d instances)",
+        len(graph_dict),
+        len(failed_list),
+        len(instance_paths),
+    )
     if not graph_dict:
         raise ValueError(
             "No graphs could be built (all failed: timeout/recursion/error?). "
@@ -133,12 +141,17 @@ def save_wl_features_to_dir(
             writer.writeheader()
             for i, path in enumerate(train_paths):
                 row = {"path": _path_for_csv(path, benchmark_root)}
-                for j in range(n_features):
-                    row[f"wl_{j}"] = F[i, j]
+                if scipy.sparse.issparse(F):
+                    row_vec = F.getrow(i).toarray().ravel()
+                    for j in range(n_features):
+                        row[f"wl_{j}"] = row_vec[j]
+                else:
+                    for j in range(n_features):
+                        row[f"wl_{j}"] = F[i, j]
                 writer.writerow(row)
         logging.info("Wrote %s: %d rows, %d dims", csv_path.name, n_rows, n_features)
 
-    failed_paths_file = output_dir / f"{failed_prefix}_failed_paths.txt"
+    failed_paths_file = output_dir / "failed_paths.txt"
     with open(failed_paths_file, "w", encoding="utf-8") as f:
         for p in failed_list:
             f.write(_path_for_csv(p, benchmark_root) + "\n")
@@ -150,25 +163,25 @@ def save_wl_features_to_dir(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Save WL features for instance paths from a CSV or performance JSON (e.g. data/cp26/raw_data/smtcomp24_performance/BV.json)",
+        description="Save WL features for instance paths from a performance JSON (e.g. data/cp26/raw_data/smtcomp24_performance/BV.json)",
     )
     parser.add_argument(
         "input",
         type=str,
-        help="Input: CSV (path column) or performance JSON (.json). For JSON, paths are top-level keys; use --benchmark-root.",
+        help="Performance JSON path. Instance paths are top-level keys.",
     )
     parser.add_argument(
         "-o",
         "--output",
         type=str,
         required=True,
-        help="Output directory. Saves level_0.csv, level_1.csv, ... per WL level and timeout{N}_failed_paths.txt (N = --graph-timeout).",
+        help="Output directory. Saves level_0.csv, level_1.csv, ... per WL level and failed_paths.txt.",
     )
     parser.add_argument(
-        "--path-column",
+        "--benchmark-root",
         type=str,
-        default="path",
-        help="CSV column name for instance paths (default: path). Ignored for JSON input.",
+        required=True,
+        help="Root directory for instance paths (paths in JSON are relative, e.g. BV/.../file.smt2).",
     )
     parser.add_argument(
         "--wl-iter",
@@ -183,42 +196,24 @@ def main() -> None:
         help="Graph build timeout per instance in seconds (default: 10)",
     )
     parser.add_argument(
-        "--benchmark-root",
-        type=str,
-        default=None,
-        help="Root directory for instance paths. Required for JSON input; optional for CSV (prepends to relative paths).",
-    )
-    parser.add_argument(
-        "--timeout",
-        type=float,
-        default=1200.0,
-        help="Timeout in seconds for parse_performance_json (default: 1200.0). Used for JSON input only.",
+        "--debug",
+        action="store_true",
+        help="Enable debug logging (e.g. which level is being extracted).",
     )
     args = parser.parse_args()
 
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG if args.debug else logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
 
     input_path = Path(args.input)
     if not input_path.exists():
         raise FileNotFoundError(f"Input not found: {args.input}")
+    if input_path.suffix.lower() != ".json":
+        raise ValueError("Input must be a performance JSON file (.json).")
 
-    if input_path.suffix.lower() == ".json":
-        if not args.benchmark_root:
-            raise ValueError(
-                "Performance JSON input requires --benchmark-root (paths in JSON are relative, e.g. BV/.../file.smt2)."
-            )
-        paths = paths_from_performance_json(
-            args.input, args.benchmark_root, timeout=args.timeout
-        )
-    else:
-        paths = paths_from_csv(
-            args.input,
-            path_column=args.path_column,
-            benchmark_root=args.benchmark_root,
-        )
+    paths = paths_from_performance_json(args.input, args.benchmark_root)
     if not paths:
         raise ValueError(f"No paths found in {args.input}")
     logging.info("Loaded %d paths from %s", len(paths), args.input)
