@@ -1,0 +1,167 @@
+{
+  "division": "ALIA",
+  "n_seeds": 5,
+  "seed_values": [
+    0,
+    10,
+    20,
+    30,
+    40
+  ],
+  "model_type": "SVM",
+  "splits_dir": "/home/john-lu/Desktop/smt-select/data/cp26/performance_splits/smtcomp24/ALIA",
+  "feature_csv_path": [
+    "data/features/smtlib_desc/all-mpnet-base-v2/ALIA.csv"
+  ],
+  "seeds": [
+    {
+      "seed": 0,
+      "train_size": 1152,
+      "test_size": 385,
+      "train_metrics": {
+        "solved": 224,
+        "avg_par2": 1953.1212329000268,
+        "sbs_name": "cvc5",
+        "sbs_solved": 217,
+        "sbs_avg_par2": 1958.486986079508,
+        "vbs_solved": 290,
+        "vbs_avg_par2": 1810.9430178216958,
+        "gap_cls_solved": 0.0958904109589041,
+        "gap_cls_par2": 0.03636714697889376
+      },
+      "test_metrics": {
+        "solved": 83,
+        "avg_par2": 1906.7149135516074,
+        "sbs_name": "iProver v3.9",
+        "sbs_solved": 80,
+        "sbs_avg_par2": 1925.4140992726755,
+        "vbs_solved": 100,
+        "vbs_avg_par2": 1799.607106712526,
+        "gap_cls_solved": 0.15,
+        "gap_cls_par2": 0.14863391406584806
+      }
+    },
+    {
+      "seed": 10,
+      "train_size": 1152,
+      "test_size": 385,
+      "train_metrics": {
+        "solved": 224,
+        "avg_par2": 1954.2922359416173,
+        "sbs_name": "cvc5",
+        "sbs_solved": 215,
+        "sbs_avg_par2": 1965.7579697006431,
+        "vbs_solved": 288,
+        "vbs_avg_par2": 1818.4328220716266,
+        "gap_cls_solved": 0.1232876712328767,
+        "gap_cls_par2": 0.07782604628978908
+      },
+      "test_metrics": {
+        "solved": 83,
+        "avg_par2": 1903.2110291258614,
+        "sbs_name": "iProver v3.9",
+        "sbs_solved": 82,
+        "sbs_avg_par2": 1909.54783782669,
+        "vbs_solved": 102,
+        "vbs_avg_par2": 1777.1960560737716,
+        "gap_cls_solved": 0.05,
+        "gap_cls_par2": 0.04787852960422226
+      }
+    },
+    {
+      "seed": 20,
+      "train_size": 1152,
+      "test_size": 385,
+      "train_metrics": {
+        "solved": 234,
+        "avg_par2": 1935.1334904552075,
+        "sbs_name": "cvc5",
+        "sbs_solved": 223,
+        "sbs_avg_par2": 1947.074880848026,
+        "vbs_solved": 298,
+        "vbs_avg_par2": 1797.614877462253,
+        "gap_cls_solved": 0.14666666666666667,
+        "gap_cls_par2": 0.07989689630874945
+      },
+      "test_metrics": {
+        "solved": 73,
+        "avg_par2": 1960.5379766592218,
+        "sbs_name": "iProver v3.9",
+        "sbs_solved": 71,
+        "sbs_avg_par2": 1973.0361225850372,
+        "vbs_solved": 92,
+        "vbs_avg_par2": 1839.4876721516903,
+        "gap_cls_solved": 0.09523809523809523,
+        "gap_cls_par2": 0.09358510626862805
+      }
+    },
+    {
+      "seed": 30,
+      "train_size": 1152,
+      "test_size": 385,
+      "train_metrics": {
+        "solved": 233,
+        "avg_par2": 1934.2702378106687,
+        "sbs_name": "iProver v3.9",
+        "sbs_solved": 229,
+        "sbs_avg_par2": 1942.6628782965095,
+        "vbs_solved": 299,
+        "vbs_avg_par2": 1792.6172004929535,
+        "gap_cls_solved": 0.05714285714285714,
+        "gap_cls_par2": 0.055933903653183625
+      },
+      "test_metrics": {
+        "solved": 74,
+        "avg_par2": 1963.1210079488555,
+        "sbs_name": "iProver v3.9",
+        "sbs_solved": 69,
+        "sbs_avg_par2": 1994.2859643889096,
+        "vbs_solved": 91,
+        "vbs_avg_par2": 1854.4417601221646,
+        "gap_cls_solved": 0.22727272727272727,
+        "gap_cls_par2": 0.22285483051273738
+      }
+    },
+    {
+      "seed": 40,
+      "train_size": 1152,
+      "test_size": 385,
+      "train_metrics": {
+        "solved": 229,
+        "avg_par2": 1942.2624378736234,
+        "sbs_name": "iProver v3.9",
+        "sbs_solved": 220,
+        "sbs_avg_par2": 1961.0210200132024,
+        "vbs_solved": 292,
+        "vbs_avg_par2": 1807.294213372571,
+        "gap_cls_solved": 0.125,
+        "gap_cls_par2": 0.12202544598113631
+      },
+      "test_metrics": {
+        "solved": 78,
+        "avg_par2": 1939.2066846435987,
+        "sbs_name": "iProver v3.9",
+        "sbs_solved": 78,
+        "sbs_avg_par2": 1939.3545896937653,
+        "vbs_solved": 98,
+        "vbs_avg_par2": 1810.52508781744,
+        "gap_cls_solved": 0.0,
+        "gap_cls_par2": 0.0011480681677137495
+      }
+    }
+  ],
+  "aggregated": {
+    "train": {
+      "gap_cls_solved_mean": 0.10959752120026094,
+      "gap_cls_solved_std": 0.03078361498994323,
+      "gap_cls_par2_mean": 0.07440988784235045,
+      "gap_cls_par2_std": 0.0286273676801724
+    },
+    "test": {
+      "gap_cls_solved_mean": 0.1045021645021645,
+      "gap_cls_solved_std": 0.078891920268652,
+      "gap_cls_par2_mean": 0.1028200897238299,
+      "gap_cls_par2_std": 0.07739290072377848
+    }
+  }
+}
