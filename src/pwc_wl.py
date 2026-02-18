@@ -13,6 +13,7 @@ from grakel.kernels import WeisfeilerLehman
 from sklearn.dummy import DummyClassifier
 from sklearn.svm import SVC
 
+from .defaults import DEFAULT_BENCHMARK_ROOT
 from .performance import parse_performance_json, MultiSolverDataset
 from .performance import PERF_DIFF_THRESHOLD
 from .solver_selector import SolverSelector
@@ -267,8 +268,8 @@ def main() -> None:
     parser.add_argument(
         "--benchmark-root",
         type=str,
-        default=None,
-        help="Root directory for instance paths; required when paths are relative (e.g. ABV/...).",
+        default=DEFAULT_BENCHMARK_ROOT,
+        help="Root directory for instance paths (default: project default).",
     )
     args = parser.parse_args()
 

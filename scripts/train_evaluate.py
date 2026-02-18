@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 import numpy as np
 
+from src.defaults import DEFAULT_BENCHMARK_ROOT
 from src.performance import parse_performance_json
 from src.pwc import train_pwc, PwcSelector
 from src.pwc_wl import train_pwc_wl, PwcWlSelector
@@ -125,8 +126,8 @@ def main():
     parser.add_argument(
         "--benchmark-root",
         type=str,
-        default=None,
-        help="Root directory for instance paths; required for --model-type wl when paths are relative (e.g. ABV/...).",
+        default=DEFAULT_BENCHMARK_ROOT,
+        help="Root directory for instance paths (default: project default).",
     )
     parser.add_argument(
         "--timeout",
