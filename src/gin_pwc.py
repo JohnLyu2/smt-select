@@ -247,7 +247,7 @@ class GINPwcSelector(SolverSelector):
         logging.info("Saved GIN-PWC model to %s", save_dir)
 
     @staticmethod
-    def load(load_path: str | Path) -> "GINPwcSelector":
+    def load(load_path: str | Path, device: str | None = None) -> "GINPwcSelector":
         load_path = Path(load_path)
         with open(load_path / "config.json") as f:
             config = json.load(f)
@@ -279,6 +279,7 @@ class GINPwcSelector(SolverSelector):
             vocabulary=vocabulary,
             fallback_solver_ids=fallback_solver_ids,
             graph_timeout=graph_timeout,
+            device=device,
             random_seed=random_seed,
         )
 

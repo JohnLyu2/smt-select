@@ -1,12 +1,93 @@
 import csv
 import argparse
 import logging
+import multiprocessing
 from pathlib import Path
+
+from tqdm import tqdm
 
 from .performance import SingleSolverDataset
 from .performance import parse_performance_csv
 from .pwc import PwcSelector
 from .setfit_model import SetfitSelector
+
+# Set by pool initializer in worker processes.
+_worker_selector = None
+
+
+def _init_selector(init_arg: tuple) -> None:
+    """Pool initializer: load selector and store in global for _eval_worker."""
+    global _worker_selector
+    loader_fn, loader_args = init_arg
+    _worker_selector = loader_fn(*loader_args)
+
+
+def _eval_worker(instance_path: str) -> tuple[str, int]:
+    """Worker: return (instance_path, selected_solver_id). Uses _worker_selector set by _init_selector."""
+    return (instance_path, _worker_selector.algorithm_select(instance_path))
+
+
+def _load_pwc_selector(model_path: str):
+    """Top-level loader for PWC (picklable for multiprocessing)."""
+    return PwcSelector.load(model_path)
+
+
+def _load_setfit_selector(setfit_model: str, desc_json: str):
+    """Top-level loader for SetFit (picklable for multiprocessing)."""
+    return SetfitSelector(setfit_model, desc_json)
+
+
+def as_evaluate_parallel(
+    instance_paths: list[str],
+    loader_fn,
+    loader_args: tuple,
+    multi_perf_data,
+    n_workers: int,
+    write_csv_path: str | None = None,
+    show_progress: bool = True,
+):
+    """
+    Evaluate algorithm selection in parallel. Each worker loads the selector via loader_fn(*loader_args).
+    Returns SingleSolverDataset like as_evaluate.
+    """
+    n_workers = min(n_workers, len(instance_paths))
+    if n_workers <= 0:
+        return SingleSolverDataset({}, "AS", multi_perf_data.get_timeout())
+    perf_dict: dict = {}
+    path_to_selected: dict[str, int] = {}
+    with multiprocessing.Pool(
+        n_workers,
+        initializer=_init_selector,
+        initargs=((loader_fn, loader_args),),
+    ) as pool:
+        it = pool.imap_unordered(_eval_worker, instance_paths, chunksize=1)
+        if show_progress:
+            it = tqdm(it, total=len(instance_paths), desc="Evaluating", unit="instance")
+        for instance_path, selected in it:
+            path_to_selected[instance_path] = selected
+            perf_dict[instance_path] = multi_perf_data.get_performance(
+                instance_path, selected
+            )
+    if write_csv_path is not None:
+        with Path(write_csv_path).open(mode="w", newline="") as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(["benchmark", "selected", "solved", "runtime"])
+            for path in instance_paths:
+                selected = path_to_selected[path]
+                is_solved, runtime = perf_dict[path]
+                csv_writer.writerow(
+                    [
+                        path,
+                        multi_perf_data.get_solver_name(selected),
+                        is_solved,
+                        runtime,
+                    ]
+                )
+    return SingleSolverDataset(
+        perf_dict,
+        "AS",
+        multi_perf_data.get_timeout(),
+    )
 
 
 def as_evaluate(as_model, multi_perf_data, write_csv_path=None, show_progress=True):
@@ -184,6 +265,12 @@ def main():
         help="Timeout in seconds for PAR-2 (default: 1200.0)",
     )
     parser.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="Parallel workers for evaluation; 1 = sequential (default: 1)",
+    )
+    parser.add_argument(
         "--log-level",
         type=str,
         default="INFO",
@@ -198,29 +285,54 @@ def main():
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
 
-    if args.setfit_model is not None:
-        if args.desc_json is None:
-            raise ValueError("--desc-json is required when using --setfit-model.")
-        logging.info("Using SetfitSelector with model %s", args.setfit_model)
-        as_model = SetfitSelector(args.setfit_model, args.desc_json)
-    else:
-        # Load model
-        logging.info("Loading PWC model from %s", args.pwc_model)
-        as_model = PwcSelector.load(args.pwc_model)
-        logging.info(
-            f"Loaded {as_model.model_type} model with {as_model.solver_size} solvers"
-        )
-
     # Load performance data
-    logging.info(f"Loading performance data from {args.perf_csv}")
+    logging.info("Loading performance data from %s", args.perf_csv)
     multi_perf_data = parse_performance_csv(args.perf_csv, args.timeout)
     logging.info(
-        f"Loaded {len(multi_perf_data)} instances with {multi_perf_data.num_solvers()} solvers"
+        "Loaded %d instances with %d solvers",
+        len(multi_perf_data),
+        multi_perf_data.num_solvers(),
     )
+    instance_paths = list(multi_perf_data.keys())
 
     # Evaluate
     logging.info("Starting evaluation...")
-    result_dataset = as_evaluate(as_model, multi_perf_data, args.output_csv)
+    if args.jobs > 1:
+        if args.setfit_model is not None:
+            loader_fn, loader_args = _load_setfit_selector, (
+                args.setfit_model,
+                args.desc_json,
+            )
+        else:
+            loader_fn, loader_args = _load_pwc_selector, (args.pwc_model,)
+        result_dataset = as_evaluate_parallel(
+            instance_paths,
+            loader_fn,
+            loader_args,
+            multi_perf_data,
+            n_workers=args.jobs,
+            write_csv_path=args.output_csv,
+            show_progress=True,
+        )
+    else:
+        if args.setfit_model is not None:
+            if args.desc_json is None:
+                raise ValueError(
+                    "--desc-json is required when using --setfit-model."
+                )
+            logging.info("Using SetfitSelector with model %s", args.setfit_model)
+            as_model = SetfitSelector(args.setfit_model, args.desc_json)
+        else:
+            logging.info("Loading PWC model from %s", args.pwc_model)
+            as_model = PwcSelector.load(args.pwc_model)
+            logging.info(
+                "Loaded %s model with %d solvers",
+                as_model.model_type,
+                as_model.solver_size,
+            )
+        result_dataset = as_evaluate(
+            as_model, multi_perf_data, args.output_csv, show_progress=True
+        )
     metrics = compute_metrics(result_dataset, multi_perf_data)
     log_evaluation_summary(metrics, multi_perf_data)
 

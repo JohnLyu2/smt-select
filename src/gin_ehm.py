@@ -248,7 +248,7 @@ class GINSelector(SolverSelector):
         return selected
 
     @staticmethod
-    def load(load_path: str | Path) -> GINSelector:
+    def load(load_path: str | Path, device: str | None = None) -> GINSelector:
         """Load from a directory containing config.json, model.pt, vocab.json, failed_paths.txt."""
         load_path = Path(load_path)
         with open(load_path / "config.json") as f:
@@ -276,6 +276,7 @@ class GINSelector(SolverSelector):
             vocabulary=vocabulary,
             fallback_solver_ids=fallback_solver_ids,
             graph_timeout=graph_timeout,
+            device=device,
         )
 
 
