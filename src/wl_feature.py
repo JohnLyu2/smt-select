@@ -1,7 +1,7 @@
 """Save Weisfeiler-Lehman features for instance paths from a performance JSON.
 
 Input: performance JSON (e.g. data/cp26/raw_data/smtcomp24_performance/BV.json).
-Instance paths are the top-level keys; --benchmark-root is required.
+Instance paths are the top-level keys; --benchmark-root has a project default.
 
 Builds SMT graphs, fits WL, extracts per-level features. Saves one CSV per WL
 level (level_0.csv, level_1.csv, ...) and failed_paths.txt.
@@ -21,8 +21,10 @@ from grakel import Graph
 from grakel.kernels import WeisfeilerLehman
 from tqdm import tqdm
 
+from .defaults import DEFAULT_BENCHMARK_ROOT
 from .graph_rep import (
     build_smt_graph_dict_timeout,
+    generate_graph_dicts_parallel,
     smt_graph_to_grakel,
     _suppress_z3_destructor_noise,
 )
@@ -91,6 +93,7 @@ def save_wl_features_to_dir(
     wl_iter: int = 2,
     graph_timeout: int = 10,
     benchmark_root: str | Path | None = None,
+    jobs: int = 1,
 ) -> tuple[int, list[str]]:
     """
     Build graphs for instance_paths, fit WL, save one CSV per level and a failed-paths list.
@@ -98,20 +101,27 @@ def save_wl_features_to_dir(
     output_dir: directory to write into (created if needed).
     Level CSVs: level_0.csv, level_1.csv, ... Failed paths: failed_paths.txt.
     Paths in CSVs and failed_paths are relative to benchmark_root when set.
+    jobs: number of parallel workers for graph building; 1 = sequential.
     Returns (number of rows written, list of failed paths as stored in file).
     """
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    graph_dict: dict[str, Graph] = {}
-    failed_list: list[str] = []
-    for p in tqdm(instance_paths, desc="Building graphs", unit="instance"):
-        g = build_smt_graph_timeout(p, graph_timeout)
-        if g is not None:
-            graph_dict[p] = g
-        else:
-            failed_list.append(p)
-            _suppress_z3_destructor_noise()
+    if jobs > 1:
+        graph_by_path, failed_list = generate_graph_dicts_parallel(
+            instance_paths, graph_timeout, n_workers=jobs
+        )
+        graph_dict = {p: smt_graph_to_grakel(g) for p, g in graph_by_path.items()}
+    else:
+        graph_dict = {}
+        failed_list = []
+        for p in tqdm(instance_paths, desc="Building graphs", unit="instance"):
+            g = build_smt_graph_timeout(p, graph_timeout)
+            if g is not None:
+                graph_dict[p] = g
+            else:
+                failed_list.append(p)
+                _suppress_z3_destructor_noise()
     logging.info(
         "Graphs: %d built, %d failed (of %d instances)",
         len(graph_dict),
@@ -181,7 +191,7 @@ def main() -> None:
     parser.add_argument(
         "--benchmark-root",
         type=str,
-        required=True,
+        default=DEFAULT_BENCHMARK_ROOT,
         help="Root directory for instance paths (paths in JSON are relative, e.g. BV/.../file.smt2).",
     )
     parser.add_argument(
@@ -195,6 +205,12 @@ def main() -> None:
         type=int,
         default=10,
         help="Graph build timeout per instance in seconds (default: 10)",
+    )
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="Number of parallel workers for graph building; 1 = sequential (default: 1)",
     )
     parser.add_argument(
         "--debug",
@@ -225,6 +241,7 @@ def main() -> None:
         wl_iter=args.wl_iter,
         graph_timeout=args.graph_timeout,
         benchmark_root=args.benchmark_root,
+        jobs=args.jobs,
     )
 
 

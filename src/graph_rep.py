@@ -2,10 +2,13 @@
 
 import gc
 import logging
+import multiprocessing
 import os
 import signal
 import sys
 from pathlib import Path
+
+from tqdm import tqdm
 
 from grakel import Graph
 from z3 import (
@@ -231,6 +234,13 @@ def build_smt_graph_dict_timeout(smt_path: str | Path, timeout_sec: int) -> dict
         signal.alarm(0)
 
 
+def _build_graph_dict_worker(args: tuple[str, int]) -> tuple[str, dict | None]:
+    """Top-level worker for process pool: (path, timeout_sec) -> (path, graph_dict | None)."""
+    path, timeout_sec = args
+    result = build_smt_graph_dict_timeout(path, timeout_sec)
+    return (path, result)
+
+
 def generate_graph_dicts(
     instance_paths: list[str], timeout_sec: int
 ) -> tuple[dict[str, dict], list[str]]:
@@ -244,6 +254,42 @@ def generate_graph_dicts(
         else:
             failed_list.append(p)
             _suppress_z3_destructor_noise()
+    logging.info(
+        "Graphs: %d built, %d failed (of %d instances)",
+        len(graph_by_path),
+        len(failed_list),
+        len(instance_paths),
+    )
+    return graph_by_path, failed_list
+
+
+def generate_graph_dicts_parallel(
+    instance_paths: list[str],
+    timeout_sec: int,
+    n_workers: int,
+) -> tuple[dict[str, dict], list[str]]:
+    """Build graph dicts in parallel. Returns (path -> graph_dict, failed_paths).
+    Uses sequential path when n_workers <= 1 or instance_paths is empty.
+    """
+    if not instance_paths:
+        return {}, []
+    if n_workers <= 1:
+        return generate_graph_dicts(instance_paths, timeout_sec)
+    n_workers = min(n_workers, len(instance_paths))
+    args = [(p, timeout_sec) for p in instance_paths]
+    graph_by_path: dict[str, dict] = {}
+    failed_list: list[str] = []
+    with multiprocessing.Pool(n_workers) as pool:
+        for path, result in tqdm(
+            pool.imap_unordered(_build_graph_dict_worker, args, chunksize=1),
+            total=len(args),
+            desc="Building graphs",
+            unit="instance",
+        ):
+            if result is not None:
+                graph_by_path[path] = result
+            else:
+                failed_list.append(path)
     logging.info(
         "Graphs: %d built, %d failed (of %d instances)",
         len(graph_by_path),

@@ -16,6 +16,7 @@ from .graph_rep import (
     smt_graph_to_gin,
     build_smt_graph_dict_timeout,
     generate_graph_dicts,
+    generate_graph_dicts_parallel,
     _suppress_z3_destructor_noise,
 )
 from .performance import MultiSolverDataset
@@ -306,6 +307,7 @@ def train_gin_regression(
     save_dir: str | Path,
     *,
     graph_timeout: int = 10,
+    jobs: int = 1,
     hidden_dim: int = 64,
     num_layers: int = 3,
     num_epochs: int = 50,
@@ -316,6 +318,7 @@ def train_gin_regression(
 ) -> None:
     """
     Build graphs, vocab, dataset; train GINMultiHeadEHM; save model, vocab, config, failed_paths.
+    jobs: number of parallel workers for graph building; 1 = sequential.
     """
     save_dir = Path(save_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
@@ -325,7 +328,12 @@ def train_gin_regression(
     instance_paths = list(multi_perf_data.keys())
     K = multi_perf_data.num_solvers()
     logging.info("Building graphs for %d instances (timeout=%ds)...", len(instance_paths), graph_timeout)
-    graph_by_path, failed_list = generate_graph_dicts(instance_paths, graph_timeout)
+    if jobs > 1:
+        graph_by_path, failed_list = generate_graph_dicts_parallel(
+            instance_paths, graph_timeout, n_workers=jobs
+        )
+    else:
+        graph_by_path, failed_list = generate_graph_dicts(instance_paths, graph_timeout)
     if not graph_by_path:
         raise ValueError(
             "No graphs could be built. Increase --graph-timeout or check instances."
