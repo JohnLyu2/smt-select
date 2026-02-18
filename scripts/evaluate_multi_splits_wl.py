@@ -25,7 +25,7 @@ from pathlib import Path
 
 import numpy as np
 
-from src.evaluate import as_evaluate
+from src.evaluate import as_evaluate, as_evaluate_parallel, _load_pwc_selector
 from src.feature import validate_feature_coverage
 from src.performance import parse_performance_json
 from src.pwc import (
@@ -108,9 +108,11 @@ def evaluate_multi_splits_wl(
     timeout: float = 1200.0,
     svm_c: float = 1.0,
     random_seed: int = 42,
+    jobs: int = 1,
 ) -> dict:
     """
     Run train/test evaluation for each split using WL features from wl_dir.
+    jobs: parallel workers for evaluation; 1 = sequential.
     """
     splits_dir = Path(splits_dir).resolve()
     wl_dir = Path(wl_dir).resolve()
@@ -188,8 +190,7 @@ def evaluate_multi_splits_wl(
             random_seed=random_seed,
         )
 
-        as_model = PwcSelector.load(str(model_save_dir / "model.joblib"))
-
+        model_path = str(model_save_dir / "model.joblib")
         train_output_csv = None
         test_output_csv = None
         if output_dir:
@@ -200,12 +201,32 @@ def evaluate_multi_splits_wl(
             train_output_csv = str(out_train / f"seed{seed_val}.csv")
             test_output_csv = str(out_test / f"seed{seed_val}.csv")
 
-        train_result = as_evaluate(
-            as_model, train_data, write_csv_path=train_output_csv
-        )
+        if jobs > 1:
+            train_result = as_evaluate_parallel(
+                list(train_data.keys()),
+                _load_pwc_selector,
+                (model_path,),
+                train_data,
+                n_workers=jobs,
+                write_csv_path=train_output_csv,
+                show_progress=False,
+            )
+            test_result = as_evaluate_parallel(
+                list(test_data.keys()),
+                _load_pwc_selector,
+                (model_path,),
+                test_data,
+                n_workers=jobs,
+                write_csv_path=test_output_csv,
+                show_progress=False,
+            )
+        else:
+            as_model = PwcSelector.load(model_path)
+            train_result = as_evaluate(
+                as_model, train_data, write_csv_path=train_output_csv
+            )
+            test_result = as_evaluate(as_model, test_data, write_csv_path=test_output_csv)
         train_metrics = compute_metrics(train_result, train_data)
-
-        test_result = as_evaluate(as_model, test_data, write_csv_path=test_output_csv)
         test_metrics = compute_metrics(test_result, test_data)
 
         seed_results.append({
@@ -347,6 +368,12 @@ def main():
         help="Random seed for tie-breaking (default: 42)",
     )
     parser.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="Parallel workers for evaluation; 1 = sequential (default: 1)",
+    )
+    parser.add_argument(
         "--log-level",
         type=str,
         default="INFO",
@@ -373,6 +400,7 @@ def main():
         timeout=args.timeout,
         svm_c=args.svm_c,
         random_seed=args.random_seed,
+        jobs=args.jobs,
     )
 
     agg = results["aggregated"]

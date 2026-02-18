@@ -88,6 +88,12 @@ def main() -> None:
         help="Save model per split in each output dir",
     )
     parser.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="Parallel workers for evaluation per split; 1 = sequential (default: 1)",
+    )
+    parser.add_argument(
         "--log-level",
         type=str,
         default="INFO",
@@ -128,6 +134,7 @@ def main() -> None:
             timeout=args.timeout,
             svm_c=args.svm_c,
             random_seed=args.random_seed,
+            jobs=args.jobs,
         )
 
     logging.info("Done. Results in %s/%s", results_base, ",".join(map(str, iterations)))

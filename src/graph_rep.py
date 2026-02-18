@@ -279,7 +279,8 @@ def generate_graph_dicts_parallel(
     args = [(p, timeout_sec) for p in instance_paths]
     graph_by_path: dict[str, dict] = {}
     failed_list: list[str] = []
-    with multiprocessing.Pool(n_workers) as pool:
+    ctx = multiprocessing.get_context("spawn")
+    with ctx.Pool(n_workers) as pool:
         for path, result in tqdm(
             pool.imap_unordered(_build_graph_dict_worker, args, chunksize=1),
             total=len(args),

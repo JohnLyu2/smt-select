@@ -55,7 +55,9 @@ def as_evaluate_parallel(
         return SingleSolverDataset({}, "AS", multi_perf_data.get_timeout())
     perf_dict: dict = {}
     path_to_selected: dict[str, int] = {}
-    with multiprocessing.Pool(
+    # Use spawn to avoid fork + multi-threaded parent (e.g. sklearn/numpy) warning/deadlocks.
+    ctx = multiprocessing.get_context("spawn")
+    with ctx.Pool(
         n_workers,
         initializer=_init_selector,
         initargs=((loader_fn, loader_args),),
