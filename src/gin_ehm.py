@@ -2,6 +2,20 @@
 
 from __future__ import annotations
 
+import warnings
+
+# Suppress deprecation warnings from PyTorch Geometric / torch (library code, not ours)
+warnings.filterwarnings(
+    "ignore",
+    category=DeprecationWarning,
+    message=r".*torch_geometric\.distributed.*deprecated.*",
+)
+warnings.filterwarnings(
+    "ignore",
+    category=DeprecationWarning,
+    message=r".*torch\.jit\.script.*deprecated.*",
+)
+
 import json
 import logging
 from pathlib import Path
@@ -379,7 +393,7 @@ def train_gin_regression(
             total_loss += loss.item()
             n_batches += 1
         avg_loss = total_loss / n_batches if n_batches else 0.0
-        if (epoch + 1) % 10 == 0 or epoch == 0:
+        if (epoch + 1) % 50 == 0 or epoch == 0:
             logging.info("Epoch %d/%d train loss %.4f", epoch + 1, num_epochs, avg_loss)
 
     fallback_solver_ids = sorted_fallback_solvers(multi_perf_data, failed_list)
