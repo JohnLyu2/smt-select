@@ -59,6 +59,91 @@ def as_evaluate(as_model, multi_perf_data, write_csv_path=None, show_progress=Tr
     )
 
 
+def compute_metrics(result_dataset, multi_perf_data) -> dict:
+    """Compute AS vs SBS/VBS metrics. Returns dict with solved, avg_par2, sbs_*, vbs_*, gap_cls_*, total_count."""
+    total_count = len(result_dataset)
+    solved_count = result_dataset.get_solved_count()
+    total_par2 = sum(result_dataset.get_par2(p) for p in result_dataset.keys())
+    avg_par2 = total_par2 / total_count if total_count > 0 else 0.0
+
+    sbs_dataset = multi_perf_data.get_best_solver_dataset()
+    sbs_solved = sbs_dataset.get_solved_count()
+    total_par2_sbs = sum(sbs_dataset.get_par2(p) for p in sbs_dataset.keys())
+    avg_par2_sbs = total_par2_sbs / total_count if total_count > 0 else 0.0
+
+    vbs_dataset = multi_perf_data.get_virtual_best_solver_dataset()
+    vbs_solved = vbs_dataset.get_solved_count()
+    total_par2_vbs = sum(vbs_dataset.get_par2(p) for p in vbs_dataset.keys())
+    avg_par2_vbs = total_par2_vbs / total_count if total_count > 0 else 0.0
+
+    solved_denom = vbs_solved - sbs_solved
+    par2_denom = avg_par2_vbs - avg_par2_sbs
+    gap_cls_solved = (
+        (solved_count - sbs_solved) / solved_denom
+        if solved_denom != 0
+        else (1.0 if solved_count == vbs_solved else 0.0)
+    )
+    gap_cls_par2 = (
+        (avg_par2 - avg_par2_sbs) / par2_denom
+        if par2_denom != 0
+        else (1.0 if avg_par2 == avg_par2_vbs else 0.0)
+    )
+    return {
+        "total_count": total_count,
+        "solved": solved_count,
+        "avg_par2": avg_par2,
+        "sbs_solved": sbs_solved,
+        "sbs_avg_par2": avg_par2_sbs,
+        "vbs_solved": vbs_solved,
+        "vbs_avg_par2": avg_par2_vbs,
+        "gap_cls_solved": gap_cls_solved,
+        "gap_cls_par2": gap_cls_par2,
+    }
+
+
+def format_evaluation_short(metrics: dict) -> str:
+    """Two-line summary: instances/solved/solve rate, then PAR2 and gap_cls_par2."""
+    n = metrics["total_count"]
+    sr = (metrics["solved"] / n * 100) if n else 0.0
+    lines = [
+        f"Instances: {n}, Solved: {metrics['solved']}, Solve rate: {sr:.2f}%",
+        f"Avg PAR2: {metrics['avg_par2']:.2f}, gap_cls_par2: {metrics['gap_cls_par2']:.4f}",
+    ]
+    return "\n".join(lines)
+
+
+def log_evaluation_summary(metrics: dict, multi_perf_data) -> None:
+    """Log full evaluation block (AS, SBS, VBS, gap closed)."""
+    total_count = metrics["total_count"]
+    solve_rate = (metrics["solved"] / total_count * 100) if total_count > 0 else 0.0
+    sbs_solve_rate = (metrics["sbs_solved"] / total_count * 100) if total_count > 0 else 0.0
+    vbs_solve_rate = (metrics["vbs_solved"] / total_count * 100) if total_count > 0 else 0.0
+    sbs_dataset = multi_perf_data.get_best_solver_dataset()
+    vbs_dataset = multi_perf_data.get_virtual_best_solver_dataset()
+
+    logging.info("=" * 60)
+    logging.info("Evaluation Results:")
+    logging.info("  Total instances: %d", total_count)
+    logging.info("  Solved: %d", metrics["solved"])
+    logging.info("  Solve rate: %.2f%%", solve_rate)
+    logging.info("  Average PAR-2: %.2f", metrics["avg_par2"])
+    logging.info("  Gap closed (solved): %.4f", metrics["gap_cls_solved"])
+    logging.info("  Gap closed (PAR-2): %.4f", metrics["gap_cls_par2"])
+    logging.info("")
+    logging.info("SBS:")
+    logging.info("  Solver: %s", sbs_dataset.get_solver_name())
+    logging.info("  Solved: %d", metrics["sbs_solved"])
+    logging.info("  Solve rate: %.2f%%", sbs_solve_rate)
+    logging.info("  Average PAR-2: %.2f", metrics["sbs_avg_par2"])
+    logging.info("")
+    logging.info("VBS:")
+    logging.info("  Solver: %s", vbs_dataset.get_solver_name())
+    logging.info("  Solved: %d", metrics["vbs_solved"])
+    logging.info("  Solve rate: %.2f%%", vbs_solve_rate)
+    logging.info("  Average PAR-2: %.2f", metrics["vbs_avg_par2"])
+    logging.info("=" * 60)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Evaluate algorithm selection model performance"
@@ -136,68 +221,8 @@ def main():
     # Evaluate
     logging.info("Starting evaluation...")
     result_dataset = as_evaluate(as_model, multi_perf_data, args.output_csv)
-
-    # Print statistics
-    solved_count = result_dataset.get_solved_count()
-    total_count = len(result_dataset)
-    total_par2_as = sum(result_dataset.get_par2(path) for path in result_dataset.keys())
-    avg_par2_as = total_par2_as / total_count if total_count > 0 else 0.0
-
-    # Get best single solver for comparison
-    best_solver_dataset = multi_perf_data.get_best_solver_dataset()
-    best_solver_solved = best_solver_dataset.get_solved_count()
-    best_solver_solve_rate = (
-        (best_solver_solved / total_count * 100) if total_count > 0 else 0.0
-    )
-    total_par2_best = sum(
-        best_solver_dataset.get_par2(path) for path in best_solver_dataset.keys()
-    )
-    avg_par2_best = total_par2_best / total_count if total_count > 0 else 0.0
-
-    # Get virtual best solver for comparison
-    virtual_best_dataset = multi_perf_data.get_virtual_best_solver_dataset()
-    virtual_best_solved = virtual_best_dataset.get_solved_count()
-    virtual_best_solve_rate = (
-        (virtual_best_solved / total_count * 100) if total_count > 0 else 0.0
-    )
-    total_par2_virtual_best = sum(
-        virtual_best_dataset.get_par2(path) for path in virtual_best_dataset.keys()
-    )
-    avg_par2_virtual_best = (
-        total_par2_virtual_best / total_count if total_count > 0 else 0.0
-    )
-
-    # Gap closed metrics: (AS - SBS) / (VBS - SBS)
-    solved_denom = virtual_best_solved - best_solver_solved
-    par2_denom = avg_par2_virtual_best - avg_par2_best
-    gap_cls_solved = (
-        (solved_count - best_solver_solved) / solved_denom if solved_denom != 0 else 0.0
-    )
-    gap_cls_par2 = (
-        (avg_par2_as - avg_par2_best) / par2_denom if par2_denom != 0 else 0.0
-    )
-
-    logging.info("=" * 60)
-    logging.info("Evaluation Results:")
-    logging.info(f"  Total instances: {total_count}")
-    logging.info(f"  Solved: {solved_count}")
-    logging.info(f"  Solve rate: {solve_rate:.2f}%")
-    logging.info(f"  Average PAR-2: {avg_par2_as:.2f}")
-    logging.info(f"  Gap closed (solved): {gap_cls_solved:.4f}")
-    logging.info(f"  Gap closed (PAR-2): {gap_cls_par2:.4f}")
-    logging.info("")
-    logging.info("SBS:")
-    logging.info(f"  Solver: {best_solver_dataset.get_solver_name()}")
-    logging.info(f"  Solved: {best_solver_solved}")
-    logging.info(f"  Solve rate: {best_solver_solve_rate:.2f}%")
-    logging.info(f"  Average PAR-2: {avg_par2_best:.2f}")
-    logging.info("")
-    logging.info("VBS:")
-    logging.info(f"  Solver: {virtual_best_dataset.get_solver_name()}")
-    logging.info(f"  Solved: {virtual_best_solved}")
-    logging.info(f"  Solve rate: {virtual_best_solve_rate:.2f}%")
-    logging.info(f"  Average PAR-2: {avg_par2_virtual_best:.2f}")
-    logging.info("=" * 60)
+    metrics = compute_metrics(result_dataset, multi_perf_data)
+    log_evaluation_summary(metrics, multi_perf_data)
 
     if args.output_csv:
         logging.info(f"Results written to {args.output_csv}")

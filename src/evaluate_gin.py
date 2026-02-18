@@ -6,52 +6,11 @@ import logging
 from pathlib import Path
 
 from .defaults import DEFAULT_BENCHMARK_ROOT
-from .evaluate import as_evaluate
+from .evaluate import as_evaluate, compute_metrics, format_evaluation_short
 from .gin_ehm import GINSelector
 from .gin_pwc import GINPwcSelector
 from .performance import MultiSolverDataset, parse_performance_json
 from .solver_selector import SolverSelector
-
-
-def compute_metrics(result_dataset, multi_perf_data):
-    """Same as evaluate_multi_splits_wl: solved, avg_par2, gap_cls vs SBS/VBS."""
-    total_count = len(result_dataset)
-    solved_count = result_dataset.get_solved_count()
-    total_par2 = sum(result_dataset.get_par2(p) for p in result_dataset.keys())
-    avg_par2 = total_par2 / total_count if total_count > 0 else 0.0
-
-    sbs_dataset = multi_perf_data.get_best_solver_dataset()
-    sbs_solved = sbs_dataset.get_solved_count()
-    total_par2_sbs = sum(sbs_dataset.get_par2(p) for p in sbs_dataset.keys())
-    avg_par2_sbs = total_par2_sbs / total_count if total_count > 0 else 0.0
-
-    vbs_dataset = multi_perf_data.get_virtual_best_solver_dataset()
-    vbs_solved = vbs_dataset.get_solved_count()
-    total_par2_vbs = sum(vbs_dataset.get_par2(p) for p in vbs_dataset.keys())
-    avg_par2_vbs = total_par2_vbs / total_count if total_count > 0 else 0.0
-
-    solved_denom = vbs_solved - sbs_solved
-    par2_denom = avg_par2_vbs - avg_par2_sbs
-    gap_cls_solved = (
-        (solved_count - sbs_solved) / solved_denom
-        if solved_denom != 0
-        else (1.0 if solved_count == vbs_solved else 0.0)
-    )
-    gap_cls_par2 = (
-        (avg_par2 - avg_par2_sbs) / par2_denom
-        if par2_denom != 0
-        else (1.0 if avg_par2 == avg_par2_vbs else 0.0)
-    )
-    return {
-        "solved": solved_count,
-        "avg_par2": avg_par2,
-        "sbs_solved": sbs_solved,
-        "sbs_avg_par2": avg_par2_sbs,
-        "vbs_solved": vbs_solved,
-        "vbs_avg_par2": avg_par2_vbs,
-        "gap_cls_solved": gap_cls_solved,
-        "gap_cls_par2": gap_cls_par2,
-    }
 
 
 def main() -> None:
@@ -98,10 +57,7 @@ def main() -> None:
         show_progress=True,
     )
     metrics = compute_metrics(result, multi_perf_data)
-    n = len(multi_perf_data)
-    sr = (metrics["solved"] / n * 100) if n else 0
-    print(f"Instances: {n}, Solved: {metrics['solved']}, Solve rate: {sr:.2f}%")
-    print(f"Avg PAR2: {metrics['avg_par2']:.2f}, gap_cls_par2: {metrics['gap_cls_par2']:.4f}")
+    print(format_evaluation_short(metrics))
     if args.output_csv:
         print(f"Wrote per-instance results to {args.output_csv}")
 
