@@ -1,0 +1,166 @@
+{
+  "division": "QF_SLIA",
+  "n_seeds": 5,
+  "seed_values": [
+    0,
+    10,
+    20,
+    30,
+    40
+  ],
+  "model_type": "WL",
+  "splits_dir": "/home/john-lu/Desktop/smt-select/data/cp26/performance_splits/smtcomp24/QF_SLIA",
+  "wl_dir": "/home/john-lu/Desktop/smt-select/data/features/wl/QF_SLIA",
+  "wl_iter": 0,
+  "seeds": [
+    {
+      "seed": 0,
+      "train_size": 17791,
+      "test_size": 5931,
+      "train_metrics": {
+        "solved": 17773,
+        "avg_par2": 4.584734712816961,
+        "sbs_name": "Z3-Noodler",
+        "sbs_solved": 17469,
+        "sbs_avg_par2": 44.65992063788583,
+        "vbs_solved": 17774,
+        "vbs_avg_par2": 4.040609480991914,
+        "gap_cls_solved": 0.9967213114754099,
+        "gap_cls_par2": 0.9866042722949353
+      },
+      "test_metrics": {
+        "solved": 5917,
+        "avg_par2": 8.270759221913503,
+        "sbs_name": "Z3-Noodler",
+        "sbs_solved": 5807,
+        "sbs_avg_par2": 51.47958290425829,
+        "vbs_solved": 5926,
+        "vbs_avg_par2": 4.233040090213708,
+        "gap_cls_solved": 0.9243697478991597,
+        "gap_cls_par2": 0.9145393738629372
+      }
+    },
+    {
+      "seed": 10,
+      "train_size": 17791,
+      "test_size": 5931,
+      "train_metrics": {
+        "solved": 17772,
+        "avg_par2": 4.725659808881831,
+        "sbs_name": "Z3-Noodler",
+        "sbs_solved": 17471,
+        "sbs_avg_par2": 44.37160102340151,
+        "vbs_solved": 17774,
+        "vbs_avg_par2": 4.118191644449987,
+        "gap_cls_solved": 0.9933993399339934,
+        "gap_cls_par2": 0.9849089015364376
+      },
+      "test_metrics": {
+        "solved": 5916,
+        "avg_par2": 8.316006008474226,
+        "sbs_name": "Z3-Noodler",
+        "sbs_solved": 5805,
+        "sbs_avg_par2": 52.344444523089955,
+        "vbs_solved": 5926,
+        "vbs_avg_par2": 4.000319761418804,
+        "gap_cls_solved": 0.9173553719008265,
+        "gap_cls_par2": 0.9107298711408869
+      }
+    },
+    {
+      "seed": 20,
+      "train_size": 17791,
+      "test_size": 5931,
+      "train_metrics": {
+        "solved": 17772,
+        "avg_par2": 4.87091395019871,
+        "sbs_name": "Z3-Noodler",
+        "sbs_solved": 17454,
+        "sbs_avg_par2": 46.47006104267027,
+        "vbs_solved": 17772,
+        "vbs_avg_par2": 4.49120287077834,
+        "gap_cls_solved": 1.0,
+        "gap_cls_par2": 0.9909547068225257
+      },
+      "test_metrics": {
+        "solved": 5920,
+        "avg_par2": 6.353160162970909,
+        "sbs_name": "Z3-Noodler",
+        "sbs_solved": 5822,
+        "sbs_avg_par2": 46.04977208963684,
+        "vbs_solved": 5928,
+        "vbs_avg_par2": 2.8814118660204353,
+        "gap_cls_solved": 0.9245283018867925,
+        "gap_cls_par2": 0.9195765537776633
+      }
+    },
+    {
+      "seed": 30,
+      "train_size": 17791,
+      "test_size": 5931,
+      "train_metrics": {
+        "solved": 17772,
+        "avg_par2": 4.728961225695109,
+        "sbs_name": "Z3-Noodler",
+        "sbs_solved": 17458,
+        "sbs_avg_par2": 46.17579783379222,
+        "vbs_solved": 17775,
+        "vbs_avg_par2": 4.124909975178831,
+        "gap_cls_solved": 0.9905362776025236,
+        "gap_cls_par2": 0.9856352319468911
+      },
+      "test_metrics": {
+        "solved": 5915,
+        "avg_par2": 8.186490890866333,
+        "sbs_name": "Z3-Noodler",
+        "sbs_solved": 5818,
+        "sbs_avg_par2": 46.93246248740271,
+        "vbs_solved": 5925,
+        "vbs_avg_par2": 3.980167034729063,
+        "gap_cls_solved": 0.9065420560747663,
+        "gap_cls_par2": 0.9020698704968645
+      }
+    },
+    {
+      "seed": 40,
+      "train_size": 17791,
+      "test_size": 5931,
+      "train_metrics": {
+        "solved": 17775,
+        "avg_par2": 4.381004971786404,
+        "sbs_name": "Z3-Noodler",
+        "sbs_solved": 17461,
+        "sbs_avg_par2": 45.611314943571195,
+        "vbs_solved": 17776,
+        "vbs_avg_par2": 3.966576320268525,
+        "gap_cls_solved": 0.9968253968253968,
+        "gap_cls_par2": 0.9900484751443251
+      },
+      "test_metrics": {
+        "solved": 5918,
+        "avg_par2": 7.575549620919125,
+        "sbs_name": "Z3-Noodler",
+        "sbs_solved": 5815,
+        "sbs_avg_par2": 48.625720808077496,
+        "vbs_solved": 5924,
+        "vbs_avg_par2": 4.455114607568255,
+        "gap_cls_solved": 0.944954128440367,
+        "gap_cls_par2": 0.9293549425338226
+      }
+    }
+  ],
+  "aggregated": {
+    "train": {
+      "gap_cls_solved_mean": 0.9954964651674647,
+      "gap_cls_solved_std": 0.0032418984790291666,
+      "gap_cls_par2_mean": 0.9876303175490231,
+      "gap_cls_par2_std": 0.0024223249465884474
+    },
+    "test": {
+      "gap_cls_solved_mean": 0.9235499212403824,
+      "gap_cls_solved_std": 0.012549178055247693,
+      "gap_cls_par2_mean": 0.9152541223624349,
+      "gap_cls_par2_std": 0.00908097742132615
+    }
+  }
+}
