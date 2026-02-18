@@ -18,6 +18,7 @@ Results are aggregated across splits (mean ± std) and optionally saved to summa
 """
 
 import argparse
+import gc
 import json
 import logging
 import re
@@ -26,6 +27,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import torch
 
 from src.defaults import DEFAULT_BENCHMARK_ROOT
 from src.evaluate import as_evaluate, as_evaluate_parallel, compute_metrics
@@ -227,6 +229,13 @@ def evaluate_multi_splits_gin_ehm(
 
         if not save_models:
             shutil.rmtree(model_save_dir, ignore_errors=True)
+
+        # Free GPU memory so the next seed starts clean (no carry-over from this split)
+        if jobs <= 1:
+            del selector
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
     test_metrics_list = [r["test_metrics"] for r in seed_results]
     train_metrics_list = [r["train_metrics"] for r in seed_results]
