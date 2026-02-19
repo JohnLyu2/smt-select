@@ -175,7 +175,7 @@ def train_pwc_wl(
     multi_perf_data: MultiSolverDataset,
     wl_iter: int,
     save_dir: str | Path,
-    graph_timeout: int = 10,
+    graph_timeout: int = 5,
 ) -> None:
     """Train pairwise WL-based SVM models and save PwcWlSelector."""
     Path(save_dir).mkdir(parents=True, exist_ok=True)
@@ -256,8 +256,8 @@ def main() -> None:
     parser.add_argument(
         "--graph-timeout",
         type=int,
-        default=10,
-        help="Graph build timeout in seconds (default: 10)",
+        default=5,
+        help="Graph build timeout in seconds (default: 5)",
     )
     parser.add_argument(
         "--timeout",

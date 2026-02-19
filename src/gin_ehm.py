@@ -322,7 +322,7 @@ def train_gin_regression(
     multi_perf_data: MultiSolverDataset,
     save_dir: str | Path,
     *,
-    graph_timeout: int = 10,
+    graph_timeout: int = 5,
     jobs: int = 1,
     hidden_dim: int = 64,
     num_layers: int = 3,

@@ -73,7 +73,7 @@ def evaluate_multi_splits_gin(
     save_models: bool = False,
     output_dir: Path | None = None,
     timeout: float = 1200.0,
-    graph_timeout: int = 10,
+    graph_timeout: int = 5,
     jobs: int = 4,
     hidden_dim: int = 64,
     num_layers: int = 3,
@@ -387,7 +387,7 @@ def main() -> None:
     parser.add_argument(
         "--graph-timeout",
         type=int,
-        default=10,
+        default=5,
         help="Graph build timeout in seconds (default: 10)",
     )
     parser.add_argument(

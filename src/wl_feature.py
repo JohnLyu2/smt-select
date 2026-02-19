@@ -91,7 +91,7 @@ def save_wl_features_to_dir(
     instance_paths: list[str],
     output_dir: str | Path,
     wl_iter: int = 2,
-    graph_timeout: int = 10,
+    graph_timeout: int = 5,
     benchmark_root: str | Path | None = None,
     jobs: int = 1,
 ) -> tuple[int, list[str]]:
@@ -203,8 +203,8 @@ def main() -> None:
     parser.add_argument(
         "--graph-timeout",
         type=int,
-        default=10,
-        help="Graph build timeout per instance in seconds (default: 10)",
+        default=5,
+        help="Graph build timeout per instance in seconds (default: 5)",
     )
     parser.add_argument(
         "--jobs",

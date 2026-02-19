@@ -120,8 +120,8 @@ def main():
     parser.add_argument(
         "--graph-timeout",
         type=int,
-        default=10,
-        help="Graph build timeout in seconds for --model-type wl (default: 10)",
+        default=5,
+        help="Graph build timeout in seconds for --model-type wl (default: 5)",
     )
     parser.add_argument(
         "--benchmark-root",
