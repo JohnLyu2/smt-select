@@ -267,9 +267,13 @@ def generate_graph_dicts_parallel(
     instance_paths: list[str],
     timeout_sec: int,
     n_workers: int,
+    result_timeout_buffer: int = 30,
 ) -> tuple[dict[str, dict], list[str]]:
     """Build graph dicts in parallel. Returns (path -> graph_dict, failed_paths).
     Uses sequential path when n_workers <= 1 or instance_paths is empty.
+
+    Each result is collected with a timeout of (timeout_sec + result_timeout_buffer) so that
+    a stuck or dead worker cannot block the main process indefinitely.
     """
     if not instance_paths:
         return {}, []
@@ -279,14 +283,33 @@ def generate_graph_dicts_parallel(
     args = [(p, timeout_sec) for p in instance_paths]
     graph_by_path: dict[str, dict] = {}
     failed_list: list[str] = []
+    get_timeout = timeout_sec + result_timeout_buffer
     ctx = multiprocessing.get_context("spawn")
     with ctx.Pool(n_workers) as pool:
-        for path, result in tqdm(
-            pool.imap_unordered(_build_graph_dict_worker, args, chunksize=1),
-            total=len(args),
+        async_results = [
+            (instance_paths[i], pool.apply_async(_build_graph_dict_worker, (args[i],)))
+            for i in range(len(args))
+        ]
+        for path, ar in tqdm(
+            async_results,
+            total=len(async_results),
             desc="Building graphs",
             unit="instance",
         ):
+            try:
+                _, result = ar.get(timeout=get_timeout)
+            except (TimeoutError, multiprocessing.TimeoutError):
+                logging.warning(
+                    "Graph build result timeout (%ds) for %s — worker may be stuck; marking failed",
+                    get_timeout,
+                    path,
+                )
+                failed_list.append(path)
+                continue
+            except Exception as e:
+                logging.debug("Graph build failed for %s: %s", path, e)
+                failed_list.append(path)
+                continue
             if result is not None:
                 graph_by_path[path] = result
             else:
