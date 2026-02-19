@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Evaluate GIN EHM over multiple train/test splits.
+Evaluate GIN (EHM or PWC) over multiple train/test splits.
 
 Expects --splits-dir to point at a division folder containing seed subdirs, e.g.:
   data/cp26/performance_splits/smtcomp24/BV/
@@ -10,7 +10,7 @@ Expects --splits-dir to point at a division folder containing seed subdirs, e.g.
 
 For each split (seed):
   1. Load train.json and test.json; rebase paths with --benchmark-root.
-  2. Train GIN EHM on the train set.
+  2. Train GIN EHM or GIN-PWC on the train set (--model-type).
   3. Evaluate on train and test sets.
   4. Compute metrics (solve rate, PAR2, gap closed vs SBS/VBS).
 
@@ -32,7 +32,8 @@ import torch
 from src.defaults import DEFAULT_BENCHMARK_ROOT
 from src.evaluate import as_evaluate, as_evaluate_parallel, compute_metrics
 from src.evaluate_gin import _load_gin_selector
-from src.gin_ehm import GINSelector, train_gin_regression
+from src.gin_ehm import train_gin_regression
+from src.gin_pwc import train_gin_pwc
 from src.performance import MultiSolverDataset, parse_performance_json
 
 
@@ -64,9 +65,10 @@ def _rebase_perf_data(multi_perf_data: MultiSolverDataset, benchmark_root: Path)
     )
 
 
-def evaluate_multi_splits_gin_ehm(
+def evaluate_multi_splits_gin(
     splits_dir: Path,
     *,
+    model_type: str = "gin_ehm",
     benchmark_root: Path | str | None = None,
     save_models: bool = False,
     output_dir: Path | None = None,
@@ -75,13 +77,17 @@ def evaluate_multi_splits_gin_ehm(
     jobs: int = 4,
     hidden_dim: int = 64,
     num_layers: int = 3,
-    num_epochs: int = 50,
+    num_epochs: int = 1000,
     batch_size: int = 32,
     lr: float = 1e-3,
     dropout: float = 0.1,
+    val_ratio: float = 0.1,
+    patience: int = 100,
+    val_split_seed: int = 42,
+    min_epochs: int = 200,
 ) -> dict:
     """
-    Run train/test evaluation with GIN EHM for each split (seed) under splits_dir.
+    Run train/test evaluation with GIN (EHM or PWC) for each split (seed) under splits_dir.
     Returns dict with division, n_seeds, per-split results, and aggregated metrics.
     """
     splits_dir = Path(splits_dir).resolve()
@@ -101,7 +107,8 @@ def evaluate_multi_splits_gin_ehm(
 
     n_seeds = len(seed_entries)
     logging.info(
-        "Starting GIN EHM evaluation over %d splits for division %s",
+        "Starting GIN (%s) evaluation over %d splits for division %s",
+        model_type,
         n_seeds,
         division,
     )
@@ -142,18 +149,42 @@ def evaluate_multi_splits_gin_ehm(
             logging.getLogger().addHandler(log_handler)
 
         try:
-            train_gin_regression(
-                train_data,
-                str(model_save_dir),
-                graph_timeout=graph_timeout,
-                jobs=jobs,
-                hidden_dim=hidden_dim,
-                num_layers=num_layers,
-                num_epochs=num_epochs,
-                batch_size=batch_size,
-                lr=lr,
-                dropout=dropout,
-            )
+            if model_type == "gin_ehm":
+                train_gin_regression(
+                    train_data,
+                    str(model_save_dir),
+                    graph_timeout=graph_timeout,
+                    jobs=jobs,
+                    hidden_dim=hidden_dim,
+                    num_layers=num_layers,
+                    num_epochs=num_epochs,
+                    batch_size=batch_size,
+                    lr=lr,
+                    dropout=dropout,
+                    val_ratio=val_ratio,
+                    patience=patience,
+                    val_split_seed=val_split_seed,
+                    min_epochs=min_epochs,
+                )
+            elif model_type == "gin_pwc":
+                train_gin_pwc(
+                    train_data,
+                    str(model_save_dir),
+                    graph_timeout=graph_timeout,
+                    jobs=jobs,
+                    hidden_dim=hidden_dim,
+                    num_layers=num_layers,
+                    num_epochs=num_epochs,
+                    batch_size=batch_size,
+                    lr=lr,
+                    dropout=dropout,
+                    val_ratio=val_ratio,
+                    patience=patience,
+                    val_split_seed=val_split_seed,
+                    min_epochs=min_epochs,
+                )
+            else:
+                raise ValueError(f"Unknown model_type: {model_type}")
         finally:
             if log_handler is not None:
                 logging.getLogger().removeHandler(log_handler)
@@ -191,7 +222,7 @@ def evaluate_multi_splits_gin_ehm(
                 show_progress=True,
             )
         else:
-            selector = GINSelector.load(str(model_save_dir))
+            selector = _load_gin_selector(str(model_save_dir))
             train_result = as_evaluate(
                 selector, train_data, write_csv_path=train_output_csv, show_progress=True
             )
@@ -259,7 +290,7 @@ def evaluate_multi_splits_gin_ehm(
         "division": division,
         "n_seeds": n_seeds,
         "seed_values": [s for s, _ in seed_entries],
-        "model_type": "gin_ehm",
+        "model_type": model_type,
         "splits_dir": str(splits_dir),
         "benchmark_root": str(root),
         "seeds": seed_results,
@@ -289,7 +320,7 @@ def evaluate_multi_splits_gin_ehm(
 
     agg = results["aggregated"]
     logging.info("\n%s", "=" * 60)
-    logging.info("Multi-splits summary — %s (GIN EHM)", results["division"])
+    logging.info("Multi-splits summary — %s (GIN %s)", results["division"], model_type.upper())
     logging.info("%s", "=" * 60)
     logging.info("Seeds: %s", results["seed_values"])
     tr = agg["train"]
@@ -315,7 +346,14 @@ def evaluate_multi_splits_gin_ehm(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Evaluate GIN EHM over multiple train/test splits (per seed)"
+        description="Evaluate GIN (EHM or PWC) over multiple train/test splits (per seed)"
+    )
+    parser.add_argument(
+        "--model-type",
+        type=str,
+        choices=["gin_ehm", "gin_pwc"],
+        default="gin_ehm",
+        help="GIN model to train and evaluate (default: gin_ehm)",
     )
     parser.add_argument(
         "--splits-dir",
@@ -338,7 +376,7 @@ def main() -> None:
     parser.add_argument(
         "--save-models",
         action="store_true",
-        help="Save GIN EHM model per split (requires --output-dir)",
+        help="Save GIN model per split (requires --output-dir)",
     )
     parser.add_argument(
         "--timeout",
@@ -360,10 +398,14 @@ def main() -> None:
     )
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--num-layers", type=int, default=3)
-    parser.add_argument("--epochs", type=int, default=50)
+    parser.add_argument("--epochs", type=int, default=1000)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--dropout", type=float, default=0.1)
+    parser.add_argument("--val-ratio", type=float, default=0.1, help="Fraction of train data for validation (0 = no early stop)")
+    parser.add_argument("--patience", type=int, default=100, help="Epochs without val improvement to stop (0 = disabled)")
+    parser.add_argument("--val-split-seed", type=int, default=42, help="Random seed for train/val split")
+    parser.add_argument("--min-epochs", type=int, default=200, help="Minimum epochs before early stop can trigger")
     parser.add_argument(
         "--log-level",
         type=str,
@@ -382,8 +424,9 @@ def main() -> None:
     if output_dir:
         output_dir.mkdir(parents=True, exist_ok=True)
 
-    evaluate_multi_splits_gin_ehm(
+    evaluate_multi_splits_gin(
         Path(args.splits_dir),
+        model_type=args.model_type,
         benchmark_root=args.benchmark_root,
         save_models=args.save_models,
         output_dir=output_dir,
@@ -396,6 +439,10 @@ def main() -> None:
         batch_size=args.batch_size,
         lr=args.lr,
         dropout=args.dropout,
+        val_ratio=args.val_ratio,
+        patience=args.patience,
+        val_split_seed=args.val_split_seed,
+        min_epochs=args.min_epochs,
     )
 
 

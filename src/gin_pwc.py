@@ -24,7 +24,7 @@ from pathlib import Path
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, Subset
 from torch_geometric.data import Batch, Data
 from torch_geometric.nn import GINConv, global_mean_pool
 
@@ -382,16 +382,22 @@ def train_gin_pwc(
     jobs: int = 1,
     hidden_dim: int = 64,
     num_layers: int = 3,
-    num_epochs: int = 50,
+    num_epochs: int = 1000,
     batch_size: int = 32,
     lr: float = 1e-3,
     dropout: float = 0.1,
     device: str | None = None,
+    val_ratio: float = 0.1,
+    patience: int = 100,
+    val_split_seed: int = 42,
+    min_epochs: int = 200,
 ) -> None:
     """
     Build graphs, vocab, pairwise samples (with weight = |PAR2_i - PAR2_j|);
     train GINPwc with weighted BCE; save model, vocab, config, failed_paths.
     jobs: number of parallel workers for graph building; 1 = sequential.
+    If val_ratio > 0 and patience > 0: split off val_ratio of samples for validation,
+    stop when validation loss does not improve for patience epochs (after at least min_epochs), and restore best checkpoint.
     """
     save_dir = Path(save_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
@@ -435,12 +441,47 @@ def train_gin_pwc(
         len(samples),
     )
     dataset = GINPwcDataset(samples)
-    loader = DataLoader(
-        dataset,
-        batch_size=batch_size,
-        shuffle=True,
-        collate_fn=_collate_gin_pwc,
-    )
+    n_total = len(dataset)
+
+    use_early_stop = val_ratio > 0 and patience > 0 and n_total >= 2
+    if use_early_stop:
+        rng = random.Random(val_split_seed)
+        indices = list(range(n_total))
+        rng.shuffle(indices)
+        n_val = max(1, int(n_total * val_ratio))
+        n_val = min(n_val, n_total - 1)
+        val_indices = indices[-n_val:]
+        train_indices = indices[:-n_val]
+        train_dataset = Subset(dataset, train_indices)
+        val_dataset = Subset(dataset, val_indices)
+        train_loader = DataLoader(
+            train_dataset,
+            batch_size=batch_size,
+            shuffle=True,
+            collate_fn=_collate_gin_pwc,
+        )
+        val_loader = DataLoader(
+            val_dataset,
+            batch_size=batch_size,
+            shuffle=False,
+            collate_fn=_collate_gin_pwc,
+        )
+        logging.info(
+            "Early stopping: val_ratio=%.2f, patience=%d, min_epochs=%d -> %d train, %d val samples",
+            val_ratio,
+            patience,
+            min_epochs,
+            len(train_indices),
+            len(val_indices),
+        )
+    else:
+        train_loader = DataLoader(
+            dataset,
+            batch_size=batch_size,
+            shuffle=True,
+            collate_fn=_collate_gin_pwc,
+        )
+        val_loader = None
 
     model = GINPwc(
         num_node_types=num_node_types,
@@ -451,11 +492,15 @@ def train_gin_pwc(
     ).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
+    best_val_loss: float | None = None
+    epochs_no_improve = 0
+    best_state_path = save_dir / "_best_model.pt"
+
     for epoch in range(num_epochs):
         model.train()
         total_loss = 0.0
         n_batches = 0
-        for batch_data, pair_idx, labels, weights in loader:
+        for batch_data, pair_idx, labels, weights in train_loader:
             batch_data = batch_data.to(device)
             pair_idx = pair_idx.to(device)
             labels = labels.to(device)
@@ -468,13 +513,60 @@ def train_gin_pwc(
             total_loss += loss.item()
             n_batches += 1
         avg_loss = total_loss / n_batches if n_batches else 0.0
-        if (epoch + 1) % 50 == 0 or epoch == 0:
-            logging.info(
-                "Epoch %d/%d train loss (weighted BCE) %.4f",
-                epoch + 1,
-                num_epochs,
-                avg_loss,
-            )
+
+        if val_loader is not None:
+            model.eval()
+            val_loss_sum = 0.0
+            val_batches = 0
+            with torch.no_grad():
+                for batch_data, pair_idx, labels, weights in val_loader:
+                    batch_data = batch_data.to(device)
+                    pair_idx = pair_idx.to(device)
+                    labels = labels.to(device)
+                    weights = weights.to(device)
+                    logits = model.forward_batch_for_loss(batch_data, pair_idx)
+                    loss = _weighted_bce_loss(logits, labels, weights)
+                    val_loss_sum += loss.item()
+                    val_batches += 1
+            val_loss = val_loss_sum / val_batches if val_batches else float("inf")
+            improved = best_val_loss is None or val_loss < best_val_loss
+            if improved:
+                best_val_loss = val_loss
+                torch.save(model.state_dict(), best_state_path)
+                epochs_no_improve = 0
+            else:
+                epochs_no_improve += 1
+            if (epoch + 1) % 20 == 0 or epoch == 0:
+                logging.info(
+                    "Epoch %d/%d train loss (weighted BCE) %.4f val loss %.4f%s",
+                    epoch + 1,
+                    num_epochs,
+                    avg_loss,
+                    val_loss,
+                    " (best)" if improved else "",
+                )
+            if epochs_no_improve >= patience and (epoch + 1) >= min_epochs:
+                logging.info(
+                    "Early stop: no val improvement for %d epochs (min_epochs=%d reached), restoring best",
+                    patience,
+                    min_epochs,
+                )
+                model.load_state_dict(torch.load(best_state_path, map_location=device, weights_only=True))
+                if best_state_path.exists():
+                    best_state_path.unlink()
+                break
+        else:
+            if (epoch + 1) % 20 == 0 or epoch == 0:
+                logging.info(
+                    "Epoch %d/%d train loss (weighted BCE) %.4f",
+                    epoch + 1,
+                    num_epochs,
+                    avg_loss,
+                )
+
+    if best_state_path.exists():
+        model.load_state_dict(torch.load(best_state_path, map_location=device, weights_only=True))
+        best_state_path.unlink(missing_ok=True)
 
     fallback_solver_ids = sorted_fallback_solvers(multi_perf_data, failed_list)
     config = {
