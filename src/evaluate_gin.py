@@ -66,6 +66,8 @@ def main() -> None:
         else:
             logging.info("Evaluating GIN-PWC with %d workers (CPU)", args.jobs)
         # Use CPU in workers to avoid CUDA init errors in forked processes.
+        fallback_ids = config.get("fallback_solver_ids") or config.get("timeout_solver_ids") or []
+        fallback_solver_id = fallback_ids[0] if fallback_ids else None
         result = as_evaluate_parallel(
             instance_paths,
             _load_gin_selector,
@@ -74,6 +76,7 @@ def main() -> None:
             n_workers=args.jobs,
             write_csv_path=args.output_csv,
             show_progress=True,
+            fallback_solver_id=fallback_solver_id,
         )
     else:
         if "num_heads" in config:

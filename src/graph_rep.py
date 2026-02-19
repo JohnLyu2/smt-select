@@ -267,7 +267,7 @@ def generate_graph_dicts_parallel(
     instance_paths: list[str],
     timeout_sec: int,
     n_workers: int,
-    result_timeout_buffer: int = 30,
+    result_timeout_buffer: int = 10,
 ) -> tuple[dict[str, dict], list[str]]:
     """Build graph dicts in parallel. Returns (path -> graph_dict, failed_paths).
     Uses sequential path when n_workers <= 1 or instance_paths is empty.

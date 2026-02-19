@@ -45,27 +45,53 @@ def as_evaluate_parallel(
     n_workers: int,
     write_csv_path: str | None = None,
     show_progress: bool = True,
+    result_timeout: int = 30,
+    fallback_solver_id: int | None = None,
 ):
     """
     Evaluate algorithm selection in parallel. Each worker loads the selector via loader_fn(*loader_args).
     Returns SingleSolverDataset like as_evaluate.
+
+    result_timeout: max seconds to wait for each worker result; prevents main process blocking
+    forever on a stuck worker. On timeout/error the instance is scored with fallback_solver_id.
+    fallback_solver_id: solver id to use when a worker times out or fails. If None, use the
+    first solver id from multi_perf_data (min of solver id dict keys).
     """
     n_workers = min(n_workers, len(instance_paths))
     if n_workers <= 0:
         return SingleSolverDataset({}, "AS", multi_perf_data.get_timeout())
+    if fallback_solver_id is None:
+        solver_ids = multi_perf_data.get_solver_id_dict().keys()
+        fallback_solver_id = min(solver_ids) if solver_ids else 0
     perf_dict: dict = {}
     path_to_selected: dict[str, int] = {}
-    # Use spawn to avoid fork + multi-threaded parent (e.g. sklearn/numpy) warning/deadlocks.
     ctx = multiprocessing.get_context("spawn")
     with ctx.Pool(
         n_workers,
         initializer=_init_selector,
         initargs=((loader_fn, loader_args),),
     ) as pool:
-        it = pool.imap_unordered(_eval_worker, instance_paths, chunksize=1)
+        async_results = [
+            (instance_paths[i], pool.apply_async(_eval_worker, (instance_paths[i],)))
+            for i in range(len(instance_paths))
+        ]
+        it = async_results
         if show_progress:
-            it = tqdm(it, total=len(instance_paths), desc="Evaluating", unit="instance")
-        for instance_path, selected in it:
+            it = tqdm(it, total=len(async_results), desc="Evaluating", unit="instance")
+        for instance_path, ar in it:
+            try:
+                _, selected = ar.get(timeout=result_timeout)
+            except (TimeoutError, multiprocessing.TimeoutError):
+                logging.warning(
+                    "Evaluation result timeout (%ds) for %s — worker stuck; using fallback solver %s",
+                    result_timeout,
+                    instance_path,
+                    multi_perf_data.get_solver_name(fallback_solver_id),
+                )
+                selected = fallback_solver_id
+            except Exception as e:
+                logging.debug("Evaluation failed for %s: %s", instance_path, e)
+                selected = fallback_solver_id
             path_to_selected[instance_path] = selected
             perf_dict[instance_path] = multi_perf_data.get_performance(
                 instance_path, selected
