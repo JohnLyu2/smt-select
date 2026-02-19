@@ -326,15 +326,15 @@ def train_gin_regression(
     jobs: int = 1,
     hidden_dim: int = 64,
     num_layers: int = 3,
-    num_epochs: int = 1000,
+    num_epochs: int = 500,
     batch_size: int = 32,
     lr: float = 1e-3,
     dropout: float = 0.1,
     device: str | None = None,
     val_ratio: float = 0.1,
-    patience: int = 100,
+    patience: int = 20,
     val_split_seed: int = 42,
-    min_epochs: int = 200,
+    min_epochs: int = 50,
 ) -> None:
     """
     Build graphs, vocab, dataset; train GINMultiHeadEHM; save model, vocab, config, failed_paths.
@@ -461,7 +461,7 @@ def train_gin_regression(
                 epochs_no_improve = 0
             else:
                 epochs_no_improve += 1
-            if (epoch + 1) % 20 == 0 or epoch == 0:
+            if (epoch + 1) % 10 == 0 or epoch == 0:
                 logging.info(
                     "Epoch %d/%d train loss %.4f val loss %.4f%s",
                     epoch + 1,
@@ -481,7 +481,7 @@ def train_gin_regression(
                     best_state_path.unlink()
                 break
         else:
-            if (epoch + 1) % 20 == 0 or epoch == 0:
+            if (epoch + 1) % 10 == 0 or epoch == 0:
                 logging.info("Epoch %d/%d train loss %.4f", epoch + 1, num_epochs, avg_loss)
 
     if best_state_path.exists():

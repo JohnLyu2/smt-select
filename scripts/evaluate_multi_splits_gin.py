@@ -77,14 +77,14 @@ def evaluate_multi_splits_gin(
     jobs: int = 4,
     hidden_dim: int = 64,
     num_layers: int = 3,
-    num_epochs: int = 1000,
+    num_epochs: int = 500,
     batch_size: int = 32,
     lr: float = 1e-3,
     dropout: float = 0.1,
     val_ratio: float = 0.1,
-    patience: int = 100,
+    patience: int = 20,
     val_split_seed: int = 42,
-    min_epochs: int = 200,
+    min_epochs: int = 50,
 ) -> dict:
     """
     Run train/test evaluation with GIN (EHM or PWC) for each split (seed) under splits_dir.
@@ -398,14 +398,14 @@ def main() -> None:
     )
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--num-layers", type=int, default=3)
-    parser.add_argument("--epochs", type=int, default=1000)
+    parser.add_argument("--epochs", type=int, default=500)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--dropout", type=float, default=0.1)
     parser.add_argument("--val-ratio", type=float, default=0.1, help="Fraction of train data for validation (0 = no early stop)")
-    parser.add_argument("--patience", type=int, default=100, help="Epochs without val improvement to stop (0 = disabled)")
+    parser.add_argument("--patience", type=int, default=20, help="Epochs without val improvement to stop (0 = disabled)")
     parser.add_argument("--val-split-seed", type=int, default=42, help="Random seed for train/val split")
-    parser.add_argument("--min-epochs", type=int, default=200, help="Minimum epochs before early stop can trigger")
+    parser.add_argument("--min-epochs", type=int, default=50, help="Minimum epochs before early stop can trigger")
     parser.add_argument(
         "--log-level",
         type=str,
