@@ -82,7 +82,7 @@ def evaluate_multi_splits_gin(
     lr: float = 1e-3,
     dropout: float = 0.1,
     val_ratio: float = 0.1,
-    patience: int = 20,
+    patience: int = 50,
     val_split_seed: int = 42,
     min_epochs: int = 50,
 ) -> dict:
@@ -403,7 +403,7 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--dropout", type=float, default=0.1)
     parser.add_argument("--val-ratio", type=float, default=0.1, help="Fraction of train data for validation (0 = no early stop)")
-    parser.add_argument("--patience", type=int, default=20, help="Epochs without val improvement to stop (0 = disabled)")
+    parser.add_argument("--patience", type=int, default=50, help="Epochs without val improvement to stop (0 = disabled)")
     parser.add_argument("--val-split-seed", type=int, default=42, help="Random seed for train/val split")
     parser.add_argument("--min-epochs", type=int, default=50, help="Minimum epochs before early stop can trigger")
     parser.add_argument(
