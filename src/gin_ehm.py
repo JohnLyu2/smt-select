@@ -135,6 +135,9 @@ def build_gin_samples(
         if graph_dict is None:
             continue
         data = graph_dict_to_gin_data(graph_dict, vocabulary)
+        if data.num_nodes == 0:
+            logging.debug("Skipping instance with 0 nodes: %s", path)
+            continue
         y = torch.zeros(K, dtype=torch.float32)
         mask = torch.zeros(K, dtype=torch.float32)
         for s in range(K):

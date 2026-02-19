@@ -181,11 +181,14 @@ def smt_graph_to_gin(graph_dict: dict) -> dict:
     nodes = graph_dict["nodes"]
     raw_edges = graph_dict["edges"]
     node_ids = sorted(nodes.keys())
+    # Remap node ids to 0..n-1 so GIN scatter never sees out-of-bounds indices.
+    old_id_to_idx = {old_id: i for i, old_id in enumerate(node_ids)}
     node_types = [nodes[nid]["type"] for nid in node_ids]
     undirected_edges: list[tuple[int, int]] = []
     for u, v, _ in raw_edges:
-        undirected_edges.append((u, v))
-        undirected_edges.append((v, u))
+        ui, vi = old_id_to_idx[u], old_id_to_idx[v]
+        undirected_edges.append((ui, vi))
+        undirected_edges.append((vi, ui))
     return {"node_types": node_types, "edges": undirected_edges}
 
 

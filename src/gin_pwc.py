@@ -316,6 +316,9 @@ def build_gin_pwc_samples(
         if graph_dict is None:
             continue
         data = graph_dict_to_gin_data(graph_dict, vocabulary)
+        if data.num_nodes == 0:
+            logging.debug("Skipping instance with 0 nodes: %s", path)
+            continue
         for i in range(K):
             for j in range(i + 1, K):
                 par2_i = multi_perf_data.get_par2(path, i)
