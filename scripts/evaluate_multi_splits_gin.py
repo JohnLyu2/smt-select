@@ -82,7 +82,7 @@ def evaluate_multi_splits_gin(
     hidden_dim: int = 64,
     num_layers: int = 3,
     num_epochs: int = 500,
-    batch_size: int = 32,
+    batch_size: int = 64,
     lr: float = 1e-3,
     dropout: float = 0.1,
     val_ratio: float = 0.1,
@@ -133,24 +133,27 @@ def evaluate_multi_splits_gin(
         train_data = _rebase_perf_data(train_data, root)
         test_data = _rebase_perf_data(test_data, root)
 
+        # For training we may use a filtered set; for train evaluation we always use full train set.
         if skip_easy_unsolvable:
             paths_to_keep, filter_stats = filter_training_instances(
                 train_data,
                 skip_unsolvable=True,
                 skip_trivial_under=skip_trivial_under,
             )
-            train_data = MultiSolverDataset(
+            train_data_for_training = MultiSolverDataset(
                 {p: train_data[p] for p in paths_to_keep},
                 train_data.get_solver_id_dict(),
                 train_data.get_timeout(),
             )
             logging.info(
-                "Filtered train to %d instances (dropped %d unsolvable, %d trivial)",
+                "Training on %d instances (dropped %d unsolvable, %d trivial); train eval will use full %d",
                 filter_stats["n_kept"],
                 filter_stats["n_unsolvable"],
                 filter_stats["n_trivial"],
+                len(train_data),
             )
         else:
+            train_data_for_training = train_data
             filter_stats = None
 
         logging.info("Train instances: %d, Test instances: %d", len(train_data), len(test_data))
@@ -177,7 +180,7 @@ def evaluate_multi_splits_gin(
         try:
             if model_type == "gin_ehm":
                 train_gin_regression(
-                    train_data,
+                    train_data_for_training,
                     str(model_save_dir),
                     graph_timeout=graph_timeout,
                     jobs=jobs,
@@ -194,7 +197,7 @@ def evaluate_multi_splits_gin(
                 )
             elif model_type == "gin_pwc":
                 train_gin_pwc(
-                    train_data,
+                    train_data_for_training,
                     str(model_save_dir),
                     graph_timeout=graph_timeout,
                     jobs=jobs,
@@ -434,7 +437,7 @@ def main() -> None:
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--num-layers", type=int, default=3)
     parser.add_argument("--epochs", type=int, default=500)
-    parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument("--batch", type=int, default=64)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--dropout", type=float, default=0.1)
     parser.add_argument("--val-ratio", type=float, default=0.1, help="Fraction of train data for validation (0 = no early stop)")
@@ -482,7 +485,7 @@ def main() -> None:
         hidden_dim=args.hidden_dim,
         num_layers=args.num_layers,
         num_epochs=args.epochs,
-        batch_size=args.batch_size,
+        batch_size=args.batch,
         lr=args.lr,
         dropout=args.dropout,
         val_ratio=args.val_ratio,

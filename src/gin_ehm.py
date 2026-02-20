@@ -341,7 +341,7 @@ def train_gin_regression(
     hidden_dim: int = 64,
     num_layers: int = 3,
     num_epochs: int = 500,
-    batch_size: int = 32,
+    batch_size: int = 64,
     lr: float = 1e-3,
     dropout: float = 0.1,
     device: str | None = None,
@@ -473,6 +473,7 @@ def train_gin_regression(
                 best_val_loss = val_loss
                 torch.save(model.state_dict(), best_state_path)
                 epochs_no_improve = 0
+                logging.info("Best val loss %.4f (epoch %d)", val_loss, epoch + 1)
             else:
                 epochs_no_improve += 1
             if (epoch + 1) % 10 == 0 or epoch == 0:

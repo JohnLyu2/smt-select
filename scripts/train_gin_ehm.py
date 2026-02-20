@@ -28,7 +28,7 @@ def main() -> None:
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--num-layers", type=int, default=3)
     parser.add_argument("--epochs", type=int, default=500)
-    parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument("--batch", type=int, default=64)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--dropout", type=float, default=0.1)
     parser.add_argument("--val-ratio", type=float, default=0.1, help="Fraction of data for validation (0 = no early stop)")
@@ -91,7 +91,7 @@ def main() -> None:
         hidden_dim=args.hidden_dim,
         num_layers=args.num_layers,
         num_epochs=args.epochs,
-        batch_size=args.batch_size,
+        batch_size=args.batch,
         lr=args.lr,
         dropout=args.dropout,
         val_ratio=args.val_ratio,
