@@ -476,7 +476,7 @@ def main() -> None:
         args.splits_dir = str(Path("data/cp26/performance_splits/smtcomp24") / args.logic)
         args.output_dir = str(Path("data/cp26/results/gnn") / args.model_type / args.logic)
         args.save_models = True
-        models_base = Path("data/cp26/results/gnn/models")
+        models_base = Path("models")
     if not args.splits_dir:
         parser.error("Either --splits-dir or --logic is required")
     logging.basicConfig(
