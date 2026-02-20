@@ -92,73 +92,18 @@ def encode_text(
     return embeddings
 
 
-def encode_all_desc(
-    json_path: str | Path,
-    output_csv_path: str | Path | None = None,
-    model_name: str = "sentence-transformers/all-mpnet-base-v2",
-    normalize: bool = False,
-    batch_size: int = 32,
-    show_progress: bool = True,
-    show_trunc_stats: bool = False,
-    is_setfit: bool = False,
+def _encode_paths_descriptions_to_csv(
+    paths: list[str],
+    descriptions: list[str],
+    output_csv_path: Path,
+    model_name: str,
+    normalize: bool,
+    batch_size: int,
+    show_progress: bool,
+    show_trunc_stats: bool,
+    is_setfit: bool,
 ) -> str | None:
-    """
-    Encode all benchmark descriptions from a JSON file and write to CSV.
-
-    Args:
-        json_path: Path to JSON file containing benchmark data (e.g., data/raw_jsons/ABV.json)
-        output_csv_path: Path to output CSV file. If None, defaults to same directory as JSON
-                         with .csv extension (e.g., data/raw_jsons/ABV.csv)
-        model_name: Name of the sentence transformer model to use
-        normalize: Whether to normalize embeddings to unit length
-        batch_size: Batch size for processing multiple texts
-        show_progress: Whether to show progress bar when encoding
-        show_trunc_stats: Whether to show truncation statistics only (no encoding performed) (default: False)
-        is_setfit: Whether the model is a SetFit model (extracts backbone)
-
-    Returns:
-        Path to the output CSV file, or None if show_trunc_stats is True (only statistics shown, no encoding performed)
-
-    Examples:
-        >>> csv_path = encode_all_desc("data/raw_jsons/ABV.json")
-        >>> # Output will be written to data/raw_jsons/ABV.csv
-    """
-    json_path = Path(json_path)
-    if not json_path.exists():
-        raise FileNotFoundError(f"JSON file not found: {json_path}")
-
-    # Determine output path
-    if output_csv_path is None:
-        output_csv_path = json_path.with_suffix(".csv")
-    else:
-        output_csv_path = Path(output_csv_path)
-
-    # Load JSON file
-    with open(json_path, "r", encoding="utf-8") as f:
-        benchmarks = json.load(f)
-
-    if not benchmarks:
-        raise ValueError(f"JSON file is empty or contains no benchmarks: {json_path}")
-
-    # Extract descriptions and smtlib paths
-    paths = []
-    descriptions = []
-    for benchmark in benchmarks:
-        smtlib_path = benchmark.get("smtlib_path", "")
-        description = benchmark.get("description", "")
-
-        # Use placeholder description if missing or empty
-        if not description or not description.strip():
-            logic = benchmark.get("logic", "unknown")
-            family = benchmark.get("family", "unknown")
-            description = f"This is a {logic} benchmark from the family {family}"
-
-        paths.append(smtlib_path)
-        descriptions.append(description.strip())
-
-    if not descriptions:
-        raise ValueError(f"No valid descriptions found in JSON file: {json_path}")
-
+    """Encode description strings and write to CSV. Used by encode_all_desc_from_descriptions_file."""
     # Check for truncation before encoding
     model = get_embedding_model(model_name, is_setfit=is_setfit)
     if model is None:
@@ -297,30 +242,96 @@ def encode_all_desc(
     return str(output_csv_path)
 
 
+def encode_all_desc_from_descriptions_file(
+    json_path: str | Path,
+    output_csv_path: str | Path | None = None,
+    model_name: str = "sentence-transformers/all-mpnet-base-v2",
+    normalize: bool = False,
+    batch_size: int = 32,
+    show_progress: bool = True,
+    show_trunc_stats: bool = False,
+    is_setfit: bool = False,
+) -> str | None:
+    """
+    Encode descriptions from a descriptions-format JSON and write to CSV.
+
+    Input JSON format: dict mapping smt-lib path -> {"raw_description": str, "description": str}.
+    Uses the "description" field (already has missing/placeholder applied). Output is CSV with
+    path column plus emb_0, emb_1, ... columns.
+
+    Args:
+        json_path: Path to descriptions JSON (e.g. data/meta_info_24/descriptions/ABV.json).
+        output_csv_path: Path to output CSV. If None, same dir as JSON with .csv extension.
+        model_name, normalize, batch_size, show_progress, show_trunc_stats, is_setfit:
+            Same semantics as for encoding.
+
+    Returns:
+        Path to output CSV, or None if show_trunc_stats is True.
+    """
+    json_path = Path(json_path)
+    if not json_path.exists():
+        raise FileNotFoundError(f"JSON file not found: {json_path}")
+
+    if output_csv_path is None:
+        output_csv_path = json_path.with_suffix(".csv")
+    else:
+        output_csv_path = Path(output_csv_path)
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if not data:
+        raise ValueError(f"JSON file is empty or contains no entries: {json_path}")
+
+    # Preserve key order (Python 3.7+ / JSON object order)
+    paths = list(data.keys())
+    missing = [
+        p for p in paths
+        if not (isinstance(data[p], dict) and "description" in data[p])
+    ]
+    if missing:
+        raise ValueError(
+            f"Missing 'description' for {len(missing)} path(s) in {json_path}, e.g.: {missing[:3]!r}"
+        )
+    descriptions = [data[p]["description"] for p in paths]
+
+    return _encode_paths_descriptions_to_csv(
+        paths=paths,
+        descriptions=descriptions,
+        output_csv_path=output_csv_path,
+        model_name=model_name,
+        normalize=normalize,
+        batch_size=batch_size,
+        show_progress=show_progress,
+        show_trunc_stats=show_trunc_stats,
+        is_setfit=is_setfit,
+    )
+
+
 def main():
-    """Command-line interface for encode_all_desc."""
+    """Command-line interface for encoding descriptions from a descriptions-format JSON."""
     parser = argparse.ArgumentParser(
-        description="Encode all benchmark descriptions from a JSON file and write to CSV.",
+        description="Encode benchmark descriptions from a descriptions JSON (path -> {raw_description, description}) and save to CSV.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Basic usage - output will be saved to data/raw_jsons/ABV.csv
-  python -m src.desc_encoder data/raw_jsons/ABV.json
+  # Basic usage - output saved next to the JSON with .csv extension
+  python -m src.desc_encoder data/meta_info_24/descriptions/ABV.json
 
   # Specify custom output path
-  python -m src.desc_encoder data/raw_jsons/ABV.json -o data/embeddings/ABV.csv
+  python -m src.desc_encoder data/meta_info_24/descriptions/ABV.json -o data/embeddings/ABV.csv
 
   # Use different model and normalize embeddings
-  python -m src.desc_encoder data/raw_jsons/ABV.json --model all-MiniLM-L6-v2 --normalize
+  python -m src.desc_encoder data/meta_info_24/descriptions/ABV.json --model all-MiniLM-L6-v2 --normalize
 
   # Adjust batch size and disable progress bar
-  python -m src.desc_encoder data/raw_jsons/ABV.json --batch-size 64 --no-progress
+  python -m src.desc_encoder data/meta_info_24/descriptions/ABV.json --batch-size 64 --no-progress
         """,
     )
     parser.add_argument(
         "json_path",
         type=str,
-        help="Path to JSON file containing benchmark data (e.g., data/raw_jsons/ABV.json)",
+        help="Path to descriptions JSON (e.g. data/meta_info_24/descriptions/ABV.json)",
     )
     parser.add_argument(
         "-o",
@@ -366,7 +377,7 @@ Examples:
 
     try:
         print(f"Loading JSON file: {args.json_path}")
-        csv_path = encode_all_desc(
+        csv_path = encode_all_desc_from_descriptions_file(
             json_path=args.json_path,
             output_csv_path=args.output,
             model_name=args.model,

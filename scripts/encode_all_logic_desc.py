@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Encode all benchmark descriptions from meta-info JSON files in data/meta_info_24/
-and save to CSV. Requires --output-dir (unless --trunc-stats).
-Use --trunc-stats to only show truncation statistics without writing CSVs.
+Encode benchmark descriptions from description JSONs in data/meta_info_24/descriptions/
+(e.g. ABV.json: path -> {raw_description, description}) and save to CSV.
+Requires --output-dir (unless --trunc-stats). Use --trunc-stats to only show truncation statistics.
 """
 
 import argparse
@@ -16,18 +16,18 @@ os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 # Add src to path to import desc_encoder
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.desc_encoder import encode_all_desc
+from src.desc_encoder import encode_all_desc_from_descriptions_file
 
-# Meta-info folder (relative to project root)
-META_INFO_DIR = Path("data") / "meta_info_24"
+# Input: description JSONs (path -> {raw_description, description}), same as scripts/desc_extract output
+DESCRIPTIONS_DIR = Path("data") / "meta_info_24" / "descriptions"
 # Logics to skip (large or otherwise excluded)
 EXCLUDED_LOGICS = {"AUFBVDTNIRA", "QF_NIA"}
 
 
 def main():
-    """Process all meta-info JSON files in data/meta_info_24/ and create CSV files."""
+    """Process all description JSONs in data/meta_info_24/descriptions/ and create CSV files."""
     parser = argparse.ArgumentParser(
-        description="Encode all benchmark descriptions from meta-info JSON files and save to CSV."
+        description="Encode benchmark descriptions from description JSONs (data/meta_info_24/descriptions/) and save to CSV."
     )
     parser.add_argument(
         "--output-dir",
@@ -49,31 +49,31 @@ def main():
 
     args = parser.parse_args()
 
-    # Validate: output-dir is required unless --trunc-stats is used
+    # Output-dir is required unless --trunc-stats is used
     if not args.trunc_stats and not args.output_dir:
         parser.error("--output-dir is required unless --trunc-stats is used")
 
     project_root = Path(__file__).parent.parent
-    meta_info_dir = project_root / META_INFO_DIR
-    if not meta_info_dir.is_dir():
-        parser.error(f"Meta-info directory is not a directory or does not exist: {meta_info_dir}")
+    descriptions_dir = project_root / DESCRIPTIONS_DIR
+    if not descriptions_dir.is_dir():
+        parser.error(f"Descriptions directory is not a directory or does not exist: {descriptions_dir}")
 
+    output_dir = None
     if args.output_dir:
         output_dir = Path(args.output_dir)
-        # Create output directory if it doesn't exist
         output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Find all JSON files, excluding specified logics
-    all_json = sorted(meta_info_dir.glob("*.json"))
+    # Find all description JSON files, excluding specified logics
+    all_json = sorted(descriptions_dir.glob("*.json"))
     json_files = [f for f in all_json if f.stem not in EXCLUDED_LOGICS]
 
     if not json_files:
-        print(f"No meta-info JSON files found in {meta_info_dir}")
+        print(f"No description JSON files found in {descriptions_dir}")
         return 1
 
-    print(f"Meta-info directory: {meta_info_dir}")
+    print(f"Descriptions directory: {descriptions_dir}")
     print(f"Found {len(json_files)} JSON file(s) to process")
-    if args.output_dir:
+    if output_dir is not None:
         print(f"Output directory: {output_dir}\n")
     else:
         print("Showing truncation statistics only\n")
@@ -86,14 +86,13 @@ def main():
         print(f"Processing {logic}...")
         print(f"  Input:  {json_file}")
 
-        # Only set output_csv if output_dir is provided
-        output_csv = None
-        if args.output_dir:
-            output_csv = output_dir / f"{logic}.csv"
+        # Only set output_csv if we're writing (not trunc-stats only)
+        output_csv = (output_dir / f"{logic}.csv") if output_dir is not None else None
+        if output_csv is not None:
             print(f"  Output: {output_csv}")
 
         try:
-            csv_path = encode_all_desc(
+            csv_path = encode_all_desc_from_descriptions_file(
                 json_path=str(json_file),
                 output_csv_path=str(output_csv) if output_csv else None,
                 model_name=args.model_name,
