@@ -34,7 +34,11 @@ from src.evaluate import as_evaluate, as_evaluate_parallel, compute_metrics
 from src.evaluate_gin import _load_gin_selector
 from src.gin_ehm import train_gin_regression
 from src.gin_pwc import train_gin_pwc
-from src.performance import MultiSolverDataset, parse_performance_json
+from src.performance import (
+    filter_training_instances,
+    MultiSolverDataset,
+    parse_performance_json,
+)
 
 
 def discover_seed_dirs(splits_dir: Path) -> list[tuple[int, Path]]:
@@ -85,6 +89,8 @@ def evaluate_multi_splits_gin(
     patience: int = 50,
     val_split_seed: int = 42,
     min_epochs: int = 50,
+    skip_easy_unsolvable: bool = False,
+    skip_trivial_under: float = 24.0,
 ) -> dict:
     """
     Run train/test evaluation with GIN (EHM or PWC) for each split (seed) under splits_dir.
@@ -126,6 +132,26 @@ def evaluate_multi_splits_gin(
         test_data = parse_performance_json(str(test_path), timeout)
         train_data = _rebase_perf_data(train_data, root)
         test_data = _rebase_perf_data(test_data, root)
+
+        if skip_easy_unsolvable:
+            paths_to_keep, filter_stats = filter_training_instances(
+                train_data,
+                skip_unsolvable=True,
+                skip_trivial_under=skip_trivial_under,
+            )
+            train_data = MultiSolverDataset(
+                {p: train_data[p] for p in paths_to_keep},
+                train_data.get_solver_id_dict(),
+                train_data.get_timeout(),
+            )
+            logging.info(
+                "Filtered train to %d instances (dropped %d unsolvable, %d trivial)",
+                filter_stats["n_kept"],
+                filter_stats["n_unsolvable"],
+                filter_stats["n_trivial"],
+            )
+        else:
+            filter_stats = None
 
         logging.info("Train instances: %d, Test instances: %d", len(train_data), len(test_data))
 
@@ -185,6 +211,15 @@ def evaluate_multi_splits_gin(
                 )
             else:
                 raise ValueError(f"Unknown model_type: {model_type}")
+
+            if filter_stats is not None:
+                save_dir = Path(model_save_dir)
+                with open(save_dir / "skipped_unsolvable.txt", "w") as f:
+                    for p in filter_stats["skipped_unsolvable"]:
+                        f.write(p + "\n")
+                with open(save_dir / "skipped_trivial.txt", "w") as f:
+                    for p in filter_stats["skipped_trivial"]:
+                        f.write(p + "\n")
         finally:
             if log_handler is not None:
                 logging.getLogger().removeHandler(log_handler)
@@ -413,6 +448,17 @@ def main() -> None:
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
         help="Log level (default: INFO)",
     )
+    parser.add_argument(
+        "--skip-easy-unsolvable",
+        action="store_true",
+        help="Exclude train instances where no solver solves or all solve in <= N seconds; saves graph/train time",
+    )
+    parser.add_argument(
+        "--skip-trivial-under",
+        type=float,
+        default=24.0,
+        help="When --skip-easy-unsolvable: exclude train instances where every solver solved with runtime <= this (default 24)",
+    )
 
     args = parser.parse_args()
     logging.basicConfig(
@@ -443,6 +489,8 @@ def main() -> None:
         patience=args.patience,
         val_split_seed=args.val_split_seed,
         min_epochs=args.min_epochs,
+        skip_easy_unsolvable=args.skip_easy_unsolvable,
+        skip_trivial_under=args.skip_trivial_under,
     )
 
 

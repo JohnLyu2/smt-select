@@ -9,6 +9,7 @@ import pytest
 from src.performance import (
     MultiSolverDataset,
     SingleSolverDataset,
+    filter_training_instances,
     parse_as_perf_csv,
     parse_performance_csv,
     parse_performance_json,
@@ -105,3 +106,65 @@ def test_multi_solver_dataset_basic() -> None:
     assert ds.get_par2("a", 0) == 10.0
     assert ds.get_par2("a", 1) == 2 * timeout  # PAR-2 for unsolved
     assert ds.get_par2("b", 1) == 5.0
+
+
+def test_is_none_solved_and_is_trivial() -> None:
+    """is_none_solved and is_trivial (strict: all solvers, all solved, runtime <= max)."""
+    # 2 solvers; (is_solved, wc_time) per solver
+    perf_dict = {
+        "unsolvable": [(0, 100.0), (0, 100.0)],   # no solver solved
+        "trivial": [(1, 10.0), (1, 24.0)],         # both solved, both <= 24
+        "trivial_strict_under_5": [(1, 2.0), (1, 4.0)],
+        "not_trivial_one_timeout": [(1, 10.0), (0, 1200.0)],
+        "not_trivial_one_slow": [(1, 10.0), (1, 100.0)],  # one > 24
+    }
+    solver_dict = {0: "A", 1: "B"}
+    timeout = 1200.0
+    ds = MultiSolverDataset(perf_dict, solver_dict, timeout)
+
+    assert ds.is_none_solved("unsolvable") is True
+    assert ds.is_none_solved("trivial") is False
+    assert ds.is_none_solved("not_trivial_one_timeout") is False
+
+    assert ds.is_trivial("trivial", 24.0) is True
+    assert ds.is_trivial("trivial_strict_under_5", 5.0) is True
+    assert ds.is_trivial("trivial_strict_under_5", 3.0) is False   # 4 > 3
+    assert ds.is_trivial("not_trivial_one_timeout", 24.0) is False
+    assert ds.is_trivial("not_trivial_one_slow", 24.0) is False
+    assert ds.is_trivial("unsolvable", 24.0) is False
+
+
+def test_filter_training_instances() -> None:
+    """filter_training_instances drops unsolvable and trivial (strict)."""
+    perf_dict = {
+        "unsolvable": [(0, 100.0), (0, 100.0)],
+        "trivial": [(1, 10.0), (1, 24.0)],
+        "keep": [(1, 10.0), (0, 1200.0)],
+    }
+    solver_dict = {0: "A", 1: "B"}
+    timeout = 1200.0
+    ds = MultiSolverDataset(perf_dict, solver_dict, timeout)
+
+    paths, stats = filter_training_instances(
+        ds, skip_unsolvable=True, skip_trivial_under=24.0
+    )
+    assert set(paths) == {"keep"}
+    assert stats["n_kept"] == 1
+    assert stats["n_unsolvable"] == 1
+    assert stats["n_trivial"] == 1
+    assert stats["skipped_unsolvable"] == ["unsolvable"]
+    assert stats["skipped_trivial"] == ["trivial"]
+
+    # Only skip unsolvable
+    paths2, stats2 = filter_training_instances(
+        ds, skip_unsolvable=True, skip_trivial_under=None
+    )
+    assert set(paths2) == {"trivial", "keep"}
+    assert stats2["n_trivial"] == 0
+
+    # No filtering
+    paths3, stats3 = filter_training_instances(
+        ds, skip_unsolvable=False, skip_trivial_under=None
+    )
+    assert set(paths3) == {"unsolvable", "trivial", "keep"}
+    assert stats3["n_unsolvable"] == 0

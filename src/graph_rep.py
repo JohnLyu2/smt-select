@@ -184,9 +184,14 @@ def smt_graph_to_gin(graph_dict: dict) -> dict:
     # Remap node ids to 0..n-1 so GIN scatter never sees out-of-bounds indices.
     old_id_to_idx = {old_id: i for i, old_id in enumerate(node_ids)}
     node_types = [nodes[nid]["type"] for nid in node_ids]
+    n = len(node_ids)
     undirected_edges: list[tuple[int, int]] = []
     for u, v, _ in raw_edges:
+        if u not in old_id_to_idx or v not in old_id_to_idx:
+            continue  # skip edges referencing missing nodes
         ui, vi = old_id_to_idx[u], old_id_to_idx[v]
+        if ui < 0 or ui >= n or vi < 0 or vi >= n:
+            continue
         undirected_edges.append((ui, vi))
         undirected_edges.append((vi, ui))
     return {"node_types": node_types, "edges": undirected_edges}

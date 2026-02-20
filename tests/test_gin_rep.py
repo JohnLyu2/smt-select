@@ -73,6 +73,7 @@ def test_graph_dict_to_gin_data():
         vocab.freeze()
 
         data = graph_dict_to_gin_data(graph_dict, vocab)
+        assert data is not None
         assert isinstance(data.x, torch.Tensor)
         assert data.x.dtype == torch.long
         assert data.x.dim() == 2 and data.x.shape[1] == 1
@@ -117,6 +118,7 @@ def test_build_vocabulary_from_graph_dicts():
             or "bvuge" in vocab.type_names()
         )
         data = graph_dict_to_gin_data(d2, vocab)
+        assert data is not None
         assert data.x.shape[0] == len(d2["nodes"])
     finally:
         p1.unlink(missing_ok=True)

@@ -113,6 +113,20 @@ class MultiSolverDataset:
             return False
         return all(is_solved == 1 for is_solved, _ in perf_list)
 
+    def is_trivial(self, smt_path: str, max_runtime: float) -> bool:
+        """
+        Return True iff trivial: every solver has a result, every solver
+        solved, and every solver's runtime <= max_runtime.
+        """
+        K = self.num_solvers()
+        perf_list = self._dict.get(smt_path)
+        if perf_list is None or len(perf_list) != K:
+            return False
+        for is_solved, wc_time in perf_list:
+            if is_solved != 1 or wc_time > max_runtime:
+                return False
+        return True
+
     def get_solver_name(self, solver_id: int) -> Optional[str]:
         """Get solver name by ID."""
         return self._solver_id_dict.get(solver_id)
@@ -320,6 +334,46 @@ class MultiSolverDataset:
                     break
 
         return dominated
+
+
+def filter_training_instances(
+    multi_perf_data: MultiSolverDataset,
+    *,
+    skip_unsolvable: bool = True,
+    skip_trivial_under: float | None = None,
+) -> tuple[list[str], dict]:
+    """
+    Return instance paths to keep for graph building and training, and stats.
+
+    When skip_unsolvable is True, drop instances where no solver solves (VBS-unsolvable).
+    When skip_trivial_under is a number, drop instances that are strictly trivial:
+    every solver has a result, every solver solved, and every runtime <= skip_trivial_under.
+
+    Returns:
+        (paths_to_keep, stats) where stats has "skipped_unsolvable", "skipped_trivial"
+        (lists of paths), and "n_kept", "n_unsolvable", "n_trivial" (ints).
+    """
+    skipped_unsolvable: list[str] = []
+    skipped_trivial: list[str] = []
+    paths_to_keep: list[str] = []
+    for path in multi_perf_data.keys():
+        if skip_unsolvable and multi_perf_data.is_none_solved(path):
+            skipped_unsolvable.append(path)
+            continue
+        if skip_trivial_under is not None and multi_perf_data.is_trivial(
+            path, skip_trivial_under
+        ):
+            skipped_trivial.append(path)
+            continue
+        paths_to_keep.append(path)
+    stats = {
+        "skipped_unsolvable": skipped_unsolvable,
+        "skipped_trivial": skipped_trivial,
+        "n_kept": len(paths_to_keep),
+        "n_unsolvable": len(skipped_unsolvable),
+        "n_trivial": len(skipped_trivial),
+    }
+    return (paths_to_keep, stats)
 
 
 class SingleSolverDataset:

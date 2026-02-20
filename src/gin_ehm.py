@@ -103,19 +103,24 @@ def build_vocabulary_from_graph_dicts(graph_dicts: list[dict]) -> NodeVocabulary
 def graph_dict_to_gin_data(
     graph_dict: dict,
     vocabulary: NodeVocabulary,
-) -> Data:
+) -> Data | None:
     """
     Convert a graph dict from smt_to_graph() to a PyG Data (node type indices, undirected edges).
+    Returns None if the graph has invalid edge indices (out of bounds); callers should skip such instances.
     """
     gin_graph = smt_graph_to_gin(graph_dict)
     type_indices = [vocabulary.get_index(t) for t in gin_graph["node_types"]]
     x = torch.tensor(type_indices, dtype=torch.long).unsqueeze(1)  # (n_nodes, 1)
+    num_nodes = x.size(0)
     edge_list = gin_graph["edges"]
     if not edge_list:
         edge_index = torch.zeros((2, 0), dtype=torch.long)
     else:
         edge_index = torch.tensor(edge_list, dtype=torch.long).t().contiguous()
-    return Data(x=x, edge_index=edge_index)
+        if edge_index.numel() > 0:
+            if edge_index.min() < 0 or edge_index.max() >= num_nodes:
+                return None
+    return Data(x=x, edge_index=edge_index, num_nodes=num_nodes)
 
 
 def build_gin_samples(
@@ -135,6 +140,9 @@ def build_gin_samples(
         if graph_dict is None:
             continue
         data = graph_dict_to_gin_data(graph_dict, vocabulary)
+        if data is None:
+            logging.debug("Skipping instance with invalid graph (out-of-bounds edges): %s", path)
+            continue
         if data.num_nodes == 0:
             logging.debug("Skipping instance with 0 nodes: %s", path)
             continue
@@ -256,6 +264,9 @@ class GINSelector(SolverSelector):
             _suppress_z3_destructor_noise()
             return self.fallback_solver_ids[0]
         data = graph_dict_to_gin_data(graph_dict, self.vocabulary)
+        if data is None:
+            _suppress_z3_destructor_noise()
+            return self.fallback_solver_ids[0]
         batch = Batch.from_data_list([data])
         batch = batch.to(self.device)
         with torch.no_grad():
