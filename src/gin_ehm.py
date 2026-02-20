@@ -348,7 +348,7 @@ def train_gin_regression(
     val_ratio: float = 0.1,
     patience: int = 50,
     val_split_seed: int = 42,
-    min_epochs: int = 50,
+    min_epochs: int = 100,
 ) -> None:
     """
     Build graphs, vocab, dataset; train GINMultiHeadEHM; save model, vocab, config, failed_paths.

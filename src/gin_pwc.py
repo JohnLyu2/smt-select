@@ -399,7 +399,7 @@ def train_gin_pwc(
     val_ratio: float = 0.1,
     patience: int = 50,
     val_split_seed: int = 42,
-    min_epochs: int = 50,
+    min_epochs: int = 100,
 ) -> None:
     """
     Build graphs, vocab, pairwise samples (with weight = |PAR2_i - PAR2_j|);
