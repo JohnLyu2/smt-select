@@ -345,7 +345,7 @@ def train_gin_regression(
     lr: float = 1e-3,
     dropout: float = 0.1,
     device: str | None = None,
-    val_ratio: float = 0.1,
+    val_ratio: float = 0.15,
     patience: int = 50,
     val_split_seed: int = 42,
     min_epochs: int = 100,

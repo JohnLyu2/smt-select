@@ -25,13 +25,10 @@ def main() -> None:
     parser.add_argument("--jobs", type=int, default=1, help="Parallel workers for graph building; 1 = sequential")
     parser.add_argument("--timeout", type=float, default=1200.0, help="PAR2 timeout in seconds")
     parser.add_argument("--benchmark-root", type=str, default=DEFAULT_BENCHMARK_ROOT, help="Root for relative instance paths")
-    parser.add_argument("--hidden-dim", type=int, default=64)
-    parser.add_argument("--num-layers", type=int, default=3)
     parser.add_argument("--epochs", type=int, default=500)
     parser.add_argument("--batch", type=int, default=64)
     parser.add_argument("--lr", type=float, default=1e-3)
-    parser.add_argument("--dropout", type=float, default=0.1)
-    parser.add_argument("--val-ratio", type=float, default=0.1, help="Fraction of data for validation (0 = no early stop)")
+    parser.add_argument("--val-ratio", type=float, default=0.15, help="Fraction of data for validation (0 = no early stop)")
     parser.add_argument("--patience", type=int, default=50, help="Epochs without val improvement to stop (0 = disabled)")
     parser.add_argument("--val-split-seed", type=int, default=42, help="Random seed for train/val split")
     parser.add_argument("--min-epochs", type=int, default=100, help="Minimum epochs before early stop can trigger")
@@ -88,12 +85,12 @@ def main() -> None:
         args.save_dir,
         graph_timeout=args.graph_timeout,
         jobs=args.jobs,
-        hidden_dim=args.hidden_dim,
-        num_layers=args.num_layers,
+        hidden_dim=64,
+        num_layers=3,
         num_epochs=args.epochs,
         batch_size=args.batch,
         lr=args.lr,
-        dropout=args.dropout,
+        dropout=0.1,
         val_ratio=args.val_ratio,
         patience=args.patience,
         val_split_seed=args.val_split_seed,

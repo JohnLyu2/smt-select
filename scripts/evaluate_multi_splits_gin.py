@@ -72,20 +72,21 @@ def _rebase_perf_data(multi_perf_data: MultiSolverDataset, benchmark_root: Path)
 def evaluate_multi_splits_gin(
     splits_dir: Path,
     *,
-    model_type: str = "gin_ehm",
+    model_type: str = "gin_pwc",
     benchmark_root: Path | str | None = None,
     save_models: bool = False,
     output_dir: Path | None = None,
+    models_base: Path | None = None,
     timeout: float = 1200.0,
     graph_timeout: int = 5,
-    jobs: int = 4,
+    jobs: int = 8,
     hidden_dim: int = 64,
     num_layers: int = 3,
     num_epochs: int = 500,
     batch_size: int = 64,
     lr: float = 1e-3,
     dropout: float = 0.1,
-    val_ratio: float = 0.1,
+    val_ratio: float = 0.15,
     patience: int = 50,
     val_split_seed: int = 42,
     min_epochs: int = 100,
@@ -158,8 +159,11 @@ def evaluate_multi_splits_gin(
 
         logging.info("Train instances: %d, Test instances: %d", len(train_data), len(test_data))
 
-        if save_models and output_dir:
-            model_save_dir = output_dir / "models" / f"seed{seed_val}"
+        if save_models and (models_base is not None or output_dir is not None):
+            if models_base is not None:
+                model_save_dir = models_base / model_type / division / f"seed{seed_val}"
+            else:
+                model_save_dir = output_dir / "models" / model_type / division / f"seed{seed_val}"
             model_save_dir.mkdir(parents=True, exist_ok=True)
         else:
             model_save_dir = Path(tempfile.mkdtemp())
@@ -390,14 +394,20 @@ def main() -> None:
         "--model-type",
         type=str,
         choices=["gin_ehm", "gin_pwc"],
-        default="gin_ehm",
-        help="GIN model to train and evaluate (default: gin_ehm)",
+        default="gin_pwc",
+        help="GIN model to train and evaluate (default: gin_pwc)",
+    )
+    parser.add_argument(
+        "--logic",
+        type=str,
+        default=None,
+        help="Logic division (e.g. BV, ABV). If set, overrides --splits-dir and --output-dir",
     )
     parser.add_argument(
         "--splits-dir",
         type=str,
-        required=True,
-        help="Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/BV)",
+        default=None,
+        help="Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/BV). Required unless --logic is set",
     )
     parser.add_argument(
         "--benchmark-root",
@@ -431,16 +441,13 @@ def main() -> None:
     parser.add_argument(
         "--jobs",
         type=int,
-        default=4,
+        default=8,
         help="Parallel workers for graph building and for evaluation (default: 4)",
     )
-    parser.add_argument("--hidden-dim", type=int, default=64)
-    parser.add_argument("--num-layers", type=int, default=3)
     parser.add_argument("--epochs", type=int, default=500)
     parser.add_argument("--batch", type=int, default=64)
     parser.add_argument("--lr", type=float, default=1e-3)
-    parser.add_argument("--dropout", type=float, default=0.1)
-    parser.add_argument("--val-ratio", type=float, default=0.1, help="Fraction of train data for validation (0 = no early stop)")
+    parser.add_argument("--val-ratio", type=float, default=0.15, help="Fraction of train data for validation (0 = no early stop)")
     parser.add_argument("--patience", type=int, default=50, help="Epochs without val improvement to stop (0 = disabled)")
     parser.add_argument("--val-split-seed", type=int, default=42, help="Random seed for train/val split")
     parser.add_argument("--min-epochs", type=int, default=100, help="Minimum epochs before early stop can trigger")
@@ -464,6 +471,14 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+    models_base = None
+    if args.logic:
+        args.splits_dir = str(Path("data/cp26/performance_splits/smtcomp24") / args.logic)
+        args.output_dir = str(Path("data/cp26/results/gnn") / args.model_type / args.logic)
+        args.save_models = True
+        models_base = Path("data/cp26/results/gnn/models")
+    if not args.splits_dir:
+        parser.error("Either --splits-dir or --logic is required")
     logging.basicConfig(
         level=getattr(logging, args.log_level),
         format="%(asctime)s - %(levelname)s - %(message)s",
@@ -479,15 +494,16 @@ def main() -> None:
         benchmark_root=args.benchmark_root,
         save_models=args.save_models,
         output_dir=output_dir,
+        models_base=models_base,
         timeout=args.timeout,
         graph_timeout=args.graph_timeout,
         jobs=args.jobs,
-        hidden_dim=args.hidden_dim,
-        num_layers=args.num_layers,
+        hidden_dim=64,
+        num_layers=3,
         num_epochs=args.epochs,
         batch_size=args.batch,
         lr=args.lr,
-        dropout=args.dropout,
+        dropout=0.1,
         val_ratio=args.val_ratio,
         patience=args.patience,
         val_split_seed=args.val_split_seed,
