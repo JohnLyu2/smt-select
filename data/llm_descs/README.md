@@ -1,1 +1,0 @@
-`v0` is generated using `gpt-oss-120b`, as calling `src/desc_gen_logic.py` in commit `68722a28bac4cfa49184779d5c37b4f8ce419c20`.
