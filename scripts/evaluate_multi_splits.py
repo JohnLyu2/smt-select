@@ -348,9 +348,11 @@ def main():
     parser.add_argument(
         "--feature-csv",
         type=str,
-        required=True,
-        nargs="+",
-        help="Path(s) to feature CSV(s)",
+        action="append",
+        default=None,
+        dest="feature_csv",
+        metavar="PATH",
+        help="Path to a feature CSV. Repeat to use multiple CSVs (e.g. syntactic + description).",
     )
     parser.add_argument(
         "--timeout",
@@ -399,6 +401,9 @@ def main():
         level=getattr(logging, args.log_level),
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
+
+    if not args.feature_csv:
+        parser.error("At least one --feature-csv is required")
 
     output_dir = Path(args.output_dir) if args.output_dir else None
     if output_dir:
