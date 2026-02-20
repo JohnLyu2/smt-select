@@ -11,39 +11,42 @@ from datasets import Dataset
 from setfit import SetFitModel, Trainer, TrainingArguments
 import torch
 
-from .performance import parse_performance_csv
+from .performance import parse_performance_csv, parse_performance_json
 from .solver_selector import SolverSelector
-
-BV_SOLVER2ID = {
-    "Bitwuzla": 0,
-    "SMTInterpol": 1,
-    "YicesQS": 2,
-    "Z3alpha": 3,
-    "cvc5": 4,
-}  # TODO: temporary mapping; replace with model-provided label2id
 
 
 def create_setfit_data(
-    perf_csv_path: str,
+    perf_path: str,
     desc_json_path: str,
     timeout: float = 1200.0,
     include_all_solved: bool = False,
     multi_label: bool = False,
-) -> dict[str, list]:
+) -> dict:
     """
-    Create SetFit training data from performance CSV and description JSON.
+    Create SetFit training data from performance data and description JSON.
+
+    Performance data can be CSV or JSON (e.g. data/cp26/raw_data/smtcomp24_performance/LOGIC.json).
+    Format is inferred by path suffix (.json -> parse_performance_json, else parse_performance_csv).
+    Solver order (for multi_label and for saving) is taken from the performance data.
+    Returns solver_id_dict (id -> solver name) so callers can save solver2id for evaluation.
 
     Args:
-        perf_csv_path: Path to performance CSV file.
+        perf_path: Path to performance CSV or JSON file.
         desc_json_path: Path to description JSON file.
         timeout: Timeout value in seconds.
         include_all_solved: Whether to include instances solved by all solvers.
-        multi_label: Whether to return all solving solvers as labels (list of strings).
+        multi_label: Whether to return all solving solvers as labels (multi-hot list).
     Returns:
-        Dict with keys: "texts", "labels", "paths".
+        Dict with keys: "texts", "labels", "paths", "solver_id_dict" (id -> name).
     """
     desc_map = _load_description_map(desc_json_path)
-    multi_perf_data = parse_performance_csv(perf_csv_path, timeout)
+    if Path(perf_path).suffix.lower() == ".json":
+        multi_perf_data = parse_performance_json(perf_path, timeout)
+    else:
+        multi_perf_data = parse_performance_csv(perf_path, timeout)
+    solver_id_dict = multi_perf_data.get_solver_id_dict()
+    solver_name_to_id = {name: idx for idx, name in solver_id_dict.items()}
+    num_solvers = len(solver_id_dict)
 
     texts: list[str] = []
     labels: list = []
@@ -63,13 +66,12 @@ def create_setfit_data(
             solver_names = multi_perf_data.get_solvers_solving_instance(path)
             if not solver_names:
                 continue
-            # Multi-hot encoding using BV_SOLVER2ID
-            label = [0] * len(BV_SOLVER2ID)
+            label = [0] * num_solvers
             for name in solver_names:
-                if name in BV_SOLVER2ID:
-                    label[BV_SOLVER2ID[name]] = 1
+                if name in solver_name_to_id:
+                    label[solver_name_to_id[name]] = 1
                 else:
-                    logging.warning(f"Solver {name} not found in BV_SOLVER2ID mapping")
+                    logging.warning("Solver %r not in performance data, skipping", name)
         else:
             solver_name = multi_perf_data.get_best_solver_for_instance(path)
             if solver_name is None:
@@ -80,7 +82,12 @@ def create_setfit_data(
         labels.append(label)
         paths.append(path)
 
-    return {"texts": texts, "labels": labels, "paths": paths}
+    return {
+        "texts": texts,
+        "labels": labels,
+        "paths": paths,
+        "solver_id_dict": solver_id_dict,
+    }
 
 
 def _load_description_map(desc_json_path: str) -> dict[str, str]:
@@ -103,13 +110,31 @@ def _load_description_map(desc_json_path: str) -> dict[str, str]:
     return desc_map
 
 
+def _load_solver2id_from_model_dir(model_path: str) -> dict[str, int] | None:
+    """Load solver2id (name -> id) from model_dir/solver2id.json if present."""
+    path = Path(model_path)
+    if not path.is_dir():
+        return None
+    f = path / "solver2id.json"
+    if not f.is_file():
+        return None
+    with open(f, "r", encoding="utf-8") as fp:
+        data = json.load(fp)
+    return {k: int(v) for k, v in data.items()}
+
+
 class SetfitSelector(SolverSelector):
     def __init__(self, setfit_model: str, desc_json_path: str) -> None:
         self.setfit_model = setfit_model
         self.desc_json_path = desc_json_path
         self._desc_map = _load_description_map(desc_json_path)
         self._model = self._load_model(setfit_model)
-        self._label_to_id = BV_SOLVER2ID
+        self._label_to_id = _load_solver2id_from_model_dir(setfit_model)
+        if self._label_to_id is None:
+            raise ValueError(
+                "solver2id.json not found in model dir. Train with scripts/train_setfit_smt.py "
+                "or add solver2id.json (solver name -> id) to the model directory."
+            )
 
     def algorithm_select(self, instance_path: str | Path) -> int:
         # TODO: This selector does not yet support multi-label models.
@@ -230,7 +255,7 @@ def main() -> None:
     parser.add_argument(
         "--train-perf-csv",
         required=True,
-        help="Path to training performance CSV.",
+        help="Path to training performance CSV or JSON (e.g. data/cp26/raw_data/smtcomp24_performance/LOGIC.json).",
     )
     parser.add_argument("--desc-json", required=True, help="Path to descriptions JSON.")
     parser.add_argument(
@@ -291,16 +316,20 @@ def main() -> None:
         include_all_solved=args.include_all_solved,
         multi_label=args.multi_label,
     )
+    solver_id_dict = train_data["solver_id_dict"]
     logging.info("Total samples: %s", len(train_data["texts"]))
     if args.multi_label:
-        logging.info("Multi-label mode enabled. Label vector length: %s", len(BV_SOLVER2ID))
+        logging.info("Multi-label mode enabled. Label vector length: %s", len(solver_id_dict))
     else:
         logging.info("Unique labels: %s", len(set(train_data["labels"])))
 
     if args.train_data_json:
         output_path = Path(args.train_data_json)
+        # Serialize with string keys for JSON
+        out_data = {k: v for k, v in train_data.items() if k != "solver_id_dict"}
+        out_data["solver_id_dict"] = {str(i): name for i, name in solver_id_dict.items()}
         with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(train_data, f, ensure_ascii=False, indent=2)
+            json.dump(out_data, f, ensure_ascii=False, indent=2)
         logging.info("Wrote SetFit data to: %s", output_path)
 
     test_data = None
@@ -322,6 +351,14 @@ def main() -> None:
         batch_size=args.batch_size,
         multi_label=args.multi_label,
     )
+
+    # Save solver name -> id so SetfitSelector can load it at eval time
+    model_dir = Path(args.model_dir)
+    if model_dir.is_dir():
+        solver2id = {name: idx for idx, name in solver_id_dict.items()}
+        with open(model_dir / "solver2id.json", "w", encoding="utf-8") as f:
+            json.dump(solver2id, f, indent=2)
+        logging.info("Wrote solver2id.json to: %s", model_dir / "solver2id.json")
 
 
 if __name__ == "__main__":
