@@ -10,7 +10,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler
 
-from .performance import parse_performance_csv
+from .performance import parse_performance_json
 from .feature import (
     extract_feature_from_csv,
     extract_feature_from_csvs_concat,
@@ -284,7 +284,7 @@ def main():
         help="Directory to save the trained models",
     )
     parser.add_argument(
-        "--perf-csv", type=str, help="The training performance csv path"
+        "--perf-json", type=str, help="The training performance JSON path"
     )
     parser.add_argument(
         "--timeout",
@@ -325,7 +325,7 @@ def main():
     xg_flag = args.xg
     save_dir = args.save_dir
     timeout = args.timeout
-    train_dataset = parse_performance_csv(args.perf_csv, timeout)
+    train_dataset = parse_performance_json(args.perf_json, timeout)
 
     if args.failed_instances:
         n = len(_load_path_list(args.failed_instances))
@@ -336,7 +336,7 @@ def main():
         )
 
     logging.info(
-        f"Training performance parse: {len(train_dataset)} benchmarks and {train_dataset.num_solvers()} solvers from {args.perf_csv}"
+        f"Training performance parse: {len(train_dataset)} benchmarks and {train_dataset.num_solvers()} solvers from {args.perf_json}"
     )
 
     train_pwc(

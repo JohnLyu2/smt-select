@@ -11,7 +11,7 @@ from datasets import Dataset
 from setfit import SetFitModel, Trainer, TrainingArguments
 import torch
 
-from .performance import parse_performance_csv, parse_performance_json
+from .performance import parse_performance_json
 from .solver_selector import SolverSelector
 
 
@@ -25,13 +25,12 @@ def create_setfit_data(
     """
     Create SetFit training data from performance data and description JSON.
 
-    Performance data can be CSV or JSON (e.g. data/cp26/raw_data/smtcomp24_performance/LOGIC.json).
-    Format is inferred by path suffix (.json -> parse_performance_json, else parse_performance_csv).
+    Performance data must be JSON (e.g. data/cp26/raw_data/smtcomp24_performance/LOGIC.json).
     Solver order (for multi_label and for saving) is taken from the performance data.
     Returns solver_id_dict (id -> solver name) so callers can save solver2id for evaluation.
 
     Args:
-        perf_path: Path to performance CSV or JSON file.
+        perf_path: Path to performance JSON file.
         desc_json_path: Path to description JSON file.
         timeout: Timeout value in seconds.
         include_all_solved: Whether to include instances solved by all solvers.
@@ -40,10 +39,7 @@ def create_setfit_data(
         Dict with keys: "texts", "labels", "paths", "solver_id_dict" (id -> name).
     """
     desc_map = _load_description_map(desc_json_path)
-    if Path(perf_path).suffix.lower() == ".json":
-        multi_perf_data = parse_performance_json(perf_path, timeout)
-    else:
-        multi_perf_data = parse_performance_csv(perf_path, timeout)
+    multi_perf_data = parse_performance_json(perf_path, timeout)
     solver_id_dict = multi_perf_data.get_solver_id_dict()
     solver_name_to_id = {name: idx for idx, name in solver_id_dict.items()}
     num_solvers = len(solver_id_dict)
@@ -132,7 +128,7 @@ class SetfitSelector(SolverSelector):
         self._label_to_id = _load_solver2id_from_model_dir(setfit_model)
         if self._label_to_id is None:
             raise ValueError(
-                "solver2id.json not found in model dir. Train with scripts/train_setfit_smt.py "
+                "solver2id.json not found in model dir. Train with scripts/finetune_desc_setfit.py "
                 "or add solver2id.json (solver name -> id) to the model directory."
             )
 
@@ -250,12 +246,12 @@ def train_setfit_model(
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(message)s")
     parser = argparse.ArgumentParser(
-        description="Create SetFit data from performance CSV and descriptions JSON."
+        description="Create SetFit data from performance JSON and descriptions JSON."
     )
     parser.add_argument(
-        "--train-perf-csv",
+        "--train-perf-json",
         required=True,
-        help="Path to training performance CSV or JSON (e.g. data/cp26/raw_data/smtcomp24_performance/LOGIC.json).",
+        help="Path to training performance JSON (e.g. data/cp26/raw_data/smtcomp24_performance/LOGIC.json).",
     )
     parser.add_argument("--desc-json", required=True, help="Path to descriptions JSON.")
     parser.add_argument(
@@ -280,9 +276,9 @@ def main() -> None:
         help="Directory to save the trained SetFit model.",
     )
     parser.add_argument(
-        "--test-perf-csv",
+        "--test-perf-json",
         default=None,
-        help="Optional performance CSV for test data.",
+        help="Optional performance JSON for test data.",
     )
     parser.add_argument(
         "--num-epochs",
@@ -310,7 +306,7 @@ def main() -> None:
     args = parser.parse_args()
 
     train_data = create_setfit_data(
-        args.train_perf_csv,
+        args.train_perf_json,
         args.desc_json,
         args.timeout,
         include_all_solved=args.include_all_solved,
@@ -333,9 +329,9 @@ def main() -> None:
         logging.info("Wrote SetFit data to: %s", output_path)
 
     test_data = None
-    if args.test_perf_csv:
+    if args.test_perf_json:
         test_data = create_setfit_data(
-            args.test_perf_csv,
+            args.test_perf_json,
             args.desc_json,
             args.timeout,
             include_all_solved=args.include_all_solved,

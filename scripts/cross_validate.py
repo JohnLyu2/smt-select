@@ -17,7 +17,7 @@ from pathlib import Path
 import numpy as np
 
 from src.performance import MultiSolverDataset
-from src.performance import parse_performance_csv
+from src.performance import parse_performance_json
 from src.pwc import train_pwc, PwcSelector
 from src.evaluate import as_evaluate
 from src.feature import validate_feature_coverage
@@ -116,16 +116,16 @@ def load_fold_test_instances(
     fold_file_path: Path, timeout: float
 ) -> MultiSolverDataset:
     """
-    Load test instances from a fold CSV file.
+    Load test instances from a fold JSON file.
 
     Args:
-        fold_file_path: Path to the fold CSV file
+        fold_file_path: Path to the fold JSON file
         timeout: Timeout value in seconds
 
     Returns:
         MultiSolverDataset containing test instances from the fold
     """
-    return parse_performance_csv(str(fold_file_path), timeout)
+    return parse_performance_json(str(fold_file_path), timeout)
 
 
 def load_all_instances_from_folds(
@@ -135,20 +135,20 @@ def load_all_instances_from_folds(
     Load all instances by combining all fold files.
 
     Args:
-        folds_dir: Directory containing fold CSV files
+        folds_dir: Directory containing fold JSON files
         timeout: Timeout value in seconds
 
     Returns:
         MultiSolverDataset containing all instances from all folds
     """
-    fold_files = sorted(folds_dir.glob("*.csv"), key=lambda x: int(x.stem))
+    fold_files = sorted(folds_dir.glob("*.json"), key=lambda x: int(x.stem))
 
     # Combine all fold datasets
     all_perf_dict = {}
     solver_id_dict = None
 
     for fold_file in fold_files:
-        fold_data = parse_performance_csv(str(fold_file), timeout)
+        fold_data = parse_performance_json(str(fold_file), timeout)
         all_perf_dict.update(fold_data)
 
         # Get solver info from first fold (should be same for all)
@@ -177,7 +177,7 @@ def cross_validate(
 
     Args:
         feature_csv_path: Path to features CSV file, or list of paths to multiple CSV files
-        folds_dir: Directory containing fold CSV files (e.g., data/perf_data/folds/ABV)
+        folds_dir: Directory containing fold JSON files (e.g., data/perf_data/folds/ABV)
         xg_flag: Whether to use XGBoost (default: False, uses SVM)
         save_models: Whether to save models for each fold
         output_dir: Directory to save results and models (optional)
@@ -243,12 +243,12 @@ def cross_validate(
         f"Feature coverage validated: all {n_instances} instances have features"
     )
 
-    # Find all fold files (e.g., 0.csv, 1.csv, 2.csv, ...)
-    fold_files = sorted(folds_dir.glob("*.csv"), key=lambda x: int(x.stem))
+    # Find all fold files (e.g., 0.json, 1.json, 2.json, ...)
+    fold_files = sorted(folds_dir.glob("*.json"), key=lambda x: int(x.stem))
     n_splits = len(fold_files)
 
     if n_splits == 0:
-        raise ValueError(f"No fold CSV files found in {folds_dir}")
+        raise ValueError(f"No fold JSON files found in {folds_dir}")
 
     logging.info(
         f"Starting {n_splits}-fold cross-validation on {n_instances} instances"

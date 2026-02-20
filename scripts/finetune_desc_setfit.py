@@ -15,7 +15,7 @@ Example:
 
 After training, evaluate with:
   python -m src.evaluate --setfit-model <model_dir> --desc-json <desc_json> \\
-    --perf-csv <test_perf_csv> [--output-csv out.csv]
+    --perf-json <test_perf_json> [--output-csv out.csv]
 """
 
 import argparse
@@ -176,7 +176,7 @@ def main() -> int:
 
     logging.info("Training complete. To evaluate:")
     logging.info(
-        "  python -m src.evaluate --setfit-model %s --desc-json %s --perf-csv <TEST_CSV> [--output-csv out.csv]",
+        "  python -m src.evaluate --setfit-model %s --desc-json %s --perf-json <TEST_JSON> [--output-csv out.csv]",
         model_dir.resolve(),
         Path(args.desc_json).resolve(),
     )

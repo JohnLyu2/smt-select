@@ -8,7 +8,7 @@ For each logic found in the folds directory:
 3. Saves results to the results directory under {LOGIC}
 
 Command-line arguments:
-    --folds-dir: Base directory containing fold CSV files (default: data/perf_data/folds)
+    --folds-dir: Base directory containing fold JSON files (default: data/perf_data/folds)
     --features-dir: Directory containing feature CSV files (required)
     --results-dir: Base directory to save results (required)
 """
@@ -41,9 +41,9 @@ def discover_logics(folds_dir: Path) -> list[str]:
 
     for logic_dir in sorted(folds_dir.iterdir()):
         if logic_dir.is_dir():
-            # Check if it contains CSV files (fold files)
-            csv_files = list(logic_dir.glob("*.csv"))
-            if csv_files:
+            # Check if it contains JSON files (fold files)
+            json_files = list(logic_dir.glob("*.json"))
+            if json_files:
                 logics.append(logic_dir.name)
 
     return logics
@@ -102,16 +102,16 @@ def run_cv_for_logic(
         print(error_msg)
         raise FileNotFoundError(error_msg)
 
-    # Check if folds directory exists and has CSV files
+    # Check if folds directory exists and has JSON files
     if not logic_folds_dir.exists():
         print(
             f"WARNING: Missing folds directory for {logic}: {logic_folds_dir} -> skipping"
         )
         return False
 
-    csv_files = list(logic_folds_dir.glob("*.csv"))
-    if not csv_files:
-        print(f"WARNING: No fold CSV files found in {logic_folds_dir} -> skipping")
+    json_files = list(logic_folds_dir.glob("*.json"))
+    if not json_files:
+        print(f"WARNING: No fold JSON files found in {logic_folds_dir} -> skipping")
         return False
 
     # Create results directory
@@ -129,7 +129,7 @@ def run_cv_for_logic(
         for csv_path in feature_csvs:
             print(f"    - {csv_path}")
     print(f"  Results dir:  {logic_results_dir}")
-    print(f"  Folds found:  {len(csv_files)}")
+    print(f"  Folds found:  {len(json_files)}")
 
     try:
         # Convert Path objects to strings for cross_validate

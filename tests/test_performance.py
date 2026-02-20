@@ -1,4 +1,4 @@
-"""Small tests for performance module (datasets and CSV/JSON parsers)."""
+"""Small tests for performance module (datasets and JSON/AS CSV parsers)."""
 
 import csv
 import json
@@ -11,34 +11,8 @@ from src.performance import (
     SingleSolverDataset,
     filter_training_instances,
     parse_as_perf_csv,
-    parse_performance_csv,
     parse_performance_json,
 )
-
-
-def test_parse_performance_csv(tmp_path: Path) -> None:
-    """Parse multi-solver performance CSV and check dataset."""
-    csv_file = tmp_path / "perf.csv"
-    # Header: path, SolverA,, SolverB,,  then ,solved,runtime,solved,runtime
-    with csv_file.open("w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["path", "SolverA", "", "SolverB", ""])
-        w.writerow(["", "solved", "runtime", "solved", "runtime"])
-        w.writerow(["bench/a.smt2", 1, 10.5, 0, 0.0])
-        w.writerow(["bench/b.smt2", 0, 0.0, 1, 2.3])
-
-    timeout = 1200.0
-    data = parse_performance_csv(str(csv_file), timeout)
-
-    assert len(data) == 2
-    assert data.get_timeout() == timeout
-    assert data.get_solver_name(0) == "SolverA"
-    assert data.get_solver_name(1) == "SolverB"
-
-    perf_a = data.get_performance("bench/a.smt2", 0)
-    assert perf_a == (1, 10.5)
-    perf_b_s1 = data.get_performance("bench/b.smt2", 1)
-    assert perf_b_s1 == (1, 2.3)
 
 
 def test_parse_as_perf_csv(tmp_path: Path) -> None:

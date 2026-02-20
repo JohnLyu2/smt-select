@@ -7,7 +7,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 from .performance import SingleSolverDataset
-from .performance import parse_performance_csv
+from .performance import parse_performance_json
 from .pwc import PwcSelector
 from .setfit_model import SetfitSelector
 
@@ -283,10 +283,10 @@ def main():
         help="Path to descriptions JSON (required for SetfitSelector)",
     )
     parser.add_argument(
-        "--perf-csv",
+        "--perf-json",
         type=str,
         required=True,
-        help="Path to the performance CSV file",
+        help="Path to the performance JSON file",
     )
     parser.add_argument(
         "--output-csv",
@@ -322,8 +322,8 @@ def main():
     )
 
     # Load performance data
-    logging.info("Loading performance data from %s", args.perf_csv)
-    multi_perf_data = parse_performance_csv(args.perf_csv, args.timeout)
+    logging.info("Loading performance data from %s", args.perf_json)
+    multi_perf_data = parse_performance_json(args.perf_json, args.timeout)
     logging.info(
         "Loaded %d instances with %d solvers",
         len(multi_perf_data),
