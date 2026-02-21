@@ -46,6 +46,19 @@ def main():
         default="Qwen/Qwen3-Embedding-0.6B",
         help="Text embedding model name (default: Qwen/Qwen3-Embedding-0.6B)",
     )
+    parser.add_argument(
+        "--logic",
+        type=str,
+        nargs="*",
+        default=None,
+        metavar="LOGIC",
+        help="Process only these logics (e.g. --logic BV). Default: all logics in descriptions dir.",
+    )
+    parser.add_argument(
+        "--setfit",
+        action="store_true",
+        help="Use a SetFit model: --model-name is path to saved SetFit dir (uses backbone for encoding).",
+    )
 
     args = parser.parse_args()
 
@@ -66,6 +79,12 @@ def main():
     # Find all description JSON files, excluding specified logics
     all_json = sorted(descriptions_dir.glob("*.json"))
     json_files = [f for f in all_json if f.stem not in EXCLUDED_LOGICS]
+    if args.logic:
+        requested = set(args.logic)
+        json_files = [f for f in json_files if f.stem in requested]
+        missing = requested - {f.stem for f in json_files}
+        if missing:
+            parser.error(f"Logic(s) not found in {descriptions_dir}: {sorted(missing)}")
 
     if not json_files:
         print(f"No description JSON files found in {descriptions_dir}")
@@ -100,6 +119,7 @@ def main():
                 batch_size=8,
                 show_progress=True,
                 show_trunc_stats=args.trunc_stats,
+                is_setfit=args.setfit,
             )
             if csv_path:
                 print(f"  Success! Saved to {csv_path}\n")
