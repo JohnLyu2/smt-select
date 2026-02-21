@@ -14,6 +14,8 @@ import json
 import sys
 from pathlib import Path
 
+from description_rules import apply_description_rule
+
 
 def description_for_benchmark(benchmark: dict) -> tuple[str, str]:
     """Return (raw_description, description) for a benchmark.
@@ -43,6 +45,9 @@ def extract_descriptions_from_json(json_path: Path) -> dict[str, dict]:
         if not smtlib_path:
             continue
         raw, description = description_for_benchmark(benchmark)
+        logic = benchmark.get("logic", "")
+        family = benchmark.get("family", "")
+        description = apply_description_rule(logic, family, description, smtlib_path)
         out[smtlib_path] = {"raw_description": raw, "description": description}
     return out
 
