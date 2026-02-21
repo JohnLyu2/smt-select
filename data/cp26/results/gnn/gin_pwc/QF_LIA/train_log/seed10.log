@@ -1,0 +1,44 @@
+2026-02-21 07:10:57,278 - INFO - Building graphs for 1799 instances (timeout=5s)...
+2026-02-21 07:12:10,747 - WARNING - Graph build result timeout (15s) for /workspace/smt-select/smtlib/non-incremental/QF_LIA/20220307-SMPT/FamilyReunion-PT-L00400M0040C020P020G001/RC-06.smt2 — worker may be stuck; marking failed
+2026-02-21 07:12:52,328 - WARNING - Graph build result timeout (15s) for /workspace/smt-select/smtlib/non-incremental/QF_LIA/2019-cmodelsdiff/labyrinth/0150-labyrinth-16-0.smt2 — worker may be stuck; marking failed
+2026-02-21 07:14:27,766 - WARNING - Graph build result timeout (15s) for /workspace/smt-select/smtlib/non-incremental/QF_LIA/nec-smt/large/checkpass/prp-38-49.smt2 — worker may be stuck; marking failed
+2026-02-21 07:15:03,141 - WARNING - Graph build result timeout (15s) for /workspace/smt-select/smtlib/non-incremental/QF_LIA/20220307-SMPT/FamilyReunion-PT-L00400M0040C020P020G001/RF-15.smt2 — worker may be stuck; marking failed
+2026-02-21 07:16:10,556 - WARNING - Graph build result timeout (15s) for /workspace/smt-select/smtlib/non-incremental/QF_LIA/nec-smt/large/int_from_list/prp-8-50.smt2 — worker may be stuck; marking failed
+2026-02-21 07:17:23,431 - INFO - Graphs: 1570 built, 229 failed (of 1799 instances)
+2026-02-21 07:18:36,941 - INFO - GIN-PWC: 1570 instances, 14838 pairwise samples
+2026-02-21 07:18:37,006 - INFO - Early stopping: val_ratio=0.15, patience=50, min_epochs=100 -> 12613 train, 2225 val samples
+2026-02-21 07:19:42,087 - INFO - Best val loss 0.4332 (epoch 1)
+2026-02-21 07:19:42,088 - INFO - Epoch 1/500 train loss (weighted BCE) 0.7475 val loss 0.4332 (best)
+2026-02-21 07:20:46,867 - INFO - Best val loss 0.3612 (epoch 2)
+2026-02-21 07:21:49,421 - INFO - Best val loss 0.3187 (epoch 3)
+2026-02-21 07:22:56,877 - INFO - Best val loss 0.2509 (epoch 4)
+2026-02-21 07:25:02,181 - INFO - Best val loss 0.2201 (epoch 6)
+2026-02-21 07:27:11,183 - INFO - Best val loss 0.2171 (epoch 8)
+2026-02-21 07:28:19,678 - INFO - Best val loss 0.2084 (epoch 9)
+2026-02-21 07:29:26,870 - INFO - Epoch 10/500 train loss (weighted BCE) 0.1992 val loss 0.2178
+2026-02-21 07:33:48,971 - INFO - Best val loss 0.1936 (epoch 14)
+2026-02-21 07:36:51,621 - INFO - Best val loss 0.1814 (epoch 17)
+2026-02-21 07:37:51,171 - INFO - Best val loss 0.1667 (epoch 18)
+2026-02-21 07:39:45,348 - INFO - Epoch 20/500 train loss (weighted BCE) 0.1822 val loss 0.1692
+2026-02-21 07:41:45,677 - INFO - Best val loss 0.1651 (epoch 22)
+2026-02-21 07:49:12,007 - INFO - Epoch 30/500 train loss (weighted BCE) 0.1474 val loss 0.1784
+2026-02-21 07:53:04,660 - INFO - Best val loss 0.1589 (epoch 34)
+2026-02-21 07:55:05,981 - INFO - Best val loss 0.1522 (epoch 36)
+2026-02-21 07:56:03,476 - INFO - Best val loss 0.1447 (epoch 37)
+2026-02-21 07:58:55,068 - INFO - Epoch 40/500 train loss (weighted BCE) 0.1291 val loss 0.1714
+2026-02-21 08:08:57,753 - INFO - Epoch 50/500 train loss (weighted BCE) 0.1233 val loss 0.1555
+2026-02-21 08:10:03,569 - INFO - Best val loss 0.1437 (epoch 51)
+2026-02-21 08:12:08,772 - INFO - Best val loss 0.1375 (epoch 53)
+2026-02-21 08:14:14,146 - INFO - Best val loss 0.1372 (epoch 55)
+2026-02-21 08:19:25,354 - INFO - Epoch 60/500 train loss (weighted BCE) 0.1159 val loss 0.1414
+2026-02-21 08:25:32,272 - INFO - Best val loss 0.1370 (epoch 66)
+2026-02-21 08:29:42,307 - INFO - Epoch 70/500 train loss (weighted BCE) 0.1099 val loss 0.1376
+2026-02-21 08:39:50,061 - INFO - Epoch 80/500 train loss (weighted BCE) 0.1074 val loss 0.1391
+2026-02-21 08:44:49,075 - INFO - Best val loss 0.1317 (epoch 85)
+2026-02-21 08:49:43,357 - INFO - Epoch 90/500 train loss (weighted BCE) 0.1136 val loss 0.1426
+2026-02-21 09:00:39,855 - INFO - Epoch 100/500 train loss (weighted BCE) 0.1246 val loss 0.1399
+2026-02-21 09:11:58,075 - INFO - Epoch 110/500 train loss (weighted BCE) 0.0917 val loss 0.1395
+2026-02-21 09:23:28,060 - INFO - Epoch 120/500 train loss (weighted BCE) 0.1327 val loss 0.1442
+2026-02-21 09:34:35,467 - INFO - Epoch 130/500 train loss (weighted BCE) 0.0952 val loss 0.1457
+2026-02-21 09:40:08,763 - INFO - Early stop: no val improvement for 50 epochs (min_epochs=100 reached), restoring best
+2026-02-21 09:40:08,818 - INFO - Saved GIN-PWC model, vocab, config, failed_paths to models/gin_pwc/QF_LIA/seed10
