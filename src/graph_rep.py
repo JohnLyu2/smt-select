@@ -271,6 +271,11 @@ def generate_graph_dicts(
     return graph_by_path, failed_list
 
 
+# Extra seconds for the first n_workers result get() calls to allow worker cold start
+# (spawn + import of Z3/graph_rep) before the first graph build.
+_INITIAL_RESULT_TIMEOUT_EXTRA = 60
+
+
 def generate_graph_dicts_parallel(
     instance_paths: list[str],
     timeout_sec: int,
@@ -281,7 +286,10 @@ def generate_graph_dicts_parallel(
     Uses sequential path when n_workers <= 1 or instance_paths is empty.
 
     Each result is collected with a timeout of (timeout_sec + result_timeout_buffer) so that
-    a stuck or dead worker cannot block the main process indefinitely.
+    a stuck or dead worker cannot block the main process indefinitely. The first n_workers
+    results use a longer timeout to account for worker cold start (process spawn + module
+    import, especially Z3) which otherwise causes the first instances to often hit the
+    result timeout.
     """
     if not instance_paths:
         return {}, []
@@ -298,18 +306,20 @@ def generate_graph_dicts_parallel(
             (instance_paths[i], pool.apply_async(_build_graph_dict_worker, (args[i],)))
             for i in range(len(args))
         ]
-        for path, ar in tqdm(
+        for i, (path, ar) in enumerate(tqdm(
             async_results,
             total=len(async_results),
             desc="Building graphs",
             unit="instance",
-        ):
+        )):
+            # First n_workers results may wait on cold workers (spawn + import); use longer timeout.
+            wait_timeout = get_timeout + _INITIAL_RESULT_TIMEOUT_EXTRA if i < n_workers else get_timeout
             try:
-                _, result = ar.get(timeout=get_timeout)
+                _, result = ar.get(timeout=wait_timeout)
             except (TimeoutError, multiprocessing.TimeoutError):
                 logging.warning(
                     "Graph build result timeout (%ds) for %s — worker may be stuck; marking failed",
-                    get_timeout,
+                    wait_timeout,
                     path,
                 )
                 failed_list.append(path)
