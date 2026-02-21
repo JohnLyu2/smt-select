@@ -13,7 +13,7 @@ _model_cache = {}
 
 
 def get_embedding_model(
-    model_name: str = "sentence-transformers/all-mpnet-base-v2",
+    model_name: str = "Qwen/Qwen3-Embedding-0.6B",
     is_setfit: bool = False,
 ) -> SentenceTransformer:
     """
@@ -40,7 +40,7 @@ def get_embedding_model(
 
 def encode_text(
     text: str | list[str],
-    model_name: str = "sentence-transformers/all-mpnet-base-v2",
+    model_name: str = "Qwen/Qwen3-Embedding-0.6B",
     normalize: bool = False,
     batch_size: int = 32,
     show_progress: bool = False,
@@ -245,7 +245,7 @@ def _encode_paths_descriptions_to_csv(
 def encode_all_desc_from_descriptions_file(
     json_path: str | Path,
     output_csv_path: str | Path | None = None,
-    model_name: str = "sentence-transformers/all-mpnet-base-v2",
+    model_name: str = "Qwen/Qwen3-Embedding-0.6B",
     normalize: bool = False,
     batch_size: int = 32,
     show_progress: bool = True,
@@ -343,8 +343,8 @@ Examples:
     parser.add_argument(
         "--model",
         type=str,
-        default="sentence-transformers/all-mpnet-base-v2",
-        help="Name of the sentence transformer model to use (default: sentence-transformers/all-mpnet-base-v2)",
+        default="Qwen/Qwen3-Embedding-0.6B",
+        help="Name of the sentence transformer / embedding model (default: Qwen/Qwen3-Embedding-0.6B)",
     )
     parser.add_argument(
         "--normalize",

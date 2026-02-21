@@ -66,8 +66,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--model-name",
-        default="sentence-transformers/all-MiniLM-L6-v2",
-        help="Base sentence-transformers model (default: all-MiniLM-L6-v2).",
+        default="Qwen/Qwen3-Embedding-0.6B",
+        help="Base embedding model for SetFit (default: Qwen/Qwen3-Embedding-0.6B).",
     )
     parser.add_argument(
         "--num-epochs",

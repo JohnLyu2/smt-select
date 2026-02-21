@@ -43,8 +43,8 @@ def main():
     parser.add_argument(
         "--model-name",
         type=str,
-        default="sentence-transformers/all-mpnet-base-v2",
-        help="Sentence-transformer model name to use",
+        default="Qwen/Qwen3-Embedding-0.6B",
+        help="Text embedding model name (default: Qwen/Qwen3-Embedding-0.6B)",
     )
 
     args = parser.parse_args()

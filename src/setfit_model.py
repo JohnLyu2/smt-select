@@ -87,21 +87,45 @@ def create_setfit_data(
 
 
 def _load_description_map(desc_json_path: str) -> dict[str, str]:
+    """
+    Load path -> description from JSON. Supports two formats:
+    - List: [{"smtlib_path": "...", "description": "..."}, ...]
+    - Dict (e.g. data/meta_info_24/descriptions/LOGIC.json): {"<path>": {"description": "..."}, ...}
+    The "description" field must exist and be non-empty for each entry.
+    """
     json_path = Path(desc_json_path)
     with open(json_path, "r", encoding="utf-8") as f:
-        benchmarks = json.load(f)
+        data = json.load(f)
 
     desc_map: dict[str, str] = {}
-    for benchmark in benchmarks:
-        smtlib_path = benchmark.get("smtlib_path", "")
-        if not smtlib_path:
-            continue
 
-        description = benchmark.get("description", "")
-        if not description or not description.strip():
-            raise AssertionError(f"Missing description for benchmark: {smtlib_path}")
-
-        desc_map[smtlib_path] = description.strip()
+    if isinstance(data, list):
+        for benchmark in data:
+            smtlib_path = benchmark.get("smtlib_path", "")
+            if not smtlib_path:
+                continue
+            description = benchmark.get("description", "")
+            if not description or not description.strip():
+                raise AssertionError(f"Missing description for benchmark: {smtlib_path}")
+            desc_map[smtlib_path] = description.strip()
+    elif isinstance(data, dict):
+        for smtlib_path, entry in data.items():
+            if not smtlib_path:
+                continue
+            if not isinstance(entry, dict):
+                raise AssertionError(
+                    f"Expected object for key {smtlib_path!r}, got {type(entry).__name__}"
+                )
+            if "description" not in entry:
+                raise AssertionError(f"Missing 'description' field for benchmark: {smtlib_path}")
+            description = entry.get("description", "")
+            if not description or not str(description).strip():
+                raise AssertionError(f"Empty description for benchmark: {smtlib_path}")
+            desc_map[smtlib_path] = str(description).strip()
+    else:
+        raise ValueError(
+            f"Description JSON must be a list or object, got {type(data).__name__}"
+        )
 
     return desc_map
 
