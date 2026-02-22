@@ -90,6 +90,7 @@ def main() -> None:
         "logic": "Logic",
         "synt": "SMT-Select-Lite",
         "synt_mpnet": "SMT-Select-Lite-Text",
+        "gin_pwc": "SMT-Select",
     }
     headers = [header_map.get(k, k.replace("_", "+").title()) for k in columns]
 

@@ -6,6 +6,7 @@ Build a result summary CSV in doc/result_summary with one row per logic and PAR2
 Default result dirs:
 - data/cp26/results/synt
 - data/cp26/results/synt+smtlib_desc/synt+mpnet
+- data/cp26/results/gnn/gin_pwc
 
 Output columns: logic, <name1>, <name1>_std, <name2>, <name2>_std, ... Missing logic/result pairs are left empty.
 """
@@ -67,8 +68,9 @@ def main() -> None:
         default=[
             PROJECT_ROOT / "data" / "cp26" / "results" / "synt",
             PROJECT_ROOT / "data" / "cp26" / "results" / "synt+smtlib_desc" / "synt+mpnet",
+            PROJECT_ROOT / "data" / "cp26" / "results" / "gnn" / "gin_pwc",
         ],
-        help="Result directories (each contains <logic>/summary.json). Default: synt, synt+smtlib_desc/synt+mpnet",
+        help="Result directories (each contains <logic>/summary.json). Default: synt, synt+mpnet, gin_pwc",
     )
     args = parser.parse_args()
 
@@ -86,9 +88,14 @@ def main() -> None:
     logics = sorted(all_logics)
 
     # Column labels: short names for default dirs
-    default_names = ["synt", "synt_mpnet"]
-    if len(result_dirs) == 2 and default_names[0] in str(result_dirs[0]) and "mpnet" in str(result_dirs[1]):
+    default_names = ["synt", "synt_mpnet", "gin_pwc"]
+    if (len(result_dirs) == 3
+            and default_names[0] in str(result_dirs[0])
+            and "mpnet" in str(result_dirs[1])
+            and "gin_pwc" in str(result_dirs[2])):
         labels = default_names
+    elif len(result_dirs) == 2 and default_names[0] in str(result_dirs[0]) and "mpnet" in str(result_dirs[1]):
+        labels = default_names[:2]
     else:
         labels = [d.name for d in result_dirs]
 
