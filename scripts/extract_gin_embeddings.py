@@ -5,8 +5,8 @@ Extract GIN-PWC backbone embeddings for benchmarks listed in a performance JSON.
 Loads a saved GIN-PWC model (e.g. models/gin_pwc/ABV/seed0), iterates over all
 benchmark paths from a JSON file (e.g. data/cp26/raw_data/smtcomp24_performance/ABV.json),
 builds the graph for each instance, runs the backbone, and saves:
-  - <out_dir>/embeddings.csv: benchmark path + columns emb_0 .. emb_{d-1}
-  - <out_dir>/extraction_times.csv: benchmark, time_sec, status (status is "ok" or "failed"; graph build is capped at graph_timeout)
+  - <out_dir>/embeddings.csv: path + columns emb_0 .. emb_{d-1}
+  - <out_dir>/extraction_times.csv: path, time_sec, status (status is "ok" or "failed"; graph build is capped at graph_timeout)
 
 Instance paths in the JSON are rebased with --benchmark-root to get full .smt2 paths.
 """
@@ -161,7 +161,7 @@ def run_extraction(
 
     csv_path = subdir / "embeddings.csv"
     with open(csv_path, "w") as f:
-        header = ["benchmark"] + [f"emb_{i}" for i in range(hidden_dim)]
+        header = ["path"] + [f"emb_{i}" for i in range(hidden_dim)]
         f.write(",".join(header) + "\n")
         for rel_path, vec in embeddings:
             row = [rel_path] + [str(x) for x in vec]
@@ -171,7 +171,7 @@ def run_extraction(
     failed_set = set(failed)
     times_path = subdir / "extraction_times.csv"
     with open(times_path, "w") as f:
-        f.write("benchmark,time_sec,status\n")
+        f.write("path,time_sec,status\n")
         for rel_path, sec in extraction_times:
             status = "failed" if rel_path in failed_set else "ok"
             f.write(f"{rel_path},{sec},{status}\n")
