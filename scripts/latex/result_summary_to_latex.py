@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-Convert doc/logic_filter/smtcomp24_logic_info.csv into a LaTeX table.
+Convert doc/result_summary/final_res.csv into a LaTeX table (doc/cp26/final_res.tex).
 
-Reads the CSV and prints a tabular environment with escaped logic names
-and formatted numeric columns.
+Reads the result summary CSV (logics × PAR2 gap closed columns) and writes
+a tabular .tex file with escaped logic names and formatted numeric cells.
 """
 
 import argparse
 import csv
 from pathlib import Path
 
+# Script is under scripts/latex/
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -29,34 +30,41 @@ def latex_escape(s: str) -> str:
     return s
 
 
-def format_rate(val: str | float) -> str:
-    """Format description_rate for LaTeX (e.g. 0.986 -> 98.6). Unit in column header."""
+def format_par2_gap(val: str | float, std_val: str | float | None = None) -> str:
+    """Format PAR2 gap closed (0–1) as percentage; if std_val given, format as mean ± std (one decimal)."""
     if val == "" or val is None:
         return "---"
     try:
         x = float(val)
-        return f"{x * 100:.1f}"
+        mean_str = f"{x * 100:.1f}"
+        if std_val not in ("", None):
+            try:
+                s = float(std_val)
+                return f"{mean_str} $\\pm$ {s * 100:.1f}"
+            except (TypeError, ValueError):
+                pass
+        return mean_str
     except (TypeError, ValueError):
         return str(val)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Convert smtcomp24_logic_info.csv into a LaTeX table."
+        description="Convert result summary CSV (PAR2 gap closed) into a LaTeX table."
     )
     parser.add_argument(
         "csv",
         type=Path,
         nargs="?",
-        default=PROJECT_ROOT / "doc" / "logic_filter" / "smtcomp24_logic_info.csv",
-        help="Input CSV path (default: doc/logic_filter/smtcomp24_logic_info.csv)",
+        default=PROJECT_ROOT / "doc" / "result_summary" / "final_res.csv",
+        help="Input CSV path (default: doc/result_summary/final_res.csv)",
     )
     parser.add_argument(
         "-o",
         "--output",
         type=Path,
-        default=PROJECT_ROOT / "doc" / "cp26" / "smtcomp24_logic_info.tex",
-        help="Output .tex path (default: doc/cp26/smtcomp24_logic_info.tex)",
+        default=PROJECT_ROOT / "doc" / "cp26" / "final_res.tex",
+        help="Output .tex path (default: doc/cp26/final_res.tex)",
     )
     parser.add_argument(
         "--no-header",
@@ -74,23 +82,17 @@ def main() -> None:
         rows = list(reader)
         fieldnames = reader.fieldnames or []
 
-    # Exclude columns we don't want in the table
-    exclude = {"num_families"}
-    columns = [k for k in fieldnames if k not in exclude]
+    # Display columns: logic plus value columns (exclude *_std; those are paired with value columns)
+    value_columns = [k for k in fieldnames if k != "logic" and not k.endswith("_std")]
+    columns = ["logic"] + value_columns
 
-    # Column headers for LaTeX (short, escaped)
     header_map = {
         "logic": "Logic",
-        "num_benchmarks": "Benchmarks",
-        "num_solvers": "Solvers",
-        "sbs": "SBS solved",
-        "vbs": "VBS solved",
-        "description_rate": "Desc.\\%",
-        "ave_size": "Avg. file size (KB)",
+        "synt": "SMT-Select-Lite",
+        "synt_mpnet": "SMT-Select-Lite-Text",
     }
-    headers = [header_map.get(k, k.replace("_", " ").title()) for k in columns]
+    headers = [header_map.get(k, k.replace("_", "+").title()) for k in columns]
 
-    # Build tabular spec: l for logic, c for the rest
     ncols = len(columns)
     col_spec = "l" + "c" * (ncols - 1)
 
@@ -111,20 +113,16 @@ def main() -> None:
             val = row.get(key, "")
             if key == "logic":
                 cells.append(latex_escape(val))
-            elif key == "description_rate":
-                cells.append(format_rate(val))
-            elif key == "ave_size":
-                cells.append(str(val) if val != "" else "---")
             else:
-                # integers
-                cells.append(str(val) if val != "" else "---")
+                std_val = row.get(f"{key}_std", "")
+                cells.append(format_par2_gap(val, std_val))
         lines.append(" & ".join(cells) + " \\\\")
 
     lines.extend([
         "\\bottomrule",
         "\\end{tabular}",
-        "\\caption{Meta-information for the selected SMT-COMP 2024 logics: benchmark count, number of competitionsolvers, SBS and VBS solved counts, description rate, and average file size.}",
-        "\\label{tab:logic-info}",
+        "\\caption{Experimental results on the held-out test set, measured by the PAR-2 SBS–VBS gap closed (\\%). Results are averaged over five random train–test splits and reported as mean $\\pm$ standard deviation.}",
+        "\\label{tab:final_res}",
         "\\end{table}",
     ])
 

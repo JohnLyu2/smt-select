@@ -16,8 +16,8 @@ import csv
 import json
 from pathlib import Path
 
-# Add project root for src imports
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+# Add project root for src imports (script is under scripts/collect_results/)
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 import sys
 sys.path.insert(0, str(PROJECT_ROOT))
 
