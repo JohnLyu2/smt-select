@@ -1,0 +1,168 @@
+{
+  "division": "QF_LIA",
+  "n_seeds": 5,
+  "seed_values": [
+    0,
+    10,
+    20,
+    30,
+    40
+  ],
+  "model_type": "SVM",
+  "splits_dir": "/home/john-lu/Desktop/smt-select/data/cp26/performance_splits/smtcomp24/QF_LIA",
+  "feature_csv_path": [
+    "data/features/syntactic/catalog_all/QF_LIA.csv",
+    "data/features/smtlib_desc/all-mpnet-base-v2/QF_LIA.csv"
+  ],
+  "seeds": [
+    {
+      "seed": 0,
+      "train_size": 3618,
+      "test_size": 1207,
+      "train_metrics": {
+        "solved": 3536,
+        "avg_par2": 64.84713106869853,
+        "sbs_name": "OpenSMT",
+        "sbs_solved": 3390,
+        "sbs_avg_par2": 211.21875675864814,
+        "vbs_solved": 3544,
+        "vbs_avg_par2": 57.76171831546939,
+        "gap_cls_solved": 0.948051948051948,
+        "gap_cls_par2": 0.9538280366602233
+      },
+      "test_metrics": {
+        "solved": 1179,
+        "avg_par2": 68.11408659094143,
+        "sbs_name": "OpenSMT",
+        "sbs_solved": 1124,
+        "sbs_avg_par2": 221.90117742543984,
+        "vbs_solved": 1182,
+        "vbs_avg_par2": 56.74290921905257,
+        "gap_cls_solved": 0.9482758620689655,
+        "gap_cls_par2": 0.9311498146875756
+      }
+    },
+    {
+      "seed": 10,
+      "train_size": 3618,
+      "test_size": 1207,
+      "train_metrics": {
+        "solved": 3537,
+        "avg_par2": 64.24879450615366,
+        "sbs_name": "OpenSMT",
+        "sbs_solved": 3385,
+        "sbs_avg_par2": 214.80620765811412,
+        "vbs_solved": 3543,
+        "vbs_avg_par2": 57.38506665321782,
+        "gap_cls_solved": 0.9620253164556962,
+        "gap_cls_par2": 0.9563989448359903
+      },
+      "test_metrics": {
+        "solved": 1177,
+        "avg_par2": 69.49350011330458,
+        "sbs_name": "OpenSMT",
+        "sbs_solved": 1129,
+        "sbs_avg_par2": 211.14774134071087,
+        "vbs_solved": 1183,
+        "vbs_avg_par2": 57.871928037632664,
+        "gap_cls_solved": 0.8888888888888888,
+        "gap_cls_par2": 0.9241786957431299
+      }
+    },
+    {
+      "seed": 20,
+      "train_size": 3618,
+      "test_size": 1207,
+      "train_metrics": {
+        "solved": 3538,
+        "avg_par2": 62.90350386038492,
+        "sbs_name": "OpenSMT",
+        "sbs_solved": 3384,
+        "sbs_avg_par2": 215.0290765680648,
+        "vbs_solved": 3546,
+        "vbs_avg_par2": 55.23112424398988,
+        "gap_cls_solved": 0.9506172839506173,
+        "gap_cls_par2": 0.95198699667418
+      },
+      "test_metrics": {
+        "solved": 1178,
+        "avg_par2": 74.00242618931394,
+        "sbs_name": "OpenSMT",
+        "sbs_solved": 1130,
+        "sbs_avg_par2": 210.47968855181145,
+        "vbs_solved": 1180,
+        "vbs_avg_par2": 64.32840163878153,
+        "gap_cls_solved": 0.96,
+        "gap_cls_par2": 0.9338081466481433
+      }
+    },
+    {
+      "seed": 30,
+      "train_size": 3618,
+      "test_size": 1207,
+      "train_metrics": {
+        "solved": 3541,
+        "avg_par2": 61.63767135001712,
+        "sbs_name": "OpenSMT",
+        "sbs_solved": 3386,
+        "sbs_avg_par2": 210.82636253598452,
+        "vbs_solved": 3548,
+        "vbs_avg_par2": 54.73785351010224,
+        "gap_cls_solved": 0.9567901234567902,
+        "gap_cls_par2": 0.9557954785847127
+      },
+      "test_metrics": {
+        "solved": 1172,
+        "avg_par2": 82.89595588945625,
+        "sbs_name": "OpenSMT",
+        "sbs_solved": 1128,
+        "sbs_avg_par2": 223.0773847971027,
+        "vbs_solved": 1178,
+        "vbs_avg_par2": 65.80698781542236,
+        "gap_cls_solved": 0.88,
+        "gap_cls_par2": 0.8913402114955906
+      }
+    },
+    {
+      "seed": 40,
+      "train_size": 3618,
+      "test_size": 1207,
+      "train_metrics": {
+        "solved": 3525,
+        "avg_par2": 71.97116462440093,
+        "sbs_name": "OpenSMT",
+        "sbs_solved": 3370,
+        "sbs_avg_par2": 224.3013800742982,
+        "vbs_solved": 3532,
+        "vbs_avg_par2": 65.21746850427438,
+        "gap_cls_solved": 0.9567901234567902,
+        "gap_cls_par2": 0.9575463285163581
+      },
+      "test_metrics": {
+        "solved": 1188,
+        "avg_par2": 49.67971582305617,
+        "sbs_name": "OpenSMT",
+        "sbs_solved": 1144,
+        "sbs_avg_par2": 182.68582435499917,
+        "vbs_solved": 1194,
+        "vbs_avg_par2": 34.394189928997484,
+        "gap_cls_solved": 0.88,
+        "gap_cls_par2": 0.896922534078035
+      }
+    }
+  ],
+  "aggregated": {
+    "train": {
+      "gap_cls_solved_mean": 0.9548549590743685,
+      "gap_cls_solved_std": 0.004962712902749502,
+      "gap_cls_par2_mean": 0.955111157054293,
+      "gap_cls_par2_std": 0.0019729941410803436
+    },
+    "test": {
+      "gap_cls_solved_mean": 0.9114329501915709,
+      "gap_cls_solved_std": 0.03521492268402854,
+      "gap_cls_par2_mean": 0.9154798805304949,
+      "gap_cls_par2_std": 0.017800226346546807
+    }
+  }
+}

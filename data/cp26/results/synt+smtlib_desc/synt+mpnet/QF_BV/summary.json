@@ -1,0 +1,168 @@
+{
+  "division": "QF_BV",
+  "n_seeds": 5,
+  "seed_values": [
+    0,
+    10,
+    20,
+    30,
+    40
+  ],
+  "model_type": "SVM",
+  "splits_dir": "/home/john-lu/Desktop/smt-select/data/cp26/performance_splits/smtcomp24/QF_BV",
+  "feature_csv_path": [
+    "data/features/syntactic/catalog_all/QF_BV.csv",
+    "data/features/smtlib_desc/all-mpnet-base-v2/QF_BV.csv"
+  ],
+  "seeds": [
+    {
+      "seed": 0,
+      "train_size": 8027,
+      "test_size": 2676,
+      "train_metrics": {
+        "solved": 7916,
+        "avg_par2": 44.748838125612075,
+        "sbs_name": "Bitwuzla",
+        "sbs_solved": 7864,
+        "sbs_avg_par2": 61.77599266787249,
+        "vbs_solved": 7918,
+        "vbs_avg_par2": 41.85153200714887,
+        "gap_cls_solved": 0.9629629629629629,
+        "gap_cls_par2": 0.8545854681941498
+      },
+      "test_metrics": {
+        "solved": 2635,
+        "avg_par2": 48.57090374820668,
+        "sbs_name": "Bitwuzla",
+        "sbs_solved": 2625,
+        "sbs_avg_par2": 58.10378827141716,
+        "vbs_solved": 2642,
+        "vbs_avg_par2": 40.25809746050704,
+        "gap_cls_solved": 0.5882352941176471,
+        "gap_cls_par2": 0.5341841133649174
+      }
+    },
+    {
+      "seed": 10,
+      "train_size": 8027,
+      "test_size": 2676,
+      "train_metrics": {
+        "solved": 7910,
+        "avg_par2": 46.7775066102727,
+        "sbs_name": "Bitwuzla",
+        "sbs_solved": 7865,
+        "sbs_avg_par2": 61.78417641632123,
+        "vbs_solved": 7914,
+        "vbs_avg_par2": 43.20045916735318,
+        "gap_cls_solved": 0.9183673469387755,
+        "gap_cls_par2": 0.8075171186153215
+      },
+      "test_metrics": {
+        "solved": 2639,
+        "avg_par2": 43.73556745860807,
+        "sbs_name": "STP",
+        "sbs_solved": 2627,
+        "sbs_avg_par2": 57.66332678096884,
+        "vbs_solved": 2646,
+        "vbs_avg_par2": 36.211820063287306,
+        "gap_cls_solved": 0.631578947368421,
+        "gap_cls_par2": 0.6492671822851833
+      }
+    },
+    {
+      "seed": 20,
+      "train_size": 8027,
+      "test_size": 2676,
+      "train_metrics": {
+        "solved": 7917,
+        "avg_par2": 43.99116379671362,
+        "sbs_name": "Bitwuzla",
+        "sbs_solved": 7865,
+        "sbs_avg_par2": 60.975859810918074,
+        "vbs_solved": 7921,
+        "vbs_avg_par2": 40.68144053542927,
+        "gap_cls_solved": 0.9285714285714286,
+        "gap_cls_par2": 0.8369146110388204
+      },
+      "test_metrics": {
+        "solved": 2635,
+        "avg_par2": 49.28780081578421,
+        "sbs_name": "Bitwuzla",
+        "sbs_solved": 2624,
+        "sbs_avg_par2": 60.50388783897062,
+        "vbs_solved": 2639,
+        "vbs_avg_par2": 43.76793462175265,
+        "gap_cls_solved": 0.7333333333333333,
+        "gap_cls_par2": 0.6701791572676773
+      }
+    },
+    {
+      "seed": 30,
+      "train_size": 8027,
+      "test_size": 2676,
+      "train_metrics": {
+        "solved": 7924,
+        "avg_par2": 42.269745973962515,
+        "sbs_name": "Bitwuzla",
+        "sbs_solved": 7870,
+        "sbs_avg_par2": 59.73287903806865,
+        "vbs_solved": 7928,
+        "vbs_avg_par2": 38.991442906889496,
+        "gap_cls_solved": 0.9310344827586207,
+        "gap_cls_par2": 0.8419442585200273
+      },
+      "test_metrics": {
+        "solved": 2625,
+        "avg_par2": 57.048910270660045,
+        "sbs_name": "Bitwuzla",
+        "sbs_solved": 2619,
+        "sbs_avg_par2": 64.2323656654513,
+        "vbs_solved": 2632,
+        "vbs_avg_par2": 48.837295968646785,
+        "gap_cls_solved": 0.46153846153846156,
+        "gap_cls_par2": 0.4666075267124183
+      }
+    },
+    {
+      "seed": 40,
+      "train_size": 8027,
+      "test_size": 2676,
+      "train_metrics": {
+        "solved": 7921,
+        "avg_par2": 42.98584354846236,
+        "sbs_name": "Bitwuzla",
+        "sbs_solved": 7868,
+        "sbs_avg_par2": 59.7629644565803,
+        "vbs_solved": 7924,
+        "vbs_avg_par2": 40.0005839586007,
+        "gap_cls_solved": 0.9464285714285714,
+        "gap_cls_par2": 0.8489423078273967
+      },
+      "test_metrics": {
+        "solved": 2630,
+        "avg_par2": 54.66079421453484,
+        "sbs_name": "Bitwuzla",
+        "sbs_solved": 2621,
+        "sbs_avg_par2": 64.14212065259892,
+        "vbs_solved": 2636,
+        "vbs_avg_par2": 45.810249921529525,
+        "gap_cls_solved": 0.6,
+        "gap_cls_par2": 0.517204521958299
+      }
+    }
+  ],
+  "aggregated": {
+    "train": {
+      "gap_cls_solved_mean": 0.9374729585320718,
+      "gap_cls_solved_std": 0.01559268372358165,
+      "gap_cls_par2_mean": 0.8379807528391432,
+      "gap_cls_par2_std": 0.016375294229569706
+    },
+    "test": {
+      "gap_cls_solved_mean": 0.6029372072715726,
+      "gap_cls_solved_std": 0.08722600265921708,
+      "gap_cls_par2_mean": 0.567488500317699,
+      "gap_cls_par2_std": 0.07880070476163982
+    }
+  }
+}
