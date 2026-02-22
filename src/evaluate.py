@@ -27,9 +27,40 @@ def _init_selector(init_arg: tuple) -> None:
 _EVALUATION_INITIAL_RESULT_TIMEOUT_EXTRA = 60
 
 
-def _eval_worker(instance_path: str) -> tuple[str, int]:
-    """Worker: return (instance_path, selected_solver_id). Uses _worker_selector set by _init_selector."""
-    return (instance_path, _worker_selector.algorithm_select(instance_path))
+def _apply_overhead_to_perf(
+    solver_is_solved: int,
+    solver_runtime: float,
+    overhead: float | None,
+    timeout: float,
+) -> tuple[int, float]:
+    """
+    Compute result (solved, runtime) accounting for overhead. Runtime is solver_runtime + overhead;
+    if this exceeds timeout, treat as timeout (0, timeout).
+    """
+    effective_runtime = solver_runtime + (overhead or 0.0)
+    if effective_runtime > timeout:
+        return (0, timeout)
+    return (solver_is_solved, effective_runtime)
+
+
+def _select_with_info(selector, instance_path: str) -> tuple[int, float | None, bool]:
+    """
+    Return (solver_id, overhead_sec, feature_fail). If selector implements
+    algorithm_select_with_info, use it; else call algorithm_select and return (selected, None, False).
+    """
+    if hasattr(selector, "algorithm_select_with_info"):
+        selected, overhead, feature_fail = selector.algorithm_select_with_info(
+            instance_path
+        )
+        return (selected, overhead, feature_fail)
+    selected = selector.algorithm_select(instance_path)
+    return (selected, None, False)
+
+
+def _eval_worker(instance_path: str) -> tuple[str, int, float | None, bool]:
+    """Worker: return (instance_path, selected_solver_id, overhead_sec, feature_fail)."""
+    selected, overhead, feature_fail = _select_with_info(_worker_selector, instance_path)
+    return (instance_path, selected, overhead, feature_fail)
 
 
 def _load_pwc_selector(model_path: str):
@@ -72,6 +103,9 @@ def as_evaluate_parallel(
         fallback_solver_id = min(solver_ids) if solver_ids else 0
     perf_dict: dict = {}
     path_to_selected: dict[str, int] = {}
+    path_to_overhead: dict[str, float | None] = {}
+    path_to_solver_runtime: dict[str, float] = {}
+    path_to_feature_fail: dict[str, bool] = {}
     ctx = multiprocessing.get_context("spawn")
     with ctx.Pool(
         n_workers,
@@ -88,7 +122,7 @@ def as_evaluate_parallel(
         for i, (instance_path, ar) in it:
             wait_timeout = result_timeout + _EVALUATION_INITIAL_RESULT_TIMEOUT_EXTRA if i < n_workers else result_timeout
             try:
-                _, selected = ar.get(timeout=wait_timeout)
+                _, selected, overhead, feature_fail = ar.get(timeout=wait_timeout)
             except (TimeoutError, multiprocessing.TimeoutError):
                 logging.warning(
                     "Evaluation result timeout (%ds) for %s — worker stuck; using fallback solver %s",
@@ -97,26 +131,45 @@ def as_evaluate_parallel(
                     multi_perf_data.get_solver_name(fallback_solver_id),
                 )
                 selected = fallback_solver_id
+                overhead = None
+                feature_fail = True
             except Exception as e:
                 logging.debug("Evaluation failed for %s: %s", instance_path, e)
                 selected = fallback_solver_id
+                overhead = None
+                feature_fail = True
             path_to_selected[instance_path] = selected
-            perf_dict[instance_path] = multi_perf_data.get_performance(
+            path_to_overhead[instance_path] = overhead
+            path_to_feature_fail[instance_path] = feature_fail
+            raw_is_solved, raw_runtime = multi_perf_data.get_performance(
                 instance_path, selected
+            )
+            path_to_solver_runtime[instance_path] = raw_runtime
+            timeout = multi_perf_data.get_timeout()
+            perf_dict[instance_path] = _apply_overhead_to_perf(
+                raw_is_solved, raw_runtime, overhead, timeout
             )
     if write_csv_path is not None:
         with Path(write_csv_path).open(mode="w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
-            csv_writer.writerow(["benchmark", "selected", "solved", "runtime"])
+            csv_writer.writerow(
+                ["benchmark", "selected", "solved", "runtime", "solver_runtime", "overhead", "feature_fail"]
+            )
             for path in instance_paths:
                 selected = path_to_selected[path]
                 is_solved, runtime = perf_dict[path]
+                solver_runtime = path_to_solver_runtime[path]
+                ov = path_to_overhead[path]
+                ff = path_to_feature_fail[path]
                 csv_writer.writerow(
                     [
                         path,
                         multi_perf_data.get_solver_name(selected),
                         is_solved,
                         runtime,
+                        solver_runtime,
+                        f"{ov:.6f}" if ov is not None else "",
+                        1 if ff else 0,
                     ]
                 )
     return SingleSolverDataset(
@@ -141,6 +194,9 @@ def as_evaluate(as_model, multi_perf_data, write_csv_path=None, show_progress=Tr
                     "selected",
                     "solved",
                     "runtime",
+                    "solver_runtime",
+                    "overhead",
+                    "feature_fail",
                 ]
             )
     perf_dict = {}
@@ -148,24 +204,29 @@ def as_evaluate(as_model, multi_perf_data, write_csv_path=None, show_progress=Tr
     if show_progress:
         from tqdm import tqdm
         instance_paths = tqdm(instance_paths, desc="Evaluating", unit="instance")
+    timeout = multi_perf_data.get_timeout()
     for instance_path in instance_paths:
-        # before = time.perf_counter()
-        selected = as_model.algorithm_select(instance_path)
-        # after = time.perf_counter()
-        # inference_time = after - before
-        selected_perf = multi_perf_data.get_performance(instance_path, selected)
-        perf_dict[instance_path] = selected_perf
+        selected, overhead, feature_fail = _select_with_info(as_model, instance_path)
+        raw_is_solved, raw_runtime = multi_perf_data.get_performance(
+            instance_path, selected
+        )
+        perf_dict[instance_path] = _apply_overhead_to_perf(
+            raw_is_solved, raw_runtime, overhead, timeout
+        )
         if write_csv_path is not None:
             with Path(write_csv_path).open(mode="a", newline="") as csv_file:
                 csv_writer = csv.writer(csv_file)
-                is_solved, time = selected_perf
+                is_solved, runtime = perf_dict[instance_path]
                 selected_solver = multi_perf_data.get_solver_name(selected)
                 csv_writer.writerow(
                     [
                         instance_path,
                         selected_solver,
                         is_solved,
-                        time,
+                        runtime,
+                        raw_runtime,
+                        f"{overhead:.6f}" if overhead is not None else "",
+                        1 if feature_fail else 0,
                     ]
                 )
         logging.debug(f"Evaluated {instance_path}: selected solver {selected}")

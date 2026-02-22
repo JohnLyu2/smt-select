@@ -19,6 +19,7 @@ warnings.filterwarnings(
 import json
 import logging
 import random
+import time
 from pathlib import Path
 
 import torch
@@ -258,23 +259,38 @@ class GINSelector(SolverSelector):
         self.model.eval()
 
     def algorithm_select(self, instance_path: str | Path) -> int:
+        selected, _, _ = self.algorithm_select_with_info(instance_path)
+        return selected
+
+    def algorithm_select_with_info(
+        self, instance_path: str | Path
+    ) -> tuple[int, float, bool]:
+        """
+        Select solver and return (solver_id, overhead_sec, feature_fail).
+        overhead: time from start to when choice is made (graph build + conversion + forward).
+        feature_fail: True if graph build or graph_dict_to_gin_data failed.
+        """
         path = Path(instance_path)
+        t0 = time.perf_counter()
         graph_dict = build_smt_graph_dict_timeout(path, self.graph_timeout)
+        t_after_build = time.perf_counter()
+        graph_elapsed = t_after_build - t0
         if graph_dict is None:
             _suppress_z3_destructor_noise()
-            return self.fallback_solver_ids[0]
+            return (self.fallback_solver_ids[0], min(graph_elapsed, self.graph_timeout), True)
         data = graph_dict_to_gin_data(graph_dict, self.vocabulary)
         if data is None:
             _suppress_z3_destructor_noise()
-            return self.fallback_solver_ids[0]
+            return (self.fallback_solver_ids[0], min(graph_elapsed, self.graph_timeout) + (time.perf_counter() - t_after_build), True)
         batch = Batch.from_data_list([data])
         batch = batch.to(self.device)
         with torch.no_grad():
             pred = self.model.forward_data(batch)  # (1, K)
         pred_np = pred[0].cpu().numpy()
         selected = int(pred_np.argmin())
+        overhead = min(graph_elapsed, self.graph_timeout) + (time.perf_counter() - t_after_build)
         _suppress_z3_destructor_noise()
-        return selected
+        return (selected, overhead, False)
 
     @staticmethod
     def load(load_path: str | Path, device: str | None = None) -> GINSelector:
