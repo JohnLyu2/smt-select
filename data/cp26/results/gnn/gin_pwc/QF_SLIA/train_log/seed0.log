@@ -1,0 +1,46 @@
+2026-02-21 20:11:47,029 - INFO - Building graphs for 7038 instances (timeout=5s)...
+2026-02-21 20:13:28,742 - INFO - Graphs: 6436 built, 602 failed (of 7038 instances)
+2026-02-21 20:13:33,901 - INFO - GIN-PWC: 6436 instances, 33743 pairwise samples
+2026-02-21 20:13:33,914 - INFO - Early stopping: val_ratio=0.15, patience=50, min_epochs=100 -> 28682 train, 5061 val samples
+2026-02-21 20:13:42,437 - INFO - Best val loss 0.1245 (epoch 1)
+2026-02-21 20:13:42,437 - INFO - Epoch 1/500 train loss (weighted BCE) 0.1767 val loss 0.1245 (best)
+2026-02-21 20:13:49,121 - INFO - Best val loss 0.1037 (epoch 2)
+2026-02-21 20:13:55,506 - INFO - Best val loss 0.0887 (epoch 3)
+2026-02-21 20:14:07,231 - INFO - Best val loss 0.0867 (epoch 5)
+2026-02-21 20:14:17,651 - INFO - Best val loss 0.0774 (epoch 7)
+2026-02-21 20:14:26,945 - INFO - Best val loss 0.0723 (epoch 9)
+2026-02-21 20:14:32,067 - INFO - Best val loss 0.0659 (epoch 10)
+2026-02-21 20:14:32,067 - INFO - Epoch 10/500 train loss (weighted BCE) 0.0704 val loss 0.0659 (best)
+2026-02-21 20:14:36,896 - INFO - Best val loss 0.0648 (epoch 11)
+2026-02-21 20:14:43,357 - INFO - Best val loss 0.0583 (epoch 12)
+2026-02-21 20:14:56,796 - INFO - Best val loss 0.0574 (epoch 14)
+2026-02-21 20:15:02,974 - INFO - Best val loss 0.0561 (epoch 15)
+2026-02-21 20:15:07,938 - INFO - Best val loss 0.0536 (epoch 16)
+2026-02-21 20:15:14,265 - INFO - Best val loss 0.0495 (epoch 17)
+2026-02-21 20:15:27,278 - INFO - Best val loss 0.0481 (epoch 19)
+2026-02-21 20:15:33,643 - INFO - Best val loss 0.0472 (epoch 20)
+2026-02-21 20:15:33,643 - INFO - Epoch 20/500 train loss (weighted BCE) 0.0499 val loss 0.0472 (best)
+2026-02-21 20:15:39,976 - INFO - Best val loss 0.0466 (epoch 21)
+2026-02-21 20:16:13,719 - INFO - Best val loss 0.0408 (epoch 26)
+2026-02-21 20:16:31,831 - INFO - Best val loss 0.0378 (epoch 29)
+2026-02-21 20:16:37,502 - INFO - Epoch 30/500 train loss (weighted BCE) 0.0384 val loss 0.0387
+2026-02-21 20:16:44,327 - INFO - Best val loss 0.0372 (epoch 31)
+2026-02-21 20:17:04,142 - INFO - Best val loss 0.0367 (epoch 34)
+2026-02-21 20:17:10,925 - INFO - Best val loss 0.0348 (epoch 35)
+2026-02-21 20:17:29,720 - INFO - Best val loss 0.0316 (epoch 38)
+2026-02-21 20:17:41,298 - INFO - Epoch 40/500 train loss (weighted BCE) 0.0297 val loss 0.0329
+2026-02-21 20:18:13,387 - INFO - Best val loss 0.0284 (epoch 45)
+2026-02-21 20:18:32,558 - INFO - Best val loss 0.0271 (epoch 48)
+2026-02-21 20:18:45,571 - INFO - Epoch 50/500 train loss (weighted BCE) 0.0231 val loss 0.0361
+2026-02-21 20:19:50,621 - INFO - Best val loss 0.0264 (epoch 60)
+2026-02-21 20:19:50,622 - INFO - Epoch 60/500 train loss (weighted BCE) 0.0209 val loss 0.0264 (best)
+2026-02-21 20:20:23,246 - INFO - Best val loss 0.0258 (epoch 65)
+2026-02-21 20:20:54,875 - INFO - Epoch 70/500 train loss (weighted BCE) 0.0176 val loss 0.0286
+2026-02-21 20:21:01,114 - INFO - Best val loss 0.0246 (epoch 71)
+2026-02-21 20:21:59,538 - INFO - Epoch 80/500 train loss (weighted BCE) 0.0179 val loss 0.0302
+2026-02-21 20:23:04,429 - INFO - Epoch 90/500 train loss (weighted BCE) 0.0156 val loss 0.0328
+2026-02-21 20:24:09,868 - INFO - Epoch 100/500 train loss (weighted BCE) 0.0216 val loss 0.0295
+2026-02-21 20:25:14,735 - INFO - Epoch 110/500 train loss (weighted BCE) 0.0135 val loss 0.0248
+2026-02-21 20:26:19,579 - INFO - Epoch 120/500 train loss (weighted BCE) 0.0176 val loss 0.0264
+2026-02-21 20:26:26,401 - INFO - Early stop: no val improvement for 50 epochs (min_epochs=100 reached), restoring best
+2026-02-21 20:26:26,470 - INFO - Saved GIN-PWC model, vocab, config, failed_paths to models/gin_pwc/QF_SLIA/seed0
