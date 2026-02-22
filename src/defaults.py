@@ -2,4 +2,4 @@
 
 # Default root for relative instance paths in performance JSONs.
 # Used as default for --benchmark-root in training and evaluation scripts.
-DEFAULT_BENCHMARK_ROOT = "/home/john-lu/Desktop/smt_data/smtlib25/non-incremental"
+DEFAULT_BENCHMARK_ROOT = "smtlib/non-incremental"
