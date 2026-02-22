@@ -92,6 +92,7 @@ def evaluate_multi_splits_gin(
     min_epochs: int = 100,
     skip_easy_unsolvable: bool = False,
     skip_trivial_under: float = 24.0,
+    seeds: list[int] | None = None,
 ) -> dict:
     """
     Run train/test evaluation with GIN (EHM or PWC) for each split (seed) under splits_dir.
@@ -111,6 +112,17 @@ def evaluate_multi_splits_gin(
         raise ValueError(
             f"No seed dirs (seedN with train.json and test.json) found in {splits_dir}"
         )
+
+    if seeds is not None:
+        seed_set = set(seeds)
+        seed_entries = [(s, d) for s, d in seed_entries if s in seed_set]
+        missing = seed_set - {s for s, _ in seed_entries}
+        if missing:
+            logging.warning("Requested seeds not found in %s: %s", splits_dir, sorted(missing))
+        if not seed_entries:
+            raise ValueError(
+                f"No matching seed dirs for seeds {sorted(seed_set)} in {splits_dir}"
+            )
 
     n_seeds = len(seed_entries)
     logging.info(
@@ -469,6 +481,14 @@ def main() -> None:
         default=24.0,
         help="When --skip-easy-unsolvable: exclude train instances where every solver solved with runtime <= this (default 24)",
     )
+    parser.add_argument(
+        "--seeds",
+        type=int,
+        nargs="*",
+        default=None,
+        metavar="N",
+        help="Only run for these seed values (e.g. --seeds 0 10 20). If omitted, run for all discovered seeds",
+    )
 
     args = parser.parse_args()
     models_base = None
@@ -510,6 +530,7 @@ def main() -> None:
         min_epochs=args.min_epochs,
         skip_easy_unsolvable=args.skip_easy_unsolvable,
         skip_trivial_under=args.skip_trivial_under,
+        seeds=args.seeds,
     )
 
 
