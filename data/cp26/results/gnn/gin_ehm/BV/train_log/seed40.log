@@ -1,0 +1,97 @@
+2026-02-22 12:47:41,949 - INFO - Building graphs for 780 instances (timeout=5s)...
+2026-02-22 12:47:55,335 - INFO - Graphs: 770 built, 10 failed (of 780 instances)
+2026-02-22 12:47:55,911 - INFO - Early stopping: val_ratio=0.15, patience=50, min_epochs=100 -> 655 train, 115 val
+2026-02-22 12:47:56,036 - INFO - Best val loss 1587183.5625 (epoch 1)
+2026-02-22 12:47:56,036 - INFO - Epoch 1/500 train loss 1606578.5682 val loss 1587183.5625 (best)
+2026-02-22 12:47:56,243 - INFO - Best val loss 1580907.4375 (epoch 3)
+2026-02-22 12:47:56,344 - INFO - Best val loss 1572993.6875 (epoch 4)
+2026-02-22 12:47:56,547 - INFO - Best val loss 1474895.3125 (epoch 6)
+2026-02-22 12:47:56,649 - INFO - Best val loss 1309589.5000 (epoch 7)
+2026-02-22 12:47:56,852 - INFO - Best val loss 1243464.6250 (epoch 9)
+2026-02-22 12:47:56,954 - INFO - Best val loss 1198592.0625 (epoch 10)
+2026-02-22 12:47:56,954 - INFO - Epoch 10/500 train loss 1071877.7727 val loss 1198592.0625 (best)
+2026-02-22 12:47:57,054 - INFO - Best val loss 1165564.9062 (epoch 11)
+2026-02-22 12:47:57,155 - INFO - Best val loss 1125255.3438 (epoch 12)
+2026-02-22 12:47:57,253 - INFO - Best val loss 1093121.1875 (epoch 13)
+2026-02-22 12:47:57,457 - INFO - Best val loss 1009953.7812 (epoch 15)
+2026-02-22 12:47:57,569 - INFO - Best val loss 981279.0000 (epoch 16)
+2026-02-22 12:47:57,673 - INFO - Best val loss 910542.5625 (epoch 17)
+2026-02-22 12:47:57,773 - INFO - Best val loss 876475.6875 (epoch 18)
+2026-02-22 12:47:57,876 - INFO - Best val loss 823050.6250 (epoch 19)
+2026-02-22 12:47:57,979 - INFO - Best val loss 762602.4062 (epoch 20)
+2026-02-22 12:47:57,979 - INFO - Epoch 20/500 train loss 767421.8977 val loss 762602.4062 (best)
+2026-02-22 12:47:58,081 - INFO - Best val loss 720444.0938 (epoch 21)
+2026-02-22 12:47:58,185 - INFO - Best val loss 712492.5312 (epoch 22)
+2026-02-22 12:47:58,283 - INFO - Best val loss 697896.5312 (epoch 23)
+2026-02-22 12:47:58,480 - INFO - Best val loss 669613.0000 (epoch 25)
+2026-02-22 12:47:58,580 - INFO - Best val loss 652499.8750 (epoch 26)
+2026-02-22 12:47:58,777 - INFO - Best val loss 650843.4688 (epoch 28)
+2026-02-22 12:47:58,875 - INFO - Best val loss 638688.1250 (epoch 29)
+2026-02-22 12:47:58,975 - INFO - Epoch 30/500 train loss 617880.4318 val loss 658656.0312
+2026-02-22 12:47:59,074 - INFO - Best val loss 629709.7812 (epoch 31)
+2026-02-22 12:47:59,266 - INFO - Best val loss 628343.7188 (epoch 33)
+2026-02-22 12:47:59,929 - INFO - Epoch 40/500 train loss 991435.6477 val loss 841648.4688
+2026-02-22 12:48:00,885 - INFO - Epoch 50/500 train loss 568712.8608 val loss 639536.9375
+2026-02-22 12:48:00,983 - INFO - Best val loss 625270.3750 (epoch 51)
+2026-02-22 12:48:01,176 - INFO - Best val loss 618123.6250 (epoch 53)
+2026-02-22 12:48:01,276 - INFO - Best val loss 615359.9062 (epoch 54)
+2026-02-22 12:48:01,661 - INFO - Best val loss 606151.7500 (epoch 58)
+2026-02-22 12:48:01,856 - INFO - Epoch 60/500 train loss 559633.6733 val loss 626619.2812
+2026-02-22 12:48:02,828 - INFO - Best val loss 600653.2188 (epoch 70)
+2026-02-22 12:48:02,828 - INFO - Epoch 70/500 train loss 548204.8466 val loss 600653.2188 (best)
+2026-02-22 12:48:02,933 - INFO - Best val loss 599512.8750 (epoch 71)
+2026-02-22 12:48:03,226 - INFO - Best val loss 593549.7500 (epoch 74)
+2026-02-22 12:48:03,799 - INFO - Epoch 80/500 train loss 558464.5597 val loss 620828.6875
+2026-02-22 12:48:04,755 - INFO - Epoch 90/500 train loss 536145.1875 val loss 632705.5938
+2026-02-22 12:48:04,856 - INFO - Best val loss 592238.7969 (epoch 91)
+2026-02-22 12:48:05,243 - INFO - Best val loss 583389.7812 (epoch 95)
+2026-02-22 12:48:05,731 - INFO - Best val loss 578775.4688 (epoch 100)
+2026-02-22 12:48:05,731 - INFO - Epoch 100/500 train loss 460187.0511 val loss 578775.4688 (best)
+2026-02-22 12:48:05,834 - INFO - Best val loss 575237.8750 (epoch 101)
+2026-02-22 12:48:05,933 - INFO - Best val loss 550809.1094 (epoch 102)
+2026-02-22 12:48:06,126 - INFO - Best val loss 544301.4062 (epoch 104)
+2026-02-22 12:48:06,413 - INFO - Best val loss 538061.5000 (epoch 107)
+2026-02-22 12:48:06,700 - INFO - Epoch 110/500 train loss 430442.4787 val loss 540130.9844
+2026-02-22 12:48:06,988 - INFO - Best val loss 518837.0781 (epoch 113)
+2026-02-22 12:48:07,652 - INFO - Epoch 120/500 train loss 421612.8977 val loss 545260.9844
+2026-02-22 12:48:08,126 - INFO - Best val loss 508599.5938 (epoch 125)
+2026-02-22 12:48:08,506 - INFO - Best val loss 489888.1875 (epoch 129)
+2026-02-22 12:48:08,603 - INFO - Epoch 130/500 train loss 398162.0653 val loss 527150.0469
+2026-02-22 12:48:09,364 - INFO - Best val loss 483235.8438 (epoch 138)
+2026-02-22 12:48:09,553 - INFO - Epoch 140/500 train loss 391541.5767 val loss 485157.5938
+2026-02-22 12:48:09,939 - INFO - Best val loss 478583.5938 (epoch 144)
+2026-02-22 12:48:10,509 - INFO - Epoch 150/500 train loss 360500.4574 val loss 495694.5781
+2026-02-22 12:48:10,702 - INFO - Best val loss 477209.3906 (epoch 152)
+2026-02-22 12:48:11,362 - INFO - Best val loss 474583.1562 (epoch 159)
+2026-02-22 12:48:11,461 - INFO - Epoch 160/500 train loss 356877.4545 val loss 489650.0312
+2026-02-22 12:48:12,037 - INFO - Best val loss 471287.9375 (epoch 166)
+2026-02-22 12:48:12,423 - INFO - Epoch 170/500 train loss 339014.4332 val loss 509665.3750
+2026-02-22 12:48:12,524 - INFO - Best val loss 463343.8125 (epoch 171)
+2026-02-22 12:48:13,103 - INFO - Best val loss 460157.7188 (epoch 177)
+2026-02-22 12:48:13,388 - INFO - Epoch 180/500 train loss 337735.4219 val loss 487556.6250
+2026-02-22 12:48:13,489 - INFO - Best val loss 457719.0156 (epoch 181)
+2026-02-22 12:48:13,942 - INFO - Best val loss 447923.2500 (epoch 185)
+2026-02-22 12:48:14,420 - INFO - Epoch 190/500 train loss 310413.4830 val loss 498571.7969
+2026-02-22 12:48:14,804 - INFO - Best val loss 437010.9844 (epoch 194)
+2026-02-22 12:48:15,369 - INFO - Epoch 200/500 train loss 314545.2656 val loss 462110.2500
+2026-02-22 12:48:16,323 - INFO - Epoch 210/500 train loss 324774.8082 val loss 468164.9219
+2026-02-22 12:48:16,615 - INFO - Best val loss 432313.8906 (epoch 213)
+2026-02-22 12:48:17,286 - INFO - Epoch 220/500 train loss 311571.5312 val loss 471397.9062
+2026-02-22 12:48:18,246 - INFO - Epoch 230/500 train loss 294195.2188 val loss 440117.4219
+2026-02-22 12:48:18,638 - INFO - Best val loss 426120.1094 (epoch 234)
+2026-02-22 12:48:19,027 - INFO - Best val loss 424486.5469 (epoch 238)
+2026-02-22 12:48:19,224 - INFO - Epoch 240/500 train loss 287732.2898 val loss 497969.1406
+2026-02-22 12:48:20,184 - INFO - Best val loss 418368.9844 (epoch 250)
+2026-02-22 12:48:20,184 - INFO - Epoch 250/500 train loss 279632.5057 val loss 418368.9844 (best)
+2026-02-22 12:48:20,957 - INFO - Best val loss 417099.2656 (epoch 258)
+2026-02-22 12:48:21,154 - INFO - Epoch 260/500 train loss 274552.1335 val loss 423328.4844
+2026-02-22 12:48:22,125 - INFO - Best val loss 411652.0312 (epoch 270)
+2026-02-22 12:48:22,125 - INFO - Epoch 270/500 train loss 264730.3438 val loss 411652.0312 (best)
+2026-02-22 12:48:22,516 - INFO - Best val loss 390992.5000 (epoch 274)
+2026-02-22 12:48:23,101 - INFO - Epoch 280/500 train loss 272376.6307 val loss 444151.6562
+2026-02-22 12:48:24,068 - INFO - Epoch 290/500 train loss 270050.7088 val loss 405364.0156
+2026-02-22 12:48:25,041 - INFO - Epoch 300/500 train loss 273288.0355 val loss 438754.4531
+2026-02-22 12:48:25,998 - INFO - Epoch 310/500 train loss 268546.9474 val loss 465126.9062
+2026-02-22 12:48:26,985 - INFO - Epoch 320/500 train loss 260624.3352 val loss 423867.3125
+2026-02-22 12:48:27,370 - INFO - Early stop: no val improvement for 50 epochs (min_epochs=100 reached), restoring best
+2026-02-22 12:48:27,374 - INFO - Saved model, vocab, config, failed_paths to models/gin_ehm/BV/seed40

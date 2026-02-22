@@ -1,0 +1,386 @@
+benchmark,selected,solved,runtime,solver_runtime,overhead,feature_fail
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_26.smt2,iProver v3.9,0,1200.0,1201.7455166208092,0.011487,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_17.smt2,iProver v3.9,0,1200.0,1201.7489256691188,0.008488,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_search_value-1.i_2.smt2,iProver v3.9,0,1200.0,1201.7269780628849,0.006004,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_equal.i_24.smt2,iProver v3.9,0,1200.0,1201.7266360099893,0.006143,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_search_value-1.i_65.smt2,iProver v3.9,1,2.452620536030736,2.4464158969931304,0.006205,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll-sorted-2.i_28.smt2,iProver v3.9,1,11.456828764872625,11.452566664898768,0.004262,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-2.i_47.smt2,iProver v3.9,0,1200.0,1201.7382169761695,0.006912,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_prepend_equal.i_44.smt2,iProver v3.9,0,1200.0,1201.7421495600138,0.007992,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-1.i_79.smt2,cvc5,1,10.622268453822471,10.607673826860264,0.014595,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_update_all_reverse.i_58.smt2,iProver v3.9,0,1200.0,1201.7677758801728,0.006073,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_unequal.i_47.smt2,iProver v3.9,0,1200.0,1201.7389664179645,0.005792,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-2.i_47.smt2,iProver v3.9,0,1200.0,1201.7218384461012,0.002931,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple-2.i_45.smt2,iProver v3.9,0,1200.0,1201.7199889048934,0.006550,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-1.i_51.smt2,cvc5,0,0.3986135911545716,0.3951583041343838,0.003455,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-token-1.i_5.smt2,cvc5,1,362.4950378231588,362.4802303791512,0.014807,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_37.smt2,iProver v3.9,1,0.8847075318917632,0.8799959048628807,0.004712,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll-sorted-2.i_20.smt2,iProver v3.9,0,1200.0,1201.7285500268918,0.005718,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_mutex_double_unlock.i_42.smt2,cvc5,0,1200.0,1201.7406538340729,0.009971,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-rb-sentinel-1.i_1.smt2,iProver v3.9,1,35.499334610882215,35.49428298091516,0.005052,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_of_dll-1.i_54.smt2,iProver v3.9,0,1200.0,1201.7754559379537,0.003546,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/splice-2.i_94.smt2,iProver v3.9,0,1200.0,1201.7301646592095,0.004208,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_77.smt2,iProver v3.9,0,1200.0,1201.723349831067,0.003261,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_remove_all.i_9.smt2,iProver v3.9,0,1200.0,1201.7517148610204,0.003671,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_40.smt2,iProver v3.9,0,1200.0,1201.7236957470886,0.008590,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_unequal.i_41.smt2,iProver v3.9,0,1200.0,1201.7214926430024,0.005736,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_82.smt2,cvc5,0,1200.0,1201.7124743890017,0.006755,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_190.smt2,iProver v3.9,0,1200.0,1201.723479392007,0.006671,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-1.i_80.smt2,cvc5,1,30.80943516100524,30.794672711053863,0.014762,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll-sorted-2.i_16.smt2,iProver v3.9,0,1200.0,1201.722381043015,0.002541,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_30.smt2,iProver v3.9,1,0.8887708588736132,0.8826138488948345,0.006157,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_built_from_end.i_55.smt2,iProver v3.9,0,1200.0,1201.722770537017,0.004404,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-1.i_42.smt2,iProver v3.9,1,25.433945538010448,25.427874427987263,0.006071,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_94.smt2,iProver v3.9,0,1200.0,1201.7368826651946,0.005373,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_85.smt2,iProver v3.9,0,1200.0,1201.7397192029748,0.003520,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_of_dll-1.i_19.smt2,iProver v3.9,0,1200.0,1201.7344336360693,0.004116,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_equal.i_35.smt2,iProver v3.9,0,1200.0,1201.7273461169098,0.004272,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_unequal.i_4.smt2,iProver v3.9,0,1200.0,1201.7319880491123,0.002656,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_unequal.i_70.smt2,iProver v3.9,0,1200.0,1201.7298942711204,0.004382,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_176.smt2,iProver v3.9,0,1200.0,1201.7461394199636,0.003280,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_72.smt2,iProver v3.9,0,1200.0,1201.728315551998,0.007343,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag.i_28.smt2,iProver v3.9,1,25.020466306072194,25.016175823053345,0.004290,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_search-1.i_3.smt2,iProver v3.9,0,1200.0,1201.7554046448786,0.003549,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_153.smt2,iProver v3.9,0,1200.0,1201.7222525740508,0.006229,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_insert_unequal.i_35.smt2,iProver v3.9,0,1200.0,1201.7400475540198,0.005002,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_25.smt2,iProver v3.9,0,1200.0,1201.7213797010481,0.004345,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_insert_unequal.i_23.smt2,iProver v3.9,0,1200.0,1201.7320260258857,0.004712,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_unequal.i_103.smt2,iProver v3.9,0,1200.0,1201.7418849468231,0.004420,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_equal.i_19.smt2,iProver v3.9,0,1200.0,1201.7382590761408,0.003718,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_and_skiplist_2lvl-2.i_56.smt2,iProver v3.9,0,1200.0,1201.725604973035,0.002997,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_197.smt2,iProver v3.9,0,1200.0,1201.7414102959447,0.003320,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_circular_traversal-1.i_57.smt2,iProver v3.9,0,1200.0,1201.7383965090849,0.003742,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_insert_unequal.i_22.smt2,iProver v3.9,0,1200.0,1201.744705498917,0.005118,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-1.i_47.smt2,iProver v3.9,0,1200.0,1201.7243295931257,0.006173,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_112.smt2,iProver v3.9,0,1200.0,1201.7240230091847,0.002726,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_add-2.i_28.smt2,cvc5,1,0.3169421289348975,0.3077767249196768,0.009165,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-queue-1.i_5.smt2,iProver v3.9,0,1200.0,1201.7266032760963,0.003998,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_unequal.i_62.smt2,iProver v3.9,0,1200.0,1201.7283945679665,0.004500,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_unequal.i_78.smt2,iProver v3.9,0,1200.0,1201.7313912559766,0.006435,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_76.smt2,iProver v3.9,0,1200.0,1201.729251554003,0.005476,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_84.smt2,cvc5,0,1200.0,1201.7130213940982,0.003364,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_148.smt2,iProver v3.9,0,1200.0,1201.7388290369418,0.004537,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_cnstr.i_23.smt2,iProver v3.9,0,1200.0,1201.7390167010017,0.004365,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_of_dll-2.i_23.smt2,iProver v3.9,0,1200.0,1201.7212832870428,0.004828,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_191.smt2,iProver v3.9,0,1200.0,1201.7326731560752,0.003075,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_159.smt2,iProver v3.9,0,1200.0,1201.7243229229935,0.004774,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-01-2.i_11.smt2,iProver v3.9,0,1200.0,1201.7232863311656,0.005336,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_equal.i_26.smt2,iProver v3.9,0,1200.0,1201.7525284439325,0.003438,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_append_equal.i_45.smt2,iProver v3.9,0,1200.0,1201.7323376578279,0.004402,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_62.smt2,iProver v3.9,0,1200.0,1201.7339319461025,0.006325,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag.i_37.smt2,iProver v3.9,0,1200.0,1201.738747056108,0.003315,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_prepend_equal.i_57.smt2,iProver v3.9,0,1200.0,1201.7221747571602,0.003790,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_of_cslls.i_16.smt2,iProver v3.9,0,1200.0,1201.7317059477791,0.003232,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_built_from_end.i_15.smt2,iProver v3.9,0,1200.0,1201.721573118819,0.004580,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll-sorted-2.i_85.smt2,iProver v3.9,0,1200.0,1201.7331128499936,0.003022,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_insert_unequal.i_5.smt2,iProver v3.9,0,1200.0,1201.7413489830215,0.003859,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/split_list_test05-2.i_10.smt2,iProver v3.9,0,1200.0,1201.726652387064,0.003215,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-2.i_106.smt2,cvc5,1,0.23038222105242312,0.22490396606735885,0.005478,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag.i_82.smt2,iProver v3.9,1,526.3038137979456,526.2983567819465,0.005457,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_prepend_unequal.i_31.smt2,iProver v3.9,1,36.54503887600731,36.5373095870018,0.007729,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/splice-2.i_52.smt2,iProver v3.9,0,1200.0,1201.7814014342148,0.004058,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_109.smt2,iProver v3.9,0,1200.0,1201.7273482081946,0.004828,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_14.smt2,iProver v3.9,0,1200.0,1201.7169624699745,0.002988,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-optional-1.i_1.smt2,iProver v3.9,0,1200.0,1201.7271427239757,0.004527,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dancing.i_0.smt2,cvc5,0,1.0616591459256597,1.056261810939759,0.005397,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_113.smt2,cvc5,0,1200.0,1201.7150576310232,0.004772,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_107.smt2,iProver v3.9,0,1200.0,1201.7466071338858,0.007164,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/bubble_sort_linux-1.i_4.smt2,iProver v3.9,0,1200.0,1201.7351164440624,0.004568,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_unequal.i_58.smt2,iProver v3.9,0,1200.0,1201.7318374740425,0.004298,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_prepend_unequal.i_11.smt2,cvc5,0,1200.0,1201.7181637571193,0.009507,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_prepend_unequal.i_58.smt2,iProver v3.9,1,820.5598961090436,820.5551995700225,0.004697,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_equal.i_9.smt2,iProver v3.9,0,1200.0,1201.7280716449022,0.003082,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_insert_equal.i_52.smt2,iProver v3.9,0,1200.0,1201.735529042082,0.004136,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/skiplist_3lvl.i_19.smt2,iProver v3.9,0,1200.0,1201.7408798751421,0.003846,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_71.smt2,iProver v3.9,0,1200.0,1201.7256034079473,0.003863,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_7.smt2,cvc5,1,0.24062560696620494,0.2356132499407977,0.005012,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_equal.i_50.smt2,iProver v3.9,0,1200.0,1201.7408312838525,0.003776,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_insert_equal.i_27.smt2,iProver v3.9,0,1200.0,1201.7259540921077,0.004545,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/bubble_sort_linux-1.i_52.smt2,iProver v3.9,0,1200.0,1201.7599684740417,0.004289,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_141.smt2,iProver v3.9,0,1200.0,1201.7456548342016,0.004581,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-1.i_21.smt2,iProver v3.9,0,1200.0,1201.7356013958342,0.005763,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-1.i_18.smt2,iProver v3.9,0,1200.0,1201.7376557081006,0.003051,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/skiplist_3lvl.i_100.smt2,iProver v3.9,1,7.9510023249313235,7.943943955935538,0.007058,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_26.smt2,cvc5,1,0.7277515080641024,0.7208473770879209,0.006904,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_equal.i_27.smt2,iProver v3.9,0,1200.0,1201.7291819381062,0.002530,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-2.i_34.smt2,iProver v3.9,0,1200.0,1201.7350536901504,0.006853,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-token-1.i_3.smt2,iProver v3.9,1,34.987497606955,34.983015957986936,0.004482,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_search-2.i_35.smt2,iProver v3.9,0,1200.0,1201.730633691186,0.003620,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/merge_sort-2.i_3.smt2,iProver v3.9,0,1200.0,1201.726283966098,0.003335,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_68.smt2,iProver v3.9,0,1200.0,1201.7198525820859,0.004626,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_59.smt2,iProver v3.9,0,1200.0,1201.7267081579193,0.003985,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_prepend_unequal.i_39.smt2,iProver v3.9,0,1200.0,1201.7215731102042,0.005862,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_unequal.i_42.smt2,iProver v3.9,0,1200.0,1201.725167396944,0.005805,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_insert_unequal.i_17.smt2,iProver v3.9,0,1200.0,1201.7409033579752,0.004260,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_71.smt2,iProver v3.9,0,1200.0,1201.7262598290108,0.006331,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_unequal.i_16.smt2,iProver v3.9,0,1200.0,1201.7290457389317,0.003983,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_parent_ptr.i_0.smt2,iProver v3.9,0,1200.0,1201.7249392489903,0.002206,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_185.smt2,iProver v3.9,1,2.8689279498066753,2.86479570181109,0.004132,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll-sorted-2.i_71.smt2,iProver v3.9,0,1200.0,1201.7242919858545,0.002444,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_33.smt2,iProver v3.9,0,1200.0,1201.7478091961239,0.004361,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_unequal.i_43.smt2,iProver v3.9,0,1200.0,1201.734256634023,0.004253,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_155.smt2,iProver v3.9,0,1200.0,1201.7250358331949,0.002970,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_61.smt2,iProver v3.9,0,1200.0,1201.7172327898443,0.004769,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-1.i_36.smt2,cvc5,1,0.23755024990532547,0.23295653192326427,0.004594,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_194.smt2,cvc5,1,46.09913330688141,46.09492868487723,0.004205,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_prepend_equal.i_56.smt2,iProver v3.9,0,1200.0,1201.7418891300913,0.003857,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-2.i_131.smt2,iProver v3.9,0,1200.0,1201.7249030431267,0.003218,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-1.i_79.smt2,iProver v3.9,1,37.47830856801011,37.47081680200063,0.007492,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-1.i_18.smt2,iProver v3.9,0,1200.0,1201.7439560838975,0.006791,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_104.smt2,iProver v3.9,0,1200.0,1201.7241398228798,0.005657,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_cnstr.i_12.smt2,iProver v3.9,0,1200.0,1201.7243022909388,0.004591,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_62.smt2,cvc5,1,0.32773394585819915,0.32232039188966155,0.005414,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_remove_all.i_12.smt2,iProver v3.9,0,1200.0,1201.748117981013,0.003459,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_prepend_unequal.i_64.smt2,iProver v3.9,0,1200.0,1201.7344739849214,0.004711,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_circular_traversal-1.i_45.smt2,iProver v3.9,0,1200.0,1201.7214636018034,0.003511,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_stack.i_40.smt2,iProver v3.9,0,1200.0,1201.7522515091114,0.003705,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_insert_unequal.i_10.smt2,iProver v3.9,0,1200.0,1201.719987527933,0.004744,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_3.smt2,iProver v3.9,0,1200.0,1201.7567393349018,0.003786,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_circular_traversal-1.i_64.smt2,iProver v3.9,0,1200.0,1201.7364549539052,0.003695,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/splice-2.i_124.smt2,iProver v3.9,1,84.53863986599026,84.53198688197881,0.006653,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_55.smt2,cvc5,1,7.926457287045196,7.919168329099193,0.007289,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_insert_equal.i_13.smt2,iProver v3.9,0,1200.0,1201.7242531080265,0.004200,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_32.smt2,cvc5,0,1200.0,1201.7182889559772,0.005155,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_197.smt2,iProver v3.9,1,3.95515161001822,3.9505586039740592,0.004593,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_52.smt2,iProver v3.9,0,1200.0,1201.7412797990255,0.003613,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_47.smt2,iProver v3.9,0,1200.0,1201.739666053094,0.002965,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/splice-2.i_59.smt2,iProver v3.9,0,1200.0,1201.7338734869845,0.003324,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_built_from_end.i_29.smt2,iProver v3.9,0,1200.0,1201.751752188895,0.003318,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_unequal.i_6.smt2,iProver v3.9,0,1200.0,1201.72296025604,0.002207,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_62.smt2,cvc5,1,0.27431498700752854,0.2669419120065868,0.007373,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag_1.i_67.smt2,iProver v3.9,0,1200.0,1201.7249469480012,0.005220,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple-2.i_36.smt2,iProver v3.9,0,1200.0,1201.720010405872,0.003499,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_and_skiplist_2lvl-2.i_31.smt2,iProver v3.9,0,1200.0,1201.7227984650526,0.004399,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_insert_unequal.i_16.smt2,iProver v3.9,0,1200.0,1201.7381878038868,0.005160,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-optional-1.i_18.smt2,iProver v3.9,0,1200.0,1201.7222918120679,0.005785,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_update_all.i_19.smt2,iProver v3.9,0,1200.0,1201.7208204311319,0.004154,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_116.smt2,iProver v3.9,0,1200.0,1201.728250432061,0.005628,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_82.smt2,cvc5,1,0.26009848597459495,0.25465930299833417,0.005439,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_90.smt2,iProver v3.9,0,1200.0,1201.7406768619549,0.004485,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple-2.i_25.smt2,iProver v3.9,0,1200.0,1201.7245196960866,0.006328,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-1.i_45.smt2,iProver v3.9,0,1200.0,1201.729688450927,0.005473,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_search-1.i_20.smt2,iProver v3.9,0,1200.0,1201.7233190510888,0.003609,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-token-1.i_13.smt2,iProver v3.9,1,2.3864099740749225,2.3811502060852945,0.005260,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-1.i_52.smt2,iProver v3.9,0,1200.0,1201.7238256190903,0.006061,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_prepend_equal.i_1.smt2,iProver v3.9,0,1200.0,1201.7368817001116,0.003268,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_prepend_equal.i_54.smt2,iProver v3.9,0,1200.0,1201.7228850789834,0.002691,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_remove_all.i_16.smt2,iProver v3.9,0,1200.0,1201.738849811023,0.003868,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll-buckets-2.i_17.smt2,iProver v3.9,1,769.0104850308853,769.003642974887,0.006842,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_98.smt2,cvc5,0,1200.0,1201.711606228957,0.005046,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_search-1.i_9.smt2,iProver v3.9,0,1200.0,1201.7265595109202,0.003229,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_1.i_42.smt2,cvc5,0,1.5508749911095947,1.5465194270946085,0.004356,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_129.smt2,iProver v3.9,0,1200.0,1201.7361581081059,0.003009,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_remove_all.i_11.smt2,iProver v3.9,0,1200.0,1201.7154166479595,0.006477,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_prepend_unequal.i_36.smt2,iProver v3.9,1,2.3860740450327285,2.379200160037726,0.006874,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple-ext_1.i_34.smt2,cvc5,0,30.46322034916375,30.457610248122364,0.005610,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag.i_66.smt2,iProver v3.9,0,1200.0,1201.7408269399311,0.002863,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/packet_filter.i_1.smt2,iProver v3.9,0,1200.0,1201.7241974731442,0.002896,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_8.smt2,iProver v3.9,0,1200.0,1201.7264953299891,0.004218,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll-optional-1.i_7.smt2,iProver v3.9,0,1200.0,1201.7267596260644,0.006993,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-optional-1.i_13.smt2,cvc5,0,1200.0,1201.7133499139454,0.009301,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_and_skiplist_2lvl-2.i_23.smt2,iProver v3.9,0,1200.0,1201.7295994460583,0.005230,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_26.smt2,iProver v3.9,0,1200.0,1201.7372924708761,0.003838,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_append_unequal.i_5.smt2,iProver v3.9,0,1200.0,1201.7217167350464,0.002557,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_43.smt2,iProver v3.9,0,1200.0,1201.7225190580357,0.002610,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_40.smt2,iProver v3.9,1,0.857301312033087,0.8516043690033257,0.005697,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/splice-2.i_104.smt2,iProver v3.9,0,1200.0,1201.7467828940134,0.004739,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_131.smt2,cvc5,0,1200.0,1201.7128625810146,0.003164,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_156.smt2,cvc5,1,0.45641660696128383,0.45154974097386,0.004867,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_81.smt2,iProver v3.9,0,1200.0,1201.72412600182,0.003749,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-1.i_25.smt2,iProver v3.9,0,1200.0,1201.7560264079366,0.007140,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_equal.i_18.smt2,iProver v3.9,0,1200.0,1201.7443689538632,0.002808,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_circular_traversal-1.i_28.smt2,iProver v3.9,1,2.427423285902478,2.4207984649110585,0.006625,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_add-2.i_85.smt2,cvc5,1,0.27550966589478776,0.26707928092218935,0.008430,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-1.i_34.smt2,cvc5,1,0.22551135800313205,0.22100431099534035,0.004507,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag_1.i_60.smt2,iProver v3.9,1,25.985576636972837,25.980966178001836,0.004610,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple-ext_1.i_7.smt2,iProver v3.9,0,1200.0,1201.7263774380554,0.003059,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_prepend_equal.i_50.smt2,iProver v3.9,0,1200.0,1201.749476928031,0.003234,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_insert_equal.i_0.smt2,iProver v3.9,0,1200.0,1201.7402524540666,0.002541,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_mutex_double_unlock.i_21.smt2,cvc5,1,0.9190921310218982,0.9139117910526693,0.005180,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag.i_3.smt2,iProver v3.9,0,1200.0,1201.7265608550515,0.002845,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_update_all.i_2.smt2,iProver v3.9,0,1200.0,1201.7607633650769,0.003163,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_146.smt2,iProver v3.9,0,1200.0,1201.721204394009,0.004996,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_11.smt2,iProver v3.9,0,1200.0,1201.728244211059,0.005831,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-1.i_87.smt2,cvc5,1,8.379860486951657,8.358569334959611,0.021291,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/prefixsum_rec.c_9.smt2,iProver v3.9,0,1200.0,1201.7376625989564,0.002547,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-2.i_103.smt2,cvc5,1,0.23554779402911663,0.23048969102092087,0.005058,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag.i_53.smt2,iProver v3.9,1,21.99158624908887,21.987350278068334,0.004236,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_insert_unequal.i_30.smt2,iProver v3.9,0,1200.0,1201.7310117420275,0.004620,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_circular_traversal-2.i_2.smt2,iProver v3.9,0,1200.0,1201.731836796971,0.009868,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_insert_unequal.i_21.smt2,iProver v3.9,0,1200.0,1201.7159043229185,0.004476,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/bubble_sort_linux-1.i_47.smt2,iProver v3.9,0,1200.0,1201.725502826972,0.006270,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_update_all_reverse.i_55.smt2,iProver v3.9,0,1200.0,1201.7233550080564,0.005888,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_47.smt2,iProver v3.9,0,1200.0,1201.7425969629548,0.003962,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_search-2.i_14.smt2,iProver v3.9,0,1200.0,1201.7268506048713,0.003314,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_67.smt2,cvc5,1,0.264833674125839,0.26005948008969426,0.004774,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_164.smt2,cvc5,1,0.24636982410447672,0.23967274907045066,0.006697,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_of_cslls.i_48.smt2,iProver v3.9,0,1200.0,1201.7264949749224,0.003466,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/bubble_sort_linux-2.i_29.smt2,cvc5,0,1200.0,1201.71661305218,0.009737,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_circular_traversal-1.i_69.smt2,iProver v3.9,0,1200.0,1201.735842294991,0.005699,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-1.i_7.smt2,iProver v3.9,0,1200.0,1201.743897890905,0.003032,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_79.smt2,iProver v3.9,0,1200.0,1201.7508687938098,0.003890,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_of_cslls.i_23.smt2,iProver v3.9,1,769.4628279719618,769.4597933290061,0.003035,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_stack.i_21.smt2,iProver v3.9,0,1200.0,1201.7453890901525,0.002939,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_1.i_50.smt2,iProver v3.9,1,1.4063156421179883,1.4026902380865067,0.003625,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_search_value-1.i_8.smt2,iProver v3.9,0,1200.0,1201.7309240330942,0.002916,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-2.i_67.smt2,iProver v3.9,0,1200.0,1201.72390543879,0.006445,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_36.smt2,iProver v3.9,1,25.512773411988746,25.508208547951654,0.004565,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_91.smt2,cvc5,0,1200.0,1201.7390459189191,0.004524,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_cnstr.i_0.smt2,iProver v3.9,0,1200.0,1201.7247964860871,0.003477,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/bubble_sort_linux-2.i_93.smt2,iProver v3.9,0,1200.0,1201.7286184239201,0.004291,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/skiplist_3lvl.i_91.smt2,iProver v3.9,0,1200.0,1201.7256814909633,0.006776,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-01-2.i_4.smt2,iProver v3.9,0,1200.0,1201.7237557170447,0.003522,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_add-2.i_52.smt2,cvc5,1,0.3315529271494597,0.31971429311670363,0.011839,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-optional-1.i_16.smt2,iProver v3.9,0,1200.0,1201.7316495759878,0.008135,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_167.smt2,cvc5,1,0.3543672680389136,0.3505398470442742,0.003827,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/skiplist_3lvl.i_64.smt2,iProver v3.9,0,1200.0,1201.7249318519607,0.003173,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_search-1.i_5.smt2,iProver v3.9,0,1200.0,1201.7490198970772,0.003119,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_152.smt2,iProver v3.9,0,1200.0,1201.7396631320007,0.006360,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_1.i_48.smt2,iProver v3.9,0,1200.0,1201.7253724848852,0.004228,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_37.smt2,iProver v3.9,0,1200.0,1201.7241687749047,0.004632,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_127.smt2,cvc5,1,520.0234593000496,520.0191939440556,0.004265,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_insert_unequal.i_32.smt2,iProver v3.9,0,1200.0,1201.723024982959,0.004775,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-1.i_53.smt2,cvc5,0,0.4318742989562452,0.42886456195265055,0.003010,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag.i_71.smt2,iProver v3.9,0,1200.0,1201.7330890828744,0.002940,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_append_unequal.i_15.smt2,iProver v3.9,0,1200.0,1201.7341099970508,0.004753,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_insert_equal.i_16.smt2,iProver v3.9,0,1200.0,1201.7273997741286,0.004256,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_mutex_unlock_at_exit.i_12.smt2,iProver v3.9,0,1200.0,1201.7250705319457,0.004179,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_18.smt2,iProver v3.9,0,1200.0,1201.7222580108792,0.004598,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_prepend_equal.i_40.smt2,iProver v3.9,0,1200.0,1201.7263814951293,0.003532,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_update_all_reverse.i_16.smt2,iProver v3.9,0,1200.0,1201.7528692961205,0.003300,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_insert_equal.i_0.smt2,iProver v3.9,1,825.5845788299921,825.5773674449883,0.007211,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/split_list_test05-2.i_2.smt2,iProver v3.9,0,1200.0,1201.7302131329197,0.002779,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_mutex_unlock_at_exit.i_44.smt2,iProver v3.9,0,1200.0,1201.7304422650486,0.005729,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_equal.i_30.smt2,iProver v3.9,0,1200.0,1201.7230349371675,0.004257,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/split_list_test05-2.i_1.smt2,iProver v3.9,0,1200.0,1201.720320353983,0.003617,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_equal.i_45.smt2,iProver v3.9,0,1200.0,1201.742973609129,0.005514,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/splice-2.i_27.smt2,iProver v3.9,0,1200.0,1201.7289301161654,0.003078,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_nullified-2.i_6.smt2,iProver v3.9,0,1200.0,1201.747020524228,0.003845,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sum_array-2-2.i_3.smt2,iProver v3.9,0,1200.0,1201.7263091930654,0.002729,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_89.smt2,cvc5,1,0.25228508486179635,0.24556443491019309,0.006721,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_9.smt2,iProver v3.9,0,1200.0,1201.7296132640913,0.005694,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_insert_unequal.i_24.smt2,iProver v3.9,0,1200.0,1201.7181816110387,0.004359,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_and_skiplist_2lvl-2.i_32.smt2,cvc5,0,0.8098220980609767,0.8045286170672625,0.005293,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_194.smt2,iProver v3.9,0,1200.0,1201.729543026071,0.005983,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_of_cslls.i_9.smt2,iProver v3.9,0,1200.0,1201.7236478058621,0.003216,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_prepend_equal.i_4.smt2,iProver v3.9,0,1200.0,1201.7201491431333,0.002621,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_insert_unequal.i_46.smt2,iProver v3.9,0,1200.0,1201.728190268157,0.003835,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_96.smt2,iProver v3.9,0,1200.0,1201.7521722700913,0.006501,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll-sorted-2.i_19.smt2,iProver v3.9,0,1200.0,1201.7359528320376,0.003400,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_of_dll-1.i_21.smt2,iProver v3.9,0,1200.0,1201.715619401075,0.004419,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_remove_all.i_9.smt2,iProver v3.9,0,1200.0,1201.7233837198,0.006870,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_57.smt2,cvc5,1,0.23176310199778527,0.2271195009816438,0.004644,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_204.smt2,cvc5,1,589.4749936740263,589.4684600220062,0.006534,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_203.smt2,iProver v3.9,0,1200.0,1201.731097130105,0.004539,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_15.smt2,iProver v3.9,0,1200.0,1201.7239933330566,0.004586,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test-0237.i_13.smt2,iProver v3.9,0,1200.0,1201.7509177809115,0.002292,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_add-2.i_27.smt2,cvc5,1,0.25718684995081276,0.24385416298173368,0.013333,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_51.smt2,iProver v3.9,0,1200.0,1201.7222980689257,0.005195,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_search-2.i_16.smt2,iProver v3.9,0,1200.0,1201.7282226150855,0.003330,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_161.smt2,iProver v3.9,0,1200.0,1201.7236975990236,0.006506,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_add-2.i_80.smt2,cvc5,1,0.5213418598868884,0.5128024918958545,0.008539,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple-2.i_51.smt2,iProver v3.9,0,1200.0,1201.7257922631688,0.005896,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-1.i_59.smt2,iProver v3.9,0,1200.0,1201.7219998610672,0.006539,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_remove_all.i_8.smt2,iProver v3.9,0,1200.0,1201.7316331099719,0.007030,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_insert_unequal.i_21.smt2,iProver v3.9,0,1200.0,1201.7245745840482,0.004678,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/splice-2.i_57.smt2,iProver v3.9,0,1200.0,1201.7258196689654,0.004182,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_121.smt2,iProver v3.9,0,1200.0,1201.742723006988,0.004257,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_57.smt2,iProver v3.9,0,1200.0,1201.7237953920849,0.005936,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_built_from_end.i_78.smt2,iProver v3.9,0,1200.0,1201.7288856459782,0.003771,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_update_all_reverse.i_13.smt2,iProver v3.9,0,1200.0,1201.7216657281388,0.004510,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_unequal.i_9.smt2,iProver v3.9,0,1200.0,1201.732728781877,0.003276,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_prepend_unequal.i_6.smt2,cvc5,0,1200.0,1201.7115150650498,0.009474,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_182.smt2,iProver v3.9,0,1200.0,1201.735345798079,0.004600,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_prepend_unequal.i_15.smt2,cvc5,0,1200.0,1201.7109008980915,0.007808,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_unequal.i_32.smt2,iProver v3.9,0,1200.0,1201.7291628611274,0.005613,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_27.smt2,iProver v3.9,0,1200.0,1201.7457937989384,0.003261,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_15.smt2,cvc5,1,2.7530434121144935,2.7419632910750806,0.011080,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_insert_unequal.i_65.smt2,iProver v3.9,0,1200.0,1201.7259968060534,0.004519,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_insert_unequal.i_79.smt2,iProver v3.9,0,1200.0,1201.7280915491283,0.003688,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_prepend_equal.i_31.smt2,iProver v3.9,0,1200.0,1201.7251723869704,0.003648,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple-2.i_52.smt2,iProver v3.9,0,1200.0,1201.7268074341118,0.004789,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_prepend_equal.i_13.smt2,iProver v3.9,0,1200.0,1201.7465781909414,0.004398,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-rb-cnstr_1-2.i_7.smt2,iProver v3.9,0,1200.0,1201.7230286418926,0.006620,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_equal.i_29.smt2,iProver v3.9,0,1200.0,1201.7590673430823,0.003735,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_182.smt2,iProver v3.9,0,1200.0,1201.7224950061645,0.004412,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-optional-1.i_0.smt2,iProver v3.9,0,1200.0,1201.7509270149749,0.004354,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_update_all_reverse.i_76.smt2,iProver v3.9,1,29.9724400890409,29.967592769069597,0.004847,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_insert_unequal.i_31.smt2,iProver v3.9,0,1200.0,1201.723526475951,0.004989,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_93.smt2,iProver v3.9,0,1200.0,1201.737809777027,0.003924,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_to_dll_rev-2.i_41.smt2,cvc5,1,0.23628802079474553,0.23345170682296157,0.002836,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag.i_111.smt2,iProver v3.9,0,1200.0,1201.7223866540007,0.004701,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-optional-1.i_14.smt2,cvc5,0,1200.0,1201.7145786320325,0.012387,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_nullified-1.i_2.smt2,iProver v3.9,0,14.161315279954579,14.158838666975498,0.002477,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_169.smt2,iProver v3.9,0,1200.0,1201.748465460958,0.003579,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_circular_traversal-1.i_16.smt2,iProver v3.9,1,36.015649369801395,36.009649492800236,0.006000,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/piVC/piVC_bd0142.smt2,cvc5,1,0.4150776729802601,0.405711323954165,0.009366,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-queue-1.i_20.smt2,iProver v3.9,0,14.297367631050292,14.294147371081635,0.003220,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_stack.i_3.smt2,iProver v3.9,0,1200.0,1201.7220624540932,0.003157,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_and_skiplist_2lvl-2.i_54.smt2,iProver v3.9,0,1200.0,1201.7465503581334,0.002629,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_67.smt2,iProver v3.9,0,1200.0,1201.7527282009833,0.004167,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_unequal.i_49.smt2,iProver v3.9,0,1200.0,1201.7282127921935,0.003943,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/splice-2.i_98.smt2,iProver v3.9,0,1200.0,1201.7279110639356,0.005071,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_add-2.i_106.smt2,cvc5,0,31.347468490945175,31.343206540914252,0.004262,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_73.smt2,iProver v3.9,0,1200.0,1201.736771640135,0.004262,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_append_unequal.i_5.smt2,iProver v3.9,0,1200.0,1201.739850238897,0.003303,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/bubble_sort_linux-1.i_42.smt2,iProver v3.9,0,1200.0,1201.7359720421955,0.006119,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_66.smt2,iProver v3.9,1,29.958277894882485,29.9531024529133,0.005175,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_search-1.i_24.smt2,iProver v3.9,0,1200.0,1201.7278090550099,0.003932,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll-token-1.i_9.smt2,cvc5,1,423.0506753750378,423.0387067680713,0.011969,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_circular_traversal-1.i_49.smt2,iProver v3.9,0,1200.0,1201.7373236918356,0.003874,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_145.smt2,iProver v3.9,0,1200.0,1201.74701439403,0.004109,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-1.i_38.smt2,iProver v3.9,0,1200.0,1201.7533423670102,0.006333,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_prepend_unequal.i_2.smt2,iProver v3.9,0,1200.0,1201.7260213280097,0.004012,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_mutex_unlock_at_exit.i_4.smt2,iProver v3.9,0,1200.0,1201.7238335839938,0.005583,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_insert_unequal.i_57.smt2,iProver v3.9,0,1200.0,1201.7552052550018,0.004447,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_10.smt2,iProver v3.9,0,1200.0,1201.7693112380803,0.003136,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_equal.i_55.smt2,iProver v3.9,0,1200.0,1201.738879268989,0.002939,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-1.i_13.smt2,iProver v3.9,0,1200.0,1201.7302369310055,0.005472,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_6.smt2,iProver v3.9,0,1200.0,1201.7449410660192,0.006644,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_insert_unequal.i_48.smt2,iProver v3.9,0,1200.0,1201.7420469801873,0.002638,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/piVC/piVC_5cee0c.smt2,cvc5,1,0.5206120621296577,0.5102067370899022,0.010405,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_built_from_end.i_32.smt2,iProver v3.9,0,1200.0,1201.7241991509218,0.005557,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_add-2.i_103.smt2,cvc5,1,0.2702544349594973,0.2612520649563521,0.009002,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_circular_traversal-1.i_55.smt2,iProver v3.9,0,1200.0,1201.7277716980316,0.004700,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag.i_98.smt2,iProver v3.9,0,1200.0,1201.725997995818,0.004289,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_add-2.i_109.smt2,cvc5,0,8.913688151107635,8.909567715134472,0.004120,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_add-2.i_40.smt2,cvc5,1,0.38094518188154325,0.3717396028805524,0.009206,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_66.smt2,cvc5,1,0.2439460960449651,0.2375262170098722,0.006420,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_flag-2.i_16.smt2,iProver v3.9,0,1200.0,1201.7311949511059,0.004033,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll-sorted-2.i_84.smt2,iProver v3.9,0,1200.0,1201.7263860881794,0.003011,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/prefixsum_rec.c_8.smt2,iProver v3.9,0,1200.0,1201.7283656171057,0.003350,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_63.smt2,cvc5,1,0.28471896704286337,0.2763822569977492,0.008337,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_update_all.i_47.smt2,iProver v3.9,0,1200.0,1201.7323435470462,0.003115,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/shared_mem1.i_50.smt2,cvc5,1,0.23454003600636497,0.23099622502923012,0.003544,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/piVC/piVC_c7166c.smt2,cvc5,1,0.23009674699278548,0.2262260359711945,0.003871,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_and_skiplist_2lvl-2.i_33.smt2,cvc5,0,1.2640262261847965,1.2583131021820009,0.005713,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll_circular_traversal-1.i_5.smt2,iProver v3.9,0,1200.0,1201.7448706440628,0.005187,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_insert_equal.i_107.smt2,iProver v3.9,0,1200.0,1201.7253551590256,0.002559,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_60.smt2,iProver v3.9,0,1200.0,1201.7443439909257,0.003603,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/ex3_forlist.i_98.smt2,iProver v3.9,0,1200.0,1201.716909912182,0.003247,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/bubble_sort_linux-2.i_27.smt2,cvc5,1,0.2829834169242531,0.27765800594352186,0.005325,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_1.i_56.smt2,iProver v3.9,0,1200.0,1201.7336303601041,0.007402,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2n_update_all.i_21.smt2,iProver v3.9,0,1200.0,1201.731655545067,0.004735,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test_mutex_unlock_at_exit.i_21.smt2,iProver v3.9,0,1200.0,1201.7291092548985,0.005491,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_3.smt2,cvc5,1,0.22793514805380255,0.22444966505281627,0.003485,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_equal.i_5.smt2,iProver v3.9,0,1200.0,1201.7350028289948,0.002968,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list-ext_flag.i_94.smt2,iProver v3.9,0,1200.0,1201.7233731809538,0.004195,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/packet_filter.i_2.smt2,iProver v3.9,0,1200.0,1201.7264265911654,0.002786,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_unequal.i_12.smt2,iProver v3.9,0,1200.0,1201.7242862400599,0.003235,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_41.smt2,iProver v3.9,0,1200.0,1201.7390188460704,0.003907,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/test-0234-1.i_25.smt2,iProver v3.9,0,1200.0,1201.7474759770557,0.004893,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_107.smt2,iProver v3.9,0,1200.0,1201.7310847160406,0.004234,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/list_and_tree_cnstr-1.i_38.smt2,iProver v3.9,0,1200.0,1201.733794715954,0.006979,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_update_all_reverse.i_7.smt2,cvc5,1,0.2271054870216176,0.22411463502794504,0.002991,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_insert_equal.i_66.smt2,iProver v3.9,0,1200.0,1201.7228287530597,0.002573,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_105.smt2,iProver v3.9,1,36.542168786982074,36.536561239976436,0.005608,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2c_append_unequal.i_17.smt2,iProver v3.9,0,1200.0,1201.7542077288963,0.003505,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll_circular_traversal-2.i_38.smt2,iProver v3.9,1,25.465136614977382,25.459345916984603,0.005791,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/length_test03-1.i_140.smt2,iProver v3.9,1,7.394755784771405,7.391400664811954,0.003355,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_cnstr.i_15.smt2,iProver v3.9,0,1200.0,1201.7514491279144,0.002783,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/tree_stack.i_23.smt2,iProver v3.9,0,1200.0,1201.7219547168352,0.004290,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/simple_search_value-1.i_29.smt2,iProver v3.9,0,1200.0,1201.7638269800227,0.003532,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_insert_unequal.i_1.smt2,iProver v3.9,0,1200.0,1201.746628436027,0.003675,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/bubble_sort_linux-1.i_56.smt2,iProver v3.9,0,1200.0,1201.7260004039854,0.004241,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/sll2c_insert_equal.i_39.smt2,iProver v3.9,0,1200.0,1201.752278096974,0.005805,0
+/home/john-lu/Desktop/smt_data/smtlib25/non-incremental/ALIA/20230321-UltimateAutomizerSvcomp2023/dll2n_append_equal.i_9.smt2,iProver v3.9,0,1200.0,1201.7490583180916,0.003709,0
