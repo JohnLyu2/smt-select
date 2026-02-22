@@ -10,11 +10,13 @@ Expects --splits-dir to point at a division folder containing seed subdirs, e.g.
 
 For each split (seed):
   1. Load train.json and test.json; rebase paths with --benchmark-root.
-  2. Train GIN EHM or GIN-PWC on the train set (--model-type).
-  3. Evaluate on train and test sets.
+  2. Train GIN EHM or GIN-PWC on the train set (--model-type), unless --eval-only.
+  3. Evaluate on train and test sets (load model from --models-base when --eval-only).
   4. Compute metrics (solve rate, PAR2, gap closed vs SBS/VBS).
 
-Results are aggregated across splits (mean ± std) and optionally saved to summary.json.
+Results are aggregated across splits (mean ± std) and saved to summary.json. Per-seed CSVs
+are written under output_dir as seed0/train_eval.csv, seed0/test_eval.csv, seed10/..., etc.
+Use --eval-only with --models-base (e.g. models) to evaluate pre-trained models without training.
 """
 
 import argparse
@@ -77,6 +79,7 @@ def evaluate_multi_splits_gin(
     save_models: bool = False,
     output_dir: Path | None = None,
     models_base: Path | None = None,
+    eval_only: bool = False,
     timeout: float = 1200.0,
     graph_timeout: int = 5,
     jobs: int = 8,
@@ -96,11 +99,15 @@ def evaluate_multi_splits_gin(
 ) -> dict:
     """
     Run train/test evaluation with GIN (EHM or PWC) for each split (seed) under splits_dir.
+    When eval_only=True, load saved models from models_base/{model_type}/{division}/seed{N}.
     Returns dict with division, n_seeds, per-split results, and aggregated metrics.
     """
     splits_dir = Path(splits_dir).resolve()
     if not splits_dir.is_dir():
         raise ValueError(f"Splits directory does not exist: {splits_dir}")
+
+    if eval_only and models_base is None:
+        raise ValueError("models_base is required when eval_only=True")
 
     root = Path(benchmark_root or DEFAULT_BENCHMARK_ROOT).resolve()
     if not root.is_dir():
@@ -126,10 +133,11 @@ def evaluate_multi_splits_gin(
 
     n_seeds = len(seed_entries)
     logging.info(
-        "Starting GIN (%s) evaluation over %d splits for division %s",
+        "Starting GIN (%s) evaluation over %d splits for division %s%s",
         model_type,
         n_seeds,
         division,
+        " (eval-only)" if eval_only else "",
     )
 
     seed_results: list[dict] = []
@@ -171,7 +179,14 @@ def evaluate_multi_splits_gin(
 
         logging.info("Train instances: %d, Test instances: %d", len(train_data), len(test_data))
 
-        if save_models and (models_base is not None or output_dir is not None):
+        if eval_only:
+            model_save_dir = models_base / model_type / division / f"seed{seed_val}"
+            if not model_save_dir.is_dir() or not (model_save_dir / "config.json").exists():
+                raise FileNotFoundError(
+                    f"Eval-only: model dir not found or invalid: {model_save_dir}"
+                )
+            logging.info("Loading saved model from %s", model_save_dir)
+        elif save_models and (models_base is not None or output_dir is not None):
             if models_base is not None:
                 model_save_dir = models_base / model_type / division / f"seed{seed_val}"
             else:
@@ -180,79 +195,78 @@ def evaluate_multi_splits_gin(
         else:
             model_save_dir = Path(tempfile.mkdtemp())
 
-        # Optionally capture training log to output_dir/train_log/seed{N}.log
-        log_handler: logging.FileHandler | None = None
-        if output_dir:
-            train_log_dir = output_dir / "train_log"
-            train_log_dir.mkdir(parents=True, exist_ok=True)
-            log_file = train_log_dir / f"seed{seed_val}.log"
-            log_handler = logging.FileHandler(log_file, mode="w", encoding="utf-8")
-            log_handler.setLevel(logging.DEBUG)
-            log_handler.setFormatter(
-                logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-            )
-            logging.getLogger().addHandler(log_handler)
-
-        try:
-            if model_type == "gin_ehm":
-                train_gin_regression(
-                    train_data_for_training,
-                    str(model_save_dir),
-                    graph_timeout=graph_timeout,
-                    jobs=jobs,
-                    hidden_dim=hidden_dim,
-                    num_layers=num_layers,
-                    num_epochs=num_epochs,
-                    batch_size=batch_size,
-                    lr=lr,
-                    dropout=dropout,
-                    val_ratio=val_ratio,
-                    patience=patience,
-                    val_split_seed=val_split_seed,
-                    min_epochs=min_epochs,
+        if not eval_only:
+            # Optionally capture training log to output_dir/train_log/seed{N}.log
+            log_handler: logging.FileHandler | None = None
+            if output_dir:
+                train_log_dir = output_dir / "train_log"
+                train_log_dir.mkdir(parents=True, exist_ok=True)
+                log_file = train_log_dir / f"seed{seed_val}.log"
+                log_handler = logging.FileHandler(log_file, mode="w", encoding="utf-8")
+                log_handler.setLevel(logging.DEBUG)
+                log_handler.setFormatter(
+                    logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
                 )
-            elif model_type == "gin_pwc":
-                train_gin_pwc(
-                    train_data_for_training,
-                    str(model_save_dir),
-                    graph_timeout=graph_timeout,
-                    jobs=jobs,
-                    hidden_dim=hidden_dim,
-                    num_layers=num_layers,
-                    num_epochs=num_epochs,
-                    batch_size=batch_size,
-                    lr=lr,
-                    dropout=dropout,
-                    val_ratio=val_ratio,
-                    patience=patience,
-                    val_split_seed=val_split_seed,
-                    min_epochs=min_epochs,
-                )
-            else:
-                raise ValueError(f"Unknown model_type: {model_type}")
+                logging.getLogger().addHandler(log_handler)
 
-            if filter_stats is not None:
-                save_dir = Path(model_save_dir)
-                with open(save_dir / "skipped_unsolvable.txt", "w") as f:
-                    for p in filter_stats["skipped_unsolvable"]:
-                        f.write(p + "\n")
-                with open(save_dir / "skipped_trivial.txt", "w") as f:
-                    for p in filter_stats["skipped_trivial"]:
-                        f.write(p + "\n")
-        finally:
-            if log_handler is not None:
-                logging.getLogger().removeHandler(log_handler)
-                log_handler.close()
+            try:
+                if model_type == "gin_ehm":
+                    train_gin_regression(
+                        train_data_for_training,
+                        str(model_save_dir),
+                        graph_timeout=graph_timeout,
+                        jobs=jobs,
+                        hidden_dim=hidden_dim,
+                        num_layers=num_layers,
+                        num_epochs=num_epochs,
+                        batch_size=batch_size,
+                        lr=lr,
+                        dropout=dropout,
+                        val_ratio=val_ratio,
+                        patience=patience,
+                        val_split_seed=val_split_seed,
+                        min_epochs=min_epochs,
+                    )
+                elif model_type == "gin_pwc":
+                    train_gin_pwc(
+                        train_data_for_training,
+                        str(model_save_dir),
+                        graph_timeout=graph_timeout,
+                        jobs=jobs,
+                        hidden_dim=hidden_dim,
+                        num_layers=num_layers,
+                        num_epochs=num_epochs,
+                        batch_size=batch_size,
+                        lr=lr,
+                        dropout=dropout,
+                        val_ratio=val_ratio,
+                        patience=patience,
+                        val_split_seed=val_split_seed,
+                        min_epochs=min_epochs,
+                    )
+                else:
+                    raise ValueError(f"Unknown model_type: {model_type}")
+
+                if filter_stats is not None:
+                    save_dir = Path(model_save_dir)
+                    with open(save_dir / "skipped_unsolvable.txt", "w") as f:
+                        for p in filter_stats["skipped_unsolvable"]:
+                            f.write(p + "\n")
+                    with open(save_dir / "skipped_trivial.txt", "w") as f:
+                        for p in filter_stats["skipped_trivial"]:
+                            f.write(p + "\n")
+            finally:
+                if log_handler is not None:
+                    logging.getLogger().removeHandler(log_handler)
+                    log_handler.close()
 
         train_output_csv = None
         test_output_csv = None
         if output_dir:
-            out_train = output_dir / "train"
-            out_test = output_dir / "test"
-            out_train.mkdir(parents=True, exist_ok=True)
-            out_test.mkdir(parents=True, exist_ok=True)
-            train_output_csv = str(out_train / f"seed{seed_val}.csv")
-            test_output_csv = str(out_test / f"seed{seed_val}.csv")
+            seed_out_dir = output_dir / f"seed{seed_val}"
+            seed_out_dir.mkdir(parents=True, exist_ok=True)
+            train_output_csv = str(seed_out_dir / "train_eval.csv")
+            test_output_csv = str(seed_out_dir / "test_eval.csv")
 
         if jobs > 1:
             train_instance_paths = list(train_data.keys())
@@ -312,7 +326,7 @@ def evaluate_multi_splits_gin(
             test_metrics["gap_cls_par2"],
         )
 
-        if not save_models:
+        if not save_models and not eval_only:
             shutil.rmtree(model_save_dir, ignore_errors=True)
 
         # Free GPU memory so the next seed starts clean (no carry-over from this split)
@@ -431,7 +445,18 @@ def main() -> None:
         "--output-dir",
         type=str,
         default=None,
-        help="Directory for summary.json and optional train/test CSVs and models",
+        help="Directory for summary.json and per-seed CSVs (seedN/train_eval.csv, test_eval.csv)",
+    )
+    parser.add_argument(
+        "--eval-only",
+        action="store_true",
+        help="Skip training; load saved models from --models-base/{model_type}/{division}/seedN",
+    )
+    parser.add_argument(
+        "--models-base",
+        type=str,
+        default=None,
+        help="Base directory for saved models (e.g. models). Required when --eval-only without --logic",
     )
     parser.add_argument(
         "--save-models",
@@ -497,6 +522,13 @@ def main() -> None:
         args.output_dir = str(Path("data/cp26/results/gnn") / args.model_type / args.logic)
         args.save_models = True
         models_base = Path("models")
+    if args.eval_only:
+        if models_base is None:
+            if not args.models_base:
+                parser.error("--models-base is required when --eval-only (or use --logic)")
+            models_base = Path(args.models_base)
+        if not models_base.is_dir():
+            parser.error(f"--models-base must be an existing directory: {models_base}")
     if not args.splits_dir:
         parser.error("Either --splits-dir or --logic is required")
     logging.basicConfig(
@@ -515,6 +547,7 @@ def main() -> None:
         save_models=args.save_models,
         output_dir=output_dir,
         models_base=models_base,
+        eval_only=args.eval_only,
         timeout=args.timeout,
         graph_timeout=args.graph_timeout,
         jobs=args.jobs,
