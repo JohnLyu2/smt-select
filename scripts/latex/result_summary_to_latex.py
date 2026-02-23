@@ -87,7 +87,7 @@ def main() -> None:
     columns = ["logic"] + value_columns
 
     header_map = {
-        "logic": "Logic",
+        "logic": "",
         "synt": "SMT-Select-Lite",
         "synt_mpnet": "SMT-Select-Lite-Text",
         "gin_pwc": "SMT-Select",
