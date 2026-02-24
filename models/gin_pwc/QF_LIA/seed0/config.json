@@ -1,0 +1,16 @@
+{
+  "num_node_types": 16,
+  "num_solvers": 5,
+  "hidden_dim": 64,
+  "num_layers": 3,
+  "graph_timeout": 5,
+  "timeout": 1200.0,
+  "fallback_solver_ids": [
+    0,
+    2,
+    3,
+    4,
+    1
+  ],
+  "random_seed": 42
+}
