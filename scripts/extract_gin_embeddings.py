@@ -132,17 +132,18 @@ def run_extraction(
         if graph_dict is None:
             _suppress_z3_destructor_noise()
             failed.append(rel_path)
-            # Graph build time is capped at graph_timeout
             elapsed = time.perf_counter() - t0
             extraction_times.append((rel_path, min(elapsed, graph_timeout_val)))
             continue
         data = graph_dict_to_gin_data(graph_dict, selector.vocabulary)
         if data is None:
+            del graph_dict
             _suppress_z3_destructor_noise()
             failed.append(rel_path)
             extraction_times.append((rel_path, time.perf_counter() - t0))
             continue
         if data.num_nodes == 0:
+            del graph_dict, data
             failed.append(rel_path)
             extraction_times.append((rel_path, time.perf_counter() - t0))
             continue
@@ -152,6 +153,12 @@ def run_extraction(
         vec = emb[0].cpu().tolist()
         embeddings.append((rel_path, vec))
         extraction_times.append((rel_path, time.perf_counter() - t0))
+        del graph_dict, data, batch, emb
+        dev = selector.device
+        if (isinstance(dev, torch.device) and dev.type == "cuda") or (
+            isinstance(dev, str) and dev.startswith("cuda")
+        ):
+            torch.cuda.empty_cache()
 
     # Output under out_dir / division / seed (e.g. data/features/gin_pwc/ABV/seed0)
     division = model_dir.parent.name

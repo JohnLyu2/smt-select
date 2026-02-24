@@ -301,44 +301,40 @@ def compute_metrics(result_dataset, multi_perf_data) -> dict:
 
 
 def format_evaluation_short(metrics: dict) -> str:
-    """Two-line summary: instances/solved/solve rate, then PAR2 and gap_cls_par2."""
+    """Two-line summary: instances/solved, then PAR2 and gap closed (%)."""
     n = metrics["total_count"]
-    sr = (metrics["solved"] / n * 100) if n else 0.0
+    gap_pct = (metrics["gap_cls_par2"] * 100) if metrics.get("gap_cls_par2") is not None else 0.0
     lines = [
-        f"Instances: {n}, Solved: {metrics['solved']}, Solve rate: {sr:.2f}%",
-        f"Avg PAR2: {metrics['avg_par2']:.2f}, gap_cls_par2: {metrics['gap_cls_par2']:.4f}",
+        f"Instances: {n}, Solved: {metrics['solved']}",
+        f"Avg PAR2: {metrics['avg_par2']:.2f}, gap closed (PAR-2): {gap_pct:.2f}%",
     ]
     return "\n".join(lines)
 
 
 def log_evaluation_summary(metrics: dict, multi_perf_data) -> None:
-    """Log full evaluation block (AS, SBS, VBS, gap closed)."""
+    """Log full evaluation block (AS, SBS, VBS, gap closed in %)."""
     total_count = metrics["total_count"]
-    solve_rate = (metrics["solved"] / total_count * 100) if total_count > 0 else 0.0
-    sbs_solve_rate = (metrics["sbs_solved"] / total_count * 100) if total_count > 0 else 0.0
-    vbs_solve_rate = (metrics["vbs_solved"] / total_count * 100) if total_count > 0 else 0.0
     sbs_dataset = multi_perf_data.get_best_solver_dataset()
     vbs_dataset = multi_perf_data.get_virtual_best_solver_dataset()
+    gap_solved_pct = (metrics["gap_cls_solved"] * 100) if metrics.get("gap_cls_solved") is not None else 0.0
+    gap_par2_pct = (metrics["gap_cls_par2"] * 100) if metrics.get("gap_cls_par2") is not None else 0.0
 
     logging.info("=" * 60)
     logging.info("Evaluation Results:")
     logging.info("  Total instances: %d", total_count)
     logging.info("  Solved: %d", metrics["solved"])
-    logging.info("  Solve rate: %.2f%%", solve_rate)
     logging.info("  Average PAR-2: %.2f", metrics["avg_par2"])
-    logging.info("  Gap closed (solved): %.4f", metrics["gap_cls_solved"])
-    logging.info("  Gap closed (PAR-2): %.4f", metrics["gap_cls_par2"])
+    logging.info("  Gap closed (solved): %.2f%%", gap_solved_pct)
+    logging.info("  Gap closed (PAR-2): %.2f%%", gap_par2_pct)
     logging.info("")
     logging.info("SBS:")
     logging.info("  Solver: %s", sbs_dataset.get_solver_name())
     logging.info("  Solved: %d", metrics["sbs_solved"])
-    logging.info("  Solve rate: %.2f%%", sbs_solve_rate)
     logging.info("  Average PAR-2: %.2f", metrics["sbs_avg_par2"])
     logging.info("")
     logging.info("VBS:")
     logging.info("  Solver: %s", vbs_dataset.get_solver_name())
     logging.info("  Solved: %d", metrics["vbs_solved"])
-    logging.info("  Solve rate: %.2f%%", vbs_solve_rate)
     logging.info("  Average PAR-2: %.2f", metrics["vbs_avg_par2"])
     logging.info("=" * 60)
 

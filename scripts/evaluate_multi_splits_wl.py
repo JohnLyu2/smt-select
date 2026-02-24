@@ -238,15 +238,15 @@ def evaluate_multi_splits_wl(
         })
 
         n_train, n_test = len(train_data), len(test_data)
-        train_sr = (train_metrics["solved"] / n_train * 100) if n_train else 0
-        test_sr = (test_metrics["solved"] / n_test * 100) if n_test else 0
+        train_gap_pct = (train_metrics["gap_cls_par2"] * 100) if train_metrics.get("gap_cls_par2") is not None else 0.0
+        test_gap_pct = (test_metrics["gap_cls_par2"] * 100) if test_metrics.get("gap_cls_par2") is not None else 0.0
         logging.info(
-            "  Train: solved %d/%d, solve_rate %.2f%%, gap_cls_par2 %.4f",
-            train_metrics["solved"], n_train, train_sr, train_metrics["gap_cls_par2"],
+            "  Train: solved %d/%d, gap closed (PAR-2): %.2f%%",
+            train_metrics["solved"], n_train, train_gap_pct,
         )
         logging.info(
-            "  Test:  solved %d/%d, solve_rate %.2f%%, gap_cls_par2 %.4f",
-            test_metrics["solved"], n_test, test_sr, test_metrics["gap_cls_par2"],
+            "  Test:  solved %d/%d, gap closed (PAR-2): %.2f%%",
+            test_metrics["solved"], n_test, test_gap_pct,
         )
 
         if not save_models:
@@ -412,15 +412,15 @@ def main():
     logging.info("")
     tr = agg["train"]
     logging.info(
-        "Train: gap_cls_solved %.4f ± %.4f, gap_cls_par2 %.4f ± %.4f",
-        tr["gap_cls_solved_mean"], tr["gap_cls_solved_std"],
-        tr["gap_cls_par2_mean"], tr["gap_cls_par2_std"],
+        "Train: gap closed (solved) %.2f%% ± %.2f%%, gap closed (PAR-2) %.2f%% ± %.2f%%",
+        tr["gap_cls_solved_mean"] * 100, tr["gap_cls_solved_std"] * 100,
+        tr["gap_cls_par2_mean"] * 100, tr["gap_cls_par2_std"] * 100,
     )
     t = agg["test"]
     logging.info(
-        "Test:  gap_cls_solved %.4f ± %.4f, gap_cls_par2 %.4f ± %.4f",
-        t["gap_cls_solved_mean"], t["gap_cls_solved_std"],
-        t["gap_cls_par2_mean"], t["gap_cls_par2_std"],
+        "Test:  gap closed (solved) %.2f%% ± %.2f%%, gap closed (PAR-2) %.2f%% ± %.2f%%",
+        t["gap_cls_solved_mean"] * 100, t["gap_cls_solved_std"] * 100,
+        t["gap_cls_par2_mean"] * 100, t["gap_cls_par2_std"] * 100,
     )
     logging.info("=" * 60)
 
