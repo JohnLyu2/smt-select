@@ -14,7 +14,8 @@ For each split (seed):
   3. Evaluate on train and test sets.
   4. Compute metrics (solve rate, PAR-2, gap closed vs SBS/VBS).
 
-Results are aggregated across splits (mean ± std) and optionally saved to summary.json.
+Results are aggregated across splits (mean ± std) and saved to summary.json. Per-seed CSVs
+are written under output_dir as seed0/train_eval.csv, seed0/test_eval.csv, seed10/..., etc.
 """
 
 import argparse
@@ -213,12 +214,10 @@ def evaluate_multi_splits(
         train_output_csv = None
         test_output_csv = None
         if output_dir:
-            out_train = output_dir / "train"
-            out_test = output_dir / "test"
-            out_train.mkdir(parents=True, exist_ok=True)
-            out_test.mkdir(parents=True, exist_ok=True)
-            train_output_csv = str(out_train / f"seed{seed_val}.csv")
-            test_output_csv = str(out_test / f"seed{seed_val}.csv")
+            seed_out_dir = output_dir / f"seed{seed_val}"
+            seed_out_dir.mkdir(parents=True, exist_ok=True)
+            train_output_csv = str(seed_out_dir / "train_eval.csv")
+            test_output_csv = str(seed_out_dir / "test_eval.csv")
 
         train_result = as_evaluate(
             as_model, train_data, write_csv_path=train_output_csv
