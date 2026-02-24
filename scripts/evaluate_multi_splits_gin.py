@@ -279,6 +279,7 @@ def evaluate_multi_splits_gin(
                 n_workers=jobs,
                 write_csv_path=train_output_csv,
                 show_progress=True,
+                csv_benchmark_root=root,
             )
             test_result = as_evaluate_parallel(
                 test_instance_paths,
@@ -288,14 +289,23 @@ def evaluate_multi_splits_gin(
                 n_workers=jobs,
                 write_csv_path=test_output_csv,
                 show_progress=True,
+                csv_benchmark_root=root,
             )
         else:
             selector = _load_gin_selector(str(model_save_dir))
             train_result = as_evaluate(
-                selector, train_data, write_csv_path=train_output_csv, show_progress=True
+                selector,
+                train_data,
+                write_csv_path=train_output_csv,
+                show_progress=True,
+                csv_benchmark_root=root,
             )
             test_result = as_evaluate(
-                selector, test_data, write_csv_path=test_output_csv, show_progress=True
+                selector,
+                test_data,
+                write_csv_path=test_output_csv,
+                show_progress=True,
+                csv_benchmark_root=root,
             )
         train_metrics = compute_metrics(train_result, train_data)
         test_metrics = compute_metrics(test_result, test_data)

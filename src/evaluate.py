@@ -73,6 +73,16 @@ def _load_setfit_selector(setfit_model: str, desc_json: str):
     return SetfitSelector(setfit_model, desc_json)
 
 
+def _csv_benchmark(path: str, csv_benchmark_root: Path | None) -> str:
+    """Return path for CSV: relative to csv_benchmark_root if set, else path as-is."""
+    if csv_benchmark_root is None:
+        return path
+    try:
+        return str(Path(path).relative_to(csv_benchmark_root))
+    except ValueError:
+        return path
+
+
 def as_evaluate_parallel(
     instance_paths: list[str],
     loader_fn,
@@ -83,6 +93,7 @@ def as_evaluate_parallel(
     show_progress: bool = True,
     result_timeout: int = 30,
     fallback_solver_id: int | None = None,
+    csv_benchmark_root: Path | str | None = None,
 ):
     """
     Evaluate algorithm selection in parallel. Each worker loads the selector via loader_fn(*loader_args).
@@ -94,6 +105,7 @@ def as_evaluate_parallel(
     load + first graph build for GIN).
     fallback_solver_id: solver id to use when a worker times out or fails. If None, use the
     first solver id from multi_perf_data (min of solver id dict keys).
+    csv_benchmark_root: if set, CSV benchmark column is written as path relative to this root (e.g. logic-relative).
     """
     n_workers = min(n_workers, len(instance_paths))
     if n_workers <= 0:
@@ -149,6 +161,7 @@ def as_evaluate_parallel(
             perf_dict[instance_path] = _apply_overhead_to_perf(
                 raw_is_solved, raw_runtime, overhead, timeout
             )
+    csv_root = Path(csv_benchmark_root) if csv_benchmark_root else None
     if write_csv_path is not None:
         with Path(write_csv_path).open(mode="w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
@@ -163,7 +176,7 @@ def as_evaluate_parallel(
                 ff = path_to_feature_fail[path]
                 csv_writer.writerow(
                     [
-                        path,
+                        _csv_benchmark(path, csv_root),
                         multi_perf_data.get_solver_name(selected),
                         is_solved,
                         runtime,
@@ -179,12 +192,20 @@ def as_evaluate_parallel(
     )
 
 
-def as_evaluate(as_model, multi_perf_data, write_csv_path=None, show_progress=True):
+def as_evaluate(
+    as_model,
+    multi_perf_data,
+    write_csv_path: str | None = None,
+    show_progress: bool = True,
+    csv_benchmark_root: Path | str | None = None,
+):
     """
     Evaluate the performance of the algorithm selection model based on the provided multi_perf_data;
     If write_csv_path is not None, write the result to the csv file.
     If show_progress is True, show a tqdm progress bar over instances.
+    If csv_benchmark_root is set, the CSV benchmark column is written as path relative to it (e.g. logic-relative).
     """
+    csv_root = Path(csv_benchmark_root) if csv_benchmark_root else None
     if write_csv_path is not None:
         with Path(write_csv_path).open(mode="w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
@@ -220,7 +241,7 @@ def as_evaluate(as_model, multi_perf_data, write_csv_path=None, show_progress=Tr
                 selected_solver = multi_perf_data.get_solver_name(selected)
                 csv_writer.writerow(
                     [
-                        instance_path,
+                        _csv_benchmark(instance_path, csv_root),
                         selected_solver,
                         is_solved,
                         runtime,
