@@ -1,0 +1,63 @@
+2026-02-24 01:04:34,737 - INFO - Validating feature coverage for 6279 instances...
+2026-02-24 01:04:34,857 - INFO - Starting evaluation over 5 splits for division UFNIA
+2026-02-24 01:04:34,857 - INFO - 
+============================================================
+2026-02-24 01:04:34,857 - INFO - Seed 0 (seed0)
+2026-02-24 01:04:34,857 - INFO - ============================================================
+2026-02-24 01:04:34,993 - INFO - Train instances: 4709, Test instances: 1570
+2026-02-24 01:04:35,132 - INFO - Saved PWC_SVM model at /tmp/tmpt3v_k5k4/model.joblib
+Evaluating:   0%|          | 0/4709 [00:00<?, ?instance/s]Evaluating:   7%|▋         | 327/4709 [00:00<00:01, 3268.71instance/s]Evaluating:  14%|█▍        | 666/4709 [00:00<00:01, 3336.22instance/s]Evaluating:  21%|██        | 1000/4709 [00:00<00:01, 3328.93instance/s]Evaluating:  28%|██▊       | 1333/4709 [00:00<00:01, 3329.06instance/s]Evaluating:  35%|███▌      | 1666/4709 [00:00<00:00, 3312.96instance/s]Evaluating:  42%|████▏     | 1998/4709 [00:00<00:00, 3301.07instance/s]Evaluating:  50%|████▉     | 2332/4709 [00:00<00:00, 3310.87instance/s]Evaluating:  57%|█████▋    | 2664/4709 [00:00<00:00, 3304.57instance/s]Evaluating:  64%|██████▎   | 2995/4709 [00:00<00:00, 3300.28instance/s]Evaluating:  71%|███████   | 3327/4709 [00:01<00:00, 3304.40instance/s]Evaluating:  78%|███████▊  | 3658/4709 [00:01<00:00, 3298.87instance/s]Evaluating:  85%|████████▍ | 3988/4709 [00:01<00:00, 3292.50instance/s]Evaluating:  92%|█████████▏| 4319/4709 [00:01<00:00, 3296.40instance/s]Evaluating:  99%|█████████▊| 4649/4709 [00:01<00:00, 3295.01instance/s]Evaluating: 100%|██████████| 4709/4709 [00:01<00:00, 3303.00instance/s]
+Evaluating:   0%|          | 0/1570 [00:00<?, ?instance/s]Evaluating:  21%|██        | 327/1570 [00:00<00:00, 3262.60instance/s]Evaluating:  42%|████▏     | 657/1570 [00:00<00:00, 3284.06instance/s]Evaluating:  64%|██████▎   | 997/1570 [00:00<00:00, 3335.19instance/s]Evaluating:  85%|████████▌ | 1337/1570 [00:00<00:00, 3357.88instance/s]Evaluating: 100%|██████████| 1570/1570 [00:00<00:00, 3334.17instance/s]
+2026-02-24 01:04:37,037 - INFO -   Train: solved 2814/4709, solve_rate 59.76%, gap_cls_par2 0.7035
+2026-02-24 01:04:37,037 - INFO -   Test:  solved 917/1570, solve_rate 58.41%, gap_cls_par2 0.2793
+2026-02-24 01:04:37,038 - INFO - 
+============================================================
+2026-02-24 01:04:37,038 - INFO - Seed 10 (seed10)
+2026-02-24 01:04:37,038 - INFO - ============================================================
+2026-02-24 01:04:37,052 - INFO - Train instances: 4709, Test instances: 1570
+2026-02-24 01:04:37,172 - INFO - Saved PWC_SVM model at /tmp/tmpyyhjv4nw/model.joblib
+Evaluating:   0%|          | 0/4709 [00:00<?, ?instance/s]Evaluating:   7%|▋         | 342/4709 [00:00<00:01, 3411.97instance/s]Evaluating:  15%|█▍        | 684/4709 [00:00<00:01, 3380.41instance/s]Evaluating:  22%|██▏       | 1029/4709 [00:00<00:01, 3410.84instance/s]Evaluating:  29%|██▉       | 1374/4709 [00:00<00:00, 3425.18instance/s]Evaluating:  36%|███▋      | 1718/4709 [00:00<00:00, 3429.80instance/s]Evaluating:  44%|████▍     | 2062/4709 [00:00<00:00, 3429.97instance/s]Evaluating:  51%|█████     | 2409/4709 [00:00<00:00, 3441.64instance/s]Evaluating:  58%|█████▊    | 2754/4709 [00:00<00:00, 3443.26instance/s]Evaluating:  66%|██████▌   | 3101/4709 [00:00<00:00, 3449.53instance/s]Evaluating:  73%|███████▎  | 3448/4709 [00:01<00:00, 3455.19instance/s]Evaluating:  81%|████████  | 3796/4709 [00:01<00:00, 3461.32instance/s]Evaluating:  88%|████████▊ | 4143/4709 [00:01<00:00, 3454.45instance/s]Evaluating:  95%|█████████▌| 4491/4709 [00:01<00:00, 3459.28instance/s]Evaluating: 100%|██████████| 4709/4709 [00:01<00:00, 3443.19instance/s]
+Evaluating:   0%|          | 0/1570 [00:00<?, ?instance/s]Evaluating:  20%|██        | 321/1570 [00:00<00:00, 3200.32instance/s]Evaluating:  41%|████      | 642/1570 [00:00<00:00, 2756.15instance/s]Evaluating:  61%|██████▏   | 965/1570 [00:00<00:00, 2954.14instance/s]Evaluating:  83%|████████▎ | 1303/1570 [00:00<00:00, 3113.32instance/s]Evaluating: 100%|██████████| 1570/1570 [00:00<00:00, 3093.09instance/s]
+2026-02-24 01:04:39,056 - INFO -   Train: solved 2786/4709, solve_rate 59.16%, gap_cls_par2 0.7395
+2026-02-24 01:04:39,056 - INFO -   Test:  solved 947/1570, solve_rate 60.32%, gap_cls_par2 0.3646
+2026-02-24 01:04:39,056 - INFO - 
+============================================================
+2026-02-24 01:04:39,056 - INFO - Seed 20 (seed20)
+2026-02-24 01:04:39,057 - INFO - ============================================================
+2026-02-24 01:04:39,071 - INFO - Train instances: 4709, Test instances: 1570
+2026-02-24 01:04:39,204 - INFO - Saved PWC_SVM model at /tmp/tmpe_j8ao71/model.joblib
+Evaluating:   0%|          | 0/4709 [00:00<?, ?instance/s]Evaluating:   7%|▋         | 330/4709 [00:00<00:01, 3296.87instance/s]Evaluating:  14%|█▍        | 660/4709 [00:00<00:01, 3290.50instance/s]Evaluating:  21%|██        | 993/4709 [00:00<00:01, 3306.79instance/s]Evaluating:  28%|██▊       | 1324/4709 [00:00<00:01, 3304.66instance/s]Evaluating:  35%|███▌      | 1655/4709 [00:00<00:00, 3298.44instance/s]Evaluating:  42%|████▏     | 1985/4709 [00:00<00:00, 3278.22instance/s]Evaluating:  49%|████▉     | 2318/4709 [00:00<00:00, 3291.95instance/s]Evaluating:  56%|█████▋    | 2653/4709 [00:00<00:00, 3307.29instance/s]Evaluating:  63%|██████▎   | 2988/4709 [00:00<00:00, 3319.43instance/s]Evaluating:  71%|███████   | 3324/4709 [00:01<00:00, 3329.62instance/s]Evaluating:  78%|███████▊  | 3657/4709 [00:01<00:00, 3299.90instance/s]Evaluating:  85%|████████▍ | 3988/4709 [00:01<00:00, 3297.76instance/s]Evaluating:  92%|█████████▏| 4323/4709 [00:01<00:00, 3311.17instance/s]Evaluating:  99%|█████████▉| 4659/4709 [00:01<00:00, 3324.21instance/s]Evaluating: 100%|██████████| 4709/4709 [00:01<00:00, 3308.38instance/s]
+Evaluating:   0%|          | 0/1570 [00:00<?, ?instance/s]Evaluating:  21%|██        | 333/1570 [00:00<00:00, 3324.19instance/s]Evaluating:  42%|████▏     | 667/1570 [00:00<00:00, 3331.21instance/s]Evaluating:  64%|██████▍   | 1004/1570 [00:00<00:00, 3345.26instance/s]Evaluating:  85%|████████▌ | 1340/1570 [00:00<00:00, 3350.21instance/s]Evaluating: 100%|██████████| 1570/1570 [00:00<00:00, 3343.47instance/s]
+2026-02-24 01:04:41,106 - INFO -   Train: solved 2832/4709, solve_rate 60.14%, gap_cls_par2 0.7328
+2026-02-24 01:04:41,106 - INFO -   Test:  solved 897/1570, solve_rate 57.13%, gap_cls_par2 -0.2586
+2026-02-24 01:04:41,106 - INFO - 
+============================================================
+2026-02-24 01:04:41,107 - INFO - Seed 30 (seed30)
+2026-02-24 01:04:41,107 - INFO - ============================================================
+2026-02-24 01:04:41,121 - INFO - Train instances: 4709, Test instances: 1570
+2026-02-24 01:04:41,257 - INFO - Saved PWC_SVM model at /tmp/tmpia_q6pe8/model.joblib
+Evaluating:   0%|          | 0/4709 [00:00<?, ?instance/s]Evaluating:   7%|▋         | 331/4709 [00:00<00:01, 3308.20instance/s]Evaluating:  14%|█▍        | 664/4709 [00:00<00:01, 3317.02instance/s]Evaluating:  21%|██        | 999/4709 [00:00<00:01, 3328.87instance/s]Evaluating:  28%|██▊       | 1333/4709 [00:00<00:01, 3329.53instance/s]Evaluating:  35%|███▌      | 1666/4709 [00:00<00:00, 3315.87instance/s]Evaluating:  42%|████▏     | 1998/4709 [00:00<00:00, 3306.53instance/s]Evaluating:  49%|████▉     | 2329/4709 [00:00<00:00, 3304.91instance/s]Evaluating:  56%|█████▋    | 2660/4709 [00:00<00:00, 3303.99instance/s]Evaluating:  64%|██████▎   | 2991/4709 [00:00<00:00, 3305.24instance/s]Evaluating:  71%|███████   | 3322/4709 [00:01<00:00, 3295.81instance/s]Evaluating:  78%|███████▊  | 3653/4709 [00:01<00:00, 3297.37instance/s]Evaluating:  85%|████████▍ | 3983/4709 [00:01<00:00, 3293.04instance/s]Evaluating:  92%|█████████▏| 4313/4709 [00:01<00:00, 3286.72instance/s]Evaluating:  99%|█████████▊| 4644/4709 [00:01<00:00, 3291.07instance/s]Evaluating: 100%|██████████| 4709/4709 [00:01<00:00, 3301.91instance/s]
+Evaluating:   0%|          | 0/1570 [00:00<?, ?instance/s]Evaluating:  21%|██▏       | 335/1570 [00:00<00:00, 3346.80instance/s]Evaluating:  43%|████▎     | 670/1570 [00:00<00:00, 3331.07instance/s]Evaluating:  64%|██████▍   | 1006/1570 [00:00<00:00, 3341.83instance/s]Evaluating:  85%|████████▌ | 1341/1570 [00:00<00:00, 3333.88instance/s]Evaluating: 100%|██████████| 1570/1570 [00:00<00:00, 3333.36instance/s]
+2026-02-24 01:04:43,164 - INFO -   Train: solved 2810/4709, solve_rate 59.67%, gap_cls_par2 0.6997
+2026-02-24 01:04:43,164 - INFO -   Test:  solved 916/1570, solve_rate 58.34%, gap_cls_par2 0.1592
+2026-02-24 01:04:43,164 - INFO - 
+============================================================
+2026-02-24 01:04:43,164 - INFO - Seed 40 (seed40)
+2026-02-24 01:04:43,164 - INFO - ============================================================
+2026-02-24 01:04:43,180 - INFO - Train instances: 4709, Test instances: 1570
+2026-02-24 01:04:43,336 - INFO - Saved PWC_SVM model at /tmp/tmp2zvsh50v/model.joblib
+Evaluating:   0%|          | 0/4709 [00:00<?, ?instance/s]Evaluating:   7%|▋         | 331/4709 [00:00<00:01, 3302.92instance/s]Evaluating:  14%|█▍        | 662/4709 [00:00<00:01, 3296.64instance/s]Evaluating:  21%|██        | 992/4709 [00:00<00:01, 3293.94instance/s]Evaluating:  28%|██▊       | 1324/4709 [00:00<00:01, 3302.42instance/s]Evaluating:  35%|███▌      | 1655/4709 [00:00<00:00, 3295.49instance/s]Evaluating:  42%|████▏     | 1988/4709 [00:00<00:00, 3304.80instance/s]Evaluating:  49%|████▉     | 2319/4709 [00:00<00:00, 3304.20instance/s]Evaluating:  56%|█████▋    | 2651/4709 [00:00<00:00, 3307.75instance/s]Evaluating:  63%|██████▎   | 2982/4709 [00:00<00:00, 3300.98instance/s]Evaluating:  70%|███████   | 3313/4709 [00:01<00:00, 3301.64instance/s]Evaluating:  77%|███████▋  | 3644/4709 [00:01<00:00, 3299.31instance/s]Evaluating:  84%|████████▍ | 3975/4709 [00:01<00:00, 3300.65instance/s]Evaluating:  91%|█████████▏| 4306/4709 [00:01<00:00, 3302.25instance/s]Evaluating:  98%|█████████▊| 4637/4709 [00:01<00:00, 3302.51instance/s]Evaluating: 100%|██████████| 4709/4709 [00:01<00:00, 3301.32instance/s]
+Evaluating:   0%|          | 0/1570 [00:00<?, ?instance/s]Evaluating:  21%|██        | 331/1570 [00:00<00:00, 3300.94instance/s]Evaluating:  42%|████▏     | 663/1570 [00:00<00:00, 3310.27instance/s]Evaluating:  64%|██████▎   | 997/1570 [00:00<00:00, 3322.35instance/s]Evaluating:  85%|████████▍ | 1332/1570 [00:00<00:00, 3330.80instance/s]Evaluating: 100%|██████████| 1570/1570 [00:00<00:00, 3326.43instance/s]
+2026-02-24 01:04:45,244 - INFO -   Train: solved 2782/4709, solve_rate 59.08%, gap_cls_par2 0.6988
+2026-02-24 01:04:45,244 - INFO -   Test:  solved 947/1570, solve_rate 60.32%, gap_cls_par2 0.1956
+2026-02-24 01:04:45,244 - INFO - Saved summary to data/cp26/results/synt/UFNIA/summary.json
+2026-02-24 01:04:45,244 - INFO - 
+============================================================
+2026-02-24 01:04:45,244 - INFO - Multi-splits summary — UFNIA
+2026-02-24 01:04:45,244 - INFO - ============================================================
+2026-02-24 01:04:45,244 - INFO - Model: SVM
+2026-02-24 01:04:45,244 - INFO - Splits (seeds): [0, 10, 20, 30, 40]
+2026-02-24 01:04:45,244 - INFO - 
+2026-02-24 01:04:45,244 - INFO - Train: gap_cls_solved 0.7290 ± 0.0215, gap_cls_par2 0.7148 ± 0.0176
+2026-02-24 01:04:45,244 - INFO - Test:  gap_cls_solved 0.0678 ± 0.2409, gap_cls_par2 0.1480 ± 0.2153
+2026-02-24 01:04:45,245 - INFO - ============================================================

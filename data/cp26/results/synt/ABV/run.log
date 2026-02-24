@@ -1,0 +1,63 @@
+2026-02-24 00:55:58,354 - INFO - Validating feature coverage for 2487 instances...
+2026-02-24 00:55:58,401 - INFO - Starting evaluation over 5 splits for division ABV
+2026-02-24 00:55:58,401 - INFO - 
+============================================================
+2026-02-24 00:55:58,401 - INFO - Seed 0 (seed0)
+2026-02-24 00:55:58,401 - INFO - ============================================================
+2026-02-24 00:55:58,407 - INFO - Train instances: 1865, Test instances: 622
+2026-02-24 00:55:58,426 - INFO - Saved PWC_SVM model at /tmp/tmp__ce_4ob/model.joblib
+Evaluating:   0%|          | 0/1865 [00:00<?, ?instance/s]Evaluating:  22%|██▏       | 417/1865 [00:00<00:00, 4161.38instance/s]Evaluating:  45%|████▌     | 842/1865 [00:00<00:00, 4213.01instance/s]Evaluating:  68%|██████▊   | 1269/1865 [00:00<00:00, 4236.75instance/s]Evaluating:  91%|█████████ | 1694/1865 [00:00<00:00, 4241.11instance/s]Evaluating: 100%|██████████| 1865/1865 [00:00<00:00, 4234.43instance/s]
+Evaluating:   0%|          | 0/622 [00:00<?, ?instance/s]Evaluating:  68%|██████▊   | 421/622 [00:00<00:00, 4204.60instance/s]Evaluating: 100%|██████████| 622/622 [00:00<00:00, 4216.25instance/s]
+2026-02-24 00:55:59,018 - INFO -   Train: solved 722/1865, solve_rate 38.71%, gap_cls_par2 0.9974
+2026-02-24 00:55:59,018 - INFO -   Test:  solved 239/622, solve_rate 38.42%, gap_cls_par2 0.6911
+2026-02-24 00:55:59,018 - INFO - 
+============================================================
+2026-02-24 00:55:59,018 - INFO - Seed 10 (seed10)
+2026-02-24 00:55:59,018 - INFO - ============================================================
+2026-02-24 00:55:59,024 - INFO - Train instances: 1865, Test instances: 622
+2026-02-24 00:55:59,044 - INFO - Saved PWC_SVM model at /tmp/tmp021b9ix7/model.joblib
+Evaluating:   0%|          | 0/1865 [00:00<?, ?instance/s]Evaluating:  22%|██▏       | 414/1865 [00:00<00:00, 4132.93instance/s]Evaluating:  45%|████▍     | 835/1865 [00:00<00:00, 4178.02instance/s]Evaluating:  67%|██████▋   | 1258/1865 [00:00<00:00, 4198.00instance/s]Evaluating:  90%|████████▉ | 1678/1865 [00:00<00:00, 4184.12instance/s]Evaluating: 100%|██████████| 1865/1865 [00:00<00:00, 4186.12instance/s]
+Evaluating:   0%|          | 0/622 [00:00<?, ?instance/s]Evaluating:  67%|██████▋   | 415/622 [00:00<00:00, 4147.17instance/s]Evaluating: 100%|██████████| 622/622 [00:00<00:00, 4168.82instance/s]
+2026-02-24 00:55:59,643 - INFO -   Train: solved 736/1865, solve_rate 39.46%, gap_cls_par2 0.9972
+2026-02-24 00:55:59,643 - INFO -   Test:  solved 227/622, solve_rate 36.50%, gap_cls_par2 0.7236
+2026-02-24 00:55:59,643 - INFO - 
+============================================================
+2026-02-24 00:55:59,643 - INFO - Seed 20 (seed20)
+2026-02-24 00:55:59,643 - INFO - ============================================================
+2026-02-24 00:55:59,649 - INFO - Train instances: 1865, Test instances: 622
+2026-02-24 00:55:59,666 - INFO - Saved PWC_SVM model at /tmp/tmpvjkjxbem/model.joblib
+Evaluating:   0%|          | 0/1865 [00:00<?, ?instance/s]Evaluating:  23%|██▎       | 424/1865 [00:00<00:00, 4232.44instance/s]Evaluating:  46%|████▌     | 851/1865 [00:00<00:00, 4254.14instance/s]Evaluating:  69%|██████▊   | 1278/1865 [00:00<00:00, 4256.83instance/s]Evaluating:  91%|█████████▏| 1706/1865 [00:00<00:00, 4265.78instance/s]Evaluating: 100%|██████████| 1865/1865 [00:00<00:00, 4259.42instance/s]
+Evaluating:   0%|          | 0/622 [00:00<?, ?instance/s]Evaluating:  68%|██████▊   | 421/622 [00:00<00:00, 4200.35instance/s]Evaluating: 100%|██████████| 622/622 [00:00<00:00, 4210.01instance/s]
+2026-02-24 00:56:00,255 - INFO -   Train: solved 710/1865, solve_rate 38.07%, gap_cls_par2 0.9971
+2026-02-24 00:56:00,255 - INFO -   Test:  solved 252/622, solve_rate 40.51%, gap_cls_par2 0.7256
+2026-02-24 00:56:00,255 - INFO - 
+============================================================
+2026-02-24 00:56:00,255 - INFO - Seed 30 (seed30)
+2026-02-24 00:56:00,255 - INFO - ============================================================
+2026-02-24 00:56:00,261 - INFO - Train instances: 1865, Test instances: 622
+2026-02-24 00:56:00,281 - INFO - Saved PWC_SVM model at /tmp/tmpc22c_el3/model.joblib
+Evaluating:   0%|          | 0/1865 [00:00<?, ?instance/s]Evaluating:  22%|██▏       | 418/1865 [00:00<00:00, 4172.04instance/s]Evaluating:  45%|████▍     | 836/1865 [00:00<00:00, 4164.14instance/s]Evaluating:  67%|██████▋   | 1253/1865 [00:00<00:00, 4144.42instance/s]Evaluating:  89%|████████▉ | 1669/1865 [00:00<00:00, 4147.54instance/s]Evaluating: 100%|██████████| 1865/1865 [00:00<00:00, 4149.54instance/s]
+Evaluating:   0%|          | 0/622 [00:00<?, ?instance/s]Evaluating:  67%|██████▋   | 415/622 [00:00<00:00, 4146.07instance/s]Evaluating: 100%|██████████| 622/622 [00:00<00:00, 4151.22instance/s]
+2026-02-24 00:56:00,884 - INFO -   Train: solved 732/1865, solve_rate 39.25%, gap_cls_par2 0.9972
+2026-02-24 00:56:00,884 - INFO -   Test:  solved 228/622, solve_rate 36.66%, gap_cls_par2 0.7005
+2026-02-24 00:56:00,884 - INFO - 
+============================================================
+2026-02-24 00:56:00,884 - INFO - Seed 40 (seed40)
+2026-02-24 00:56:00,884 - INFO - ============================================================
+2026-02-24 00:56:00,891 - INFO - Train instances: 1865, Test instances: 622
+2026-02-24 00:56:00,908 - INFO - Saved PWC_SVM model at /tmp/tmpzg6fwn1m/model.joblib
+Evaluating:   0%|          | 0/1865 [00:00<?, ?instance/s]Evaluating:  22%|██▏       | 419/1865 [00:00<00:00, 4183.64instance/s]Evaluating:  45%|████▌     | 841/1865 [00:00<00:00, 4201.01instance/s]Evaluating:  68%|██████▊   | 1262/1865 [00:00<00:00, 4199.46instance/s]Evaluating:  90%|█████████ | 1682/1865 [00:00<00:00, 4197.25instance/s]Evaluating: 100%|██████████| 1865/1865 [00:00<00:00, 4197.50instance/s]
+Evaluating:   0%|          | 0/622 [00:00<?, ?instance/s]Evaluating:  68%|██████▊   | 421/622 [00:00<00:00, 4209.71instance/s]Evaluating: 100%|██████████| 622/622 [00:00<00:00, 4203.60instance/s]
+2026-02-24 00:56:01,504 - INFO -   Train: solved 722/1865, solve_rate 38.71%, gap_cls_par2 0.9982
+2026-02-24 00:56:01,504 - INFO -   Test:  solved 238/622, solve_rate 38.26%, gap_cls_par2 0.7317
+2026-02-24 00:56:01,505 - INFO - Saved summary to data/cp26/results/synt/ABV/summary.json
+2026-02-24 00:56:01,505 - INFO - 
+============================================================
+2026-02-24 00:56:01,505 - INFO - Multi-splits summary — ABV
+2026-02-24 00:56:01,505 - INFO - ============================================================
+2026-02-24 00:56:01,505 - INFO - Model: SVM
+2026-02-24 00:56:01,505 - INFO - Splits (seeds): [0, 10, 20, 30, 40]
+2026-02-24 00:56:01,505 - INFO - 
+2026-02-24 00:56:01,505 - INFO - Train: gap_cls_solved 1.0000 ± 0.0000, gap_cls_par2 0.9974 ± 0.0004
+2026-02-24 00:56:01,505 - INFO - Test:  gap_cls_solved 0.7184 ± 0.0154, gap_cls_par2 0.7145 ± 0.0158
+2026-02-24 00:56:01,505 - INFO - ============================================================
