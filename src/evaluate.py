@@ -92,6 +92,21 @@ def load_extraction_times_csv(csv_path: Path) -> dict[str, float]:
     return out
 
 
+def load_failed_paths_from_extraction_times_csv(csv_path: Path) -> list[str]:
+    """Load instance paths with failed=1 from extraction_times.csv (normalized paths). Returns [] if no 'failed' column."""
+    failed: list[str] = []
+    with open(csv_path, encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames and "failed" not in reader.fieldnames:
+            return []
+        for row in reader:
+            if (row.get("failed") or "").strip() == "1":
+                p = _normalize_path((row.get("path") or "").strip())
+                if p:
+                    failed.append(p)
+    return failed
+
+
 def _csv_benchmark(path: str, csv_benchmark_root: Path | None) -> str:
     """Return path for CSV: relative to csv_benchmark_root if set, else path as-is."""
     if csv_benchmark_root is None:

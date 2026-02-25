@@ -141,6 +141,8 @@ class PwcSelector(SolverSelector):
         self.feature_timeout: float | None = None
         self.extraction_time_by_path: dict[str, float] | None = None
         self.sbs_solver_id: int | None = None
+        # Optional: set of paths with failed=1 in extraction_times CSV; use this label for SBS at eval (not time comparison)
+        self.failed_paths_from_csv: set[str] | None = None
 
     def save(self, save_dir):
         Path(save_dir).mkdir(parents=True, exist_ok=True)
@@ -189,20 +191,15 @@ class PwcSelector(SolverSelector):
         Return (solver_id, overhead_sec, feature_fail).
         overhead_sec is the time for feature lookup + model inference (SVM/XGBoost).
         feature_fail is True if feature extraction failed (instance not in CSV or in failed set without fallback).
-        When feature_timeout, extraction_time_by_path, and sbs_solver_id are set, instances with
-        extraction_time >= feature_timeout return (sbs_solver_id, 0.0, True) (use SBS, no overhead).
+        When failed_paths_from_csv and sbs_solver_id are set, instances in that set return (sbs_solver_id, 0.0, True)
+        (use SBS, no overhead). The CSV label failed=1 is used for this decision, not extraction_time comparison.
         """
         path_str = str(instance_path)
-        feature_timeout = getattr(self, "feature_timeout", None)
-        extraction_time_by_path = getattr(self, "extraction_time_by_path", None)
+        path_norm = self._normalize_path(path_str)
         sbs_solver_id = getattr(self, "sbs_solver_id", None)
-        if (
-            feature_timeout is not None
-            and extraction_time_by_path is not None
-            and sbs_solver_id is not None
-        ):
-            ext = extraction_time_by_path.get(self._normalize_path(path_str), 0.0)
-            if ext >= feature_timeout:
+        failed_from_csv = getattr(self, "failed_paths_from_csv", None)
+        if failed_from_csv is not None and sbs_solver_id is not None:
+            if path_norm in failed_from_csv:
                 return (sbs_solver_id, 0.0, True)
 
         random_seed = self.random_seed
