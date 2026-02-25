@@ -10,35 +10,33 @@
   ],
   "model_type": "SVM",
   "splits_dir": "/home/john-lu/Desktop/smt-select/data/cp26/performance_splits/smtcomp24/BV",
-  "feature_csv_path": [
-    "data/features/syntactic/catalog_all/BV.csv"
-  ],
+  "feature_csv_path": "/home/john-lu/Desktop/smt-select/data/features/syntactic/BV/features.csv",
   "seeds": [
     {
       "seed": 0,
       "train_size": 780,
       "test_size": 260,
       "train_metrics": {
+        "total_count": 780,
         "solved": 755,
-        "avg_par2": 92.42803103691624,
-        "sbs_name": "cvc5",
+        "avg_par2": 92.42897103392872,
         "sbs_solved": 717,
         "sbs_avg_par2": 228.02426085833085,
         "vbs_solved": 756,
         "vbs_avg_par2": 84.73612726397263,
         "gap_cls_solved": 0.9743589743589743,
-        "gap_cls_par2": 0.9463186268116311
+        "gap_cls_par2": 0.9463120666242039
       },
       "test_metrics": {
+        "total_count": 260,
         "solved": 240,
-        "avg_par2": 208.7692332987593,
-        "sbs_name": "cvc5",
+        "avg_par2": 208.77032796954535,
         "sbs_solved": 235,
         "sbs_avg_par2": 259.9218850382541,
         "vbs_solved": 246,
         "vbs_avg_par2": 137.09389392141648,
         "gap_cls_solved": 0.45454545454545453,
-        "gap_cls_par2": 0.4164576109596785
+        "gap_cls_par2": 0.41644869873392204
       }
     },
     {
@@ -46,26 +44,26 @@
       "train_size": 780,
       "test_size": 260,
       "train_metrics": {
+        "total_count": 780,
         "solved": 749,
-        "avg_par2": 111.8714029178692,
-        "sbs_name": "cvc5",
+        "avg_par2": 111.87240086715879,
         "sbs_solved": 712,
         "sbs_avg_par2": 240.39324967535512,
         "vbs_solved": 752,
         "vbs_avg_par2": 97.6815779535473,
         "gap_cls_solved": 0.925,
-        "gap_cls_par2": 0.9005699758602607
+        "gap_cls_par2": 0.9005629830945145
       },
       "test_metrics": {
+        "total_count": 260,
         "solved": 239,
-        "avg_par2": 206.3407905982297,
-        "sbs_name": "cvc5",
+        "avg_par2": 206.34155387999198,
         "sbs_solved": 240,
         "sbs_avg_par2": 222.8149185871813,
         "vbs_solved": 250,
         "vbs_avg_par2": 98.25754185269247,
         "gap_cls_solved": -0.1,
-        "gap_cls_par2": 0.1322613595505345
+        "gap_cls_par2": 0.13225523159743932
       }
     },
     {
@@ -73,26 +71,26 @@
       "train_size": 780,
       "test_size": 260,
       "train_metrics": {
+        "total_count": 780,
         "solved": 751,
-        "avg_par2": 101.40145577049623,
-        "sbs_name": "cvc5",
+        "avg_par2": 101.40245038551146,
         "sbs_solved": 720,
         "sbs_avg_par2": 215.95072717511107,
         "vbs_solved": 752,
         "vbs_avg_par2": 94.11469797483579,
         "gap_cls_solved": 0.96875,
-        "gap_cls_par2": 0.9401920938864283
+        "gap_cls_par2": 0.9401839303323323
       },
       "test_metrics": {
+        "total_count": 260,
         "solved": 240,
-        "avg_par2": 202.73757420810603,
-        "sbs_name": "cvc5",
+        "avg_par2": 202.73842724014517,
         "sbs_solved": 232,
         "sbs_avg_par2": 296.1424860879134,
         "vbs_solved": 250,
         "vbs_avg_par2": 108.95818178882698,
         "gap_cls_solved": 0.4444444444444444,
-        "gap_cls_par2": 0.49899970101426533
+        "gap_cls_par2": 0.4989951438370899
       }
     },
     {
@@ -100,26 +98,26 @@
       "train_size": 780,
       "test_size": 260,
       "train_metrics": {
+        "total_count": 780,
         "solved": 750,
-        "avg_par2": 110.09274881278607,
-        "sbs_name": "cvc5",
+        "avg_par2": 110.09363140865977,
         "sbs_solved": 713,
         "sbs_avg_par2": 238.5362482514528,
         "vbs_solved": 751,
         "vbs_avg_par2": 99.42559507891613,
         "gap_cls_solved": 0.9736842105263158,
-        "gap_cls_par2": 0.9233189299985555
+        "gap_cls_par2": 0.9233125854386418
       },
       "test_metrics": {
+        "total_count": 260,
         "solved": 242,
-        "avg_par2": 189.01487382960755,
-        "sbs_name": "cvc5",
+        "avg_par2": 189.01574532169437,
         "sbs_solved": 239,
         "sbs_avg_par2": 228.38592285888825,
         "vbs_solved": 251,
         "vbs_avg_par2": 93.02549047658596,
         "gap_cls_solved": 0.25,
-        "gap_cls_par2": 0.29086083973257365
+        "gap_cls_par2": 0.29085440142507507
       }
     },
     {
@@ -127,26 +125,26 @@
       "train_size": 780,
       "test_size": 260,
       "train_metrics": {
+        "total_count": 780,
         "solved": 746,
-        "avg_par2": 120.751485560021,
-        "sbs_name": "cvc5",
+        "avg_par2": 120.7524803882329,
         "sbs_solved": 715,
         "sbs_avg_par2": 234.67214455008238,
         "vbs_solved": 748,
         "vbs_avg_par2": 108.70766903136779,
         "gap_cls_solved": 0.9393939393939394,
-        "gap_cls_par2": 0.9043871974296129
+        "gap_cls_par2": 0.9043792997409368
       },
       "test_metrics": {
+        "total_count": 260,
         "solved": 248,
-        "avg_par2": 139.89742273961713,
-        "sbs_name": "cvc5",
+        "avg_par2": 139.89831569419698,
         "sbs_solved": 237,
         "sbs_avg_par2": 239.97823396299947,
         "vbs_solved": 254,
         "vbs_avg_par2": 65.17926861923098,
         "gap_cls_solved": 0.6470588235294118,
-        "gap_cls_par2": 0.5725480755939164
+        "gap_cls_par2": 0.5725429671278675
       }
     }
   ],
@@ -154,14 +152,14 @@
     "train": {
       "gap_cls_solved_mean": 0.956237424855846,
       "gap_cls_solved_std": 0.020242653667411407,
-      "gap_cls_par2_mean": 0.9229573647972977,
-      "gap_cls_par2_std": 0.018379126630799502
+      "gap_cls_par2_mean": 0.9229501730461258,
+      "gap_cls_par2_std": 0.018379202451371358
     },
     "test": {
       "gap_cls_solved_mean": 0.33920974450386215,
       "gap_cls_solved_std": 0.25298668017144854,
-      "gap_cls_par2_mean": 0.38222551737019367,
-      "gap_cls_par2_std": 0.15611553854783236
+      "gap_cls_par2_mean": 0.3822192885442788,
+      "gap_cls_par2_std": 0.15611593633868082
     }
   }
 }
