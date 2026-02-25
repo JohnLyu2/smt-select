@@ -64,14 +64,13 @@ def _rebase_perf_data(multi_perf_data: MultiSolverDataset, benchmark_root: Path)
 
 
 def load_failed_gin_paths(extraction_times_csv: Path) -> list[str]:
-    """Load instance paths with status != 'ok' from extraction_times CSV (relative paths)."""
+    """Load instance paths with failed=1 from extraction_times CSV (relative paths)."""
     failed = []
     with open(extraction_times_csv, encoding="utf-8") as f:
         reader = csv.DictReader(f)
         path_key = "path"
         for row in reader:
-            status = (row.get("status") or "").strip().lower()
-            if status != "ok":
+            if (row.get("failed") or "").strip() == "1":
                 p = (row.get(path_key) or row.get("benchmark") or "").strip().replace("\\", "/")
                 if p:
                     failed.append(p)

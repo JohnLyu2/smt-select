@@ -79,7 +79,7 @@ def _normalize_path(path: str) -> str:
 
 
 def load_extraction_times_csv(csv_path: Path) -> dict[str, float]:
-    """Load path -> time_sec from extraction_times.csv (path, time_sec, status)."""
+    """Load path -> time_sec from extraction_times.csv (path, time_sec, failed)."""
     out: dict[str, float] = {}
     with open(csv_path, encoding="utf-8") as f:
         reader = csv.DictReader(f)
