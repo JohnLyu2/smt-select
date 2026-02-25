@@ -1,1 +1,0 @@
-*catalog_all*: all available measures and symbol counts in SMT-LIB catalog
