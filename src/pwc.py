@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 from pathlib import Path
 import joblib
@@ -29,6 +31,10 @@ def _load_path_list(value: str | Path | None) -> list[str]:
         return [p.strip() for p in f if p.strip()]
 
 
+def _normalize_path(path: str) -> str:
+    return path.strip().replace("\\", "/")
+
+
 def _wl_level_csv_paths(wl_dir: str | Path, wl_iter: int) -> list[str]:
     """Paths to level_0.csv through level_{wl_iter}.csv under wl_dir (as in wl_feature output)."""
     base = Path(wl_dir)
@@ -41,8 +47,12 @@ def create_pairwise_samples(
     solver1_id,
     feature_csv_path,
     failed_instance_path: str | Path | None = None,
+    extraction_time_by_path: dict[str, float] | None = None,
+    feature_timeout: float | None = None,
 ):
-    """Build pairwise (feature, label, cost) for training. Skip paths in failed_instance_path (path to file, one path per line)."""
+    """Build pairwise (feature, label, cost) for training. Skip paths in failed_instance_path (path to file, one path per line).
+    When extraction_time_by_path and feature_timeout are set, skip instances with extraction_time >= feature_timeout.
+    """
     failed_paths = _load_path_list(failed_instance_path)
     failed_set = set(failed_paths)
     inputs = []
@@ -51,6 +61,9 @@ def create_pairwise_samples(
     for instance_path in multi_perf_data.keys():
         if str(instance_path) in failed_set:
             continue
+        if extraction_time_by_path is not None and feature_timeout is not None:
+            if extraction_time_by_path.get(_normalize_path(str(instance_path)), 0.0) >= feature_timeout:
+                continue
         # Handle both single CSV path (str) and multiple CSV paths (list)
         try:
             if isinstance(feature_csv_path, list):
@@ -124,6 +137,10 @@ class PwcSelector(SolverSelector):
         self.fallback_solver_ids = list(fallback_solver_ids) if fallback_solver_ids else []
         paths = _load_path_list(failed_instance_paths)
         self._failed_set = set(paths)
+        # Optional: when set, instances with extraction_time > feature_timeout use SBS (sbs_solver_id)
+        self.feature_timeout: float | None = None
+        self.extraction_time_by_path: dict[str, float] | None = None
+        self.sbs_solver_id: int | None = None
 
     def save(self, save_dir):
         Path(save_dir).mkdir(parents=True, exist_ok=True)
@@ -161,12 +178,38 @@ class PwcSelector(SolverSelector):
         If instance is in failed list → use fallback (fallback_solver_ids[0]).
         Else extract feature; if not available, raise KeyError.
         """
+        selected, _, _ = self.algorithm_select_with_info(instance_path)
+        return selected
+
+    def _normalize_path(self, path: str) -> str:
+        return path.strip().replace("\\", "/")
+
+    def algorithm_select_with_info(self, instance_path):
+        """
+        Return (solver_id, overhead_sec, feature_fail).
+        overhead_sec is the time for feature lookup + model inference (SVM/XGBoost).
+        feature_fail is True if feature extraction failed (instance not in CSV or in failed set without fallback).
+        When feature_timeout, extraction_time_by_path, and sbs_solver_id are set, instances with
+        extraction_time >= feature_timeout return (sbs_solver_id, 0.0, True) (use SBS, no overhead).
+        """
+        path_str = str(instance_path)
+        feature_timeout = getattr(self, "feature_timeout", None)
+        extraction_time_by_path = getattr(self, "extraction_time_by_path", None)
+        sbs_solver_id = getattr(self, "sbs_solver_id", None)
+        if (
+            feature_timeout is not None
+            and extraction_time_by_path is not None
+            and sbs_solver_id is not None
+        ):
+            ext = extraction_time_by_path.get(self._normalize_path(path_str), 0.0)
+            if ext >= feature_timeout:
+                return (sbs_solver_id, 0.0, True)
+
         random_seed = self.random_seed
         feature_csv_path = self.feature_csv_path
-        path_str = str(instance_path)
         if path_str in self._failed_set:
             if self.fallback_solver_ids:
-                return self.fallback_solver_ids[0]
+                return (self.fallback_solver_ids[0], 0.0, False)
             raise ValueError(
                 "Instance is in failed list but fallback_solver_ids is empty."
             )
@@ -175,12 +218,23 @@ class PwcSelector(SolverSelector):
                 "feature_csv_path not set in PwcSelector. "
                 "It must be provided during model creation or loading."
             )
-        if isinstance(feature_csv_path, list):
-            feature = extract_feature_from_csvs_concat(instance_path, feature_csv_path)
-        else:
-            feature = extract_feature_from_csv(instance_path, feature_csv_path)
-        selected_id = self._get_rank_lst(feature, random_seed)[0]
-        return selected_id
+        t0 = time.perf_counter()
+        try:
+            if isinstance(feature_csv_path, list):
+                feature = extract_feature_from_csvs_concat(
+                    instance_path, feature_csv_path
+                )
+            else:
+                feature = extract_feature_from_csv(
+                    instance_path, feature_csv_path
+                )
+            selected_id = self._get_rank_lst(feature, random_seed)[0]
+            overhead = time.perf_counter() - t0
+            return (selected_id, overhead, False)
+        except KeyError:
+            overhead = time.perf_counter() - t0
+            fallback = self.fallback_solver_ids[0] if self.fallback_solver_ids else 0
+            return (fallback, overhead, True)
 
 
 WL_FAILED_PATHS_FILENAME = "failed_paths.txt"
@@ -194,12 +248,27 @@ def train_pwc(
     svm_c: float = 1.0,
     random_seed: int = 42,
     timeout_instance_paths: str | Path | None = None,
+    extraction_time_by_path: dict[str, float] | None = None,
+    feature_timeout: float | None = None,
 ):
     """
     Train pairwise selector. timeout_instance_paths: path to file (e.g. timeout{N}_failed_paths.txt)
     listing instance paths to exclude from training; used for failback solver ranking.
+    When extraction_time_by_path and feature_timeout are set, instances with extraction_time >= feature_timeout
+    are excluded from training.
     """
     Path(save_dir).mkdir(parents=True, exist_ok=True)
+    if extraction_time_by_path is not None and feature_timeout is not None:
+        n_skipped = sum(
+            1 for p in multi_perf_data.keys()
+            if extraction_time_by_path.get(_normalize_path(str(p)), 0.0) >= feature_timeout
+        )
+        if n_skipped:
+            logging.info(
+                "Skipping %d instances with extraction_time >= %.1fs for training",
+                n_skipped,
+                feature_timeout,
+            )
     paths = _load_path_list(timeout_instance_paths)
     solver_size = multi_perf_data.num_solvers()
     fallback_solver_ids = sorted_fallback_solvers(multi_perf_data, paths)
@@ -214,7 +283,13 @@ def train_pwc(
                 labels_array,
                 costs_array,
             ) = create_pairwise_samples(
-                multi_perf_data, i, j, feature_csv_path, failed_instance_path=timeout_instance_paths
+                multi_perf_data,
+                i,
+                j,
+                feature_csv_path,
+                failed_instance_path=timeout_instance_paths,
+                extraction_time_by_path=extraction_time_by_path,
+                feature_timeout=feature_timeout,
             )
             if len(labels_array) == 0:
                 continue

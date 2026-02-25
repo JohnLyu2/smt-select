@@ -198,8 +198,7 @@ def as_evaluate_parallel(
                     "solved",
                     "runtime",
                     "solver_runtime",
-                    "selector_overhead",
-                    "extra_overhead",
+                    "overhead",
                     "feature_fail",
                 ]
             )
@@ -209,6 +208,7 @@ def as_evaluate_parallel(
                 solver_runtime = path_to_solver_runtime[path]
                 ov = path_to_overhead[path]
                 extra_sec = path_to_extra_overhead[path]
+                total_ov = (ov if ov is not None else 0.0) + extra_sec
                 ff = path_to_feature_fail[path]
                 csv_writer.writerow(
                     [
@@ -217,8 +217,7 @@ def as_evaluate_parallel(
                         is_solved,
                         runtime,
                         solver_runtime,
-                        f"{ov:.6f}" if ov is not None else "",
-                        f"{extra_sec:.6f}" if extra_sec else "",
+                        f"{total_ov:.6f}" if total_ov else "",
                         1 if ff else 0,
                     ]
                 )
@@ -256,8 +255,7 @@ def as_evaluate(
                     "solved",
                     "runtime",
                     "solver_runtime",
-                    "selector_overhead",
-                    "extra_overhead",
+                    "overhead",
                     "feature_fail",
                 ]
             )
@@ -289,8 +287,7 @@ def as_evaluate(
                         is_solved,
                         runtime,
                         raw_runtime,
-                        f"{overhead:.6f}" if overhead is not None else "",
-                        f"{extra_sec:.6f}" if extra_sec else "",
+                        f"{total_overhead:.6f}" if total_overhead else "",
                         1 if feature_fail else 0,
                     ]
                 )

@@ -164,14 +164,12 @@ class MultiSolverDataset:
         solver_name = self.get_solver_name(solver_id)
         return SingleSolverDataset(solver_perf_dict, solver_name, self._timeout)
 
-    def get_best_solver_dataset(self) -> "SingleSolverDataset":
+    def get_best_solver_id(self) -> int:
         """
-        Get the SingleSolverDataset for the best performing solver.
-
-        The best solver is determined by the lowest average PAR-2 score.
+        Get the solver ID with the lowest average PAR-2 score (SBS).
 
         Returns:
-            SingleSolverDataset containing performance data for the best solver
+            Solver ID of the single best solver
 
         Raises:
             ValueError: If there are no solvers or no valid performance data
@@ -200,7 +198,21 @@ class MultiSolverDataset:
         if best_solver_id is None:
             raise ValueError("Cannot find best solver: no valid performance data")
 
-        return self.get_solver_dataset(best_solver_id)
+        return best_solver_id
+
+    def get_best_solver_dataset(self) -> "SingleSolverDataset":
+        """
+        Get the SingleSolverDataset for the best performing solver.
+
+        The best solver is determined by the lowest average PAR-2 score.
+
+        Returns:
+            SingleSolverDataset containing performance data for the best solver
+
+        Raises:
+            ValueError: If there are no solvers or no valid performance data
+        """
+        return self.get_solver_dataset(self.get_best_solver_id())
 
     def get_virtual_best_solver_dataset(self) -> "SingleSolverDataset":
         """

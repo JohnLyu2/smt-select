@@ -44,6 +44,10 @@ from src.performance import parse_performance_json
 from src.pwc import PwcSelector, train_pwc
 
 
+def _normalize_path(path: str) -> str:
+    return path.strip().replace("\\", "/")
+
+
 def discover_seed_dirs(splits_dir: Path) -> list[tuple[int, Path]]:
     """
     Find seed subdirectories under splits_dir that contain train.json and test.json.
@@ -67,6 +71,7 @@ def evaluate_multi_splits(
     feature_csv_path: str | list[str],
     extraction_time_by_path: dict[str, float],
     *,
+    feature_timeout: float = 5.0,
     xg_flag: bool = False,
     save_models: bool = False,
     output_dir: Path | None = None,
@@ -78,11 +83,13 @@ def evaluate_multi_splits(
     Run train/test evaluation for each split (seed) under splits_dir (seed0/, seed10/, ...),
     then aggregate metrics across splits. Division name for outputs is taken from splits_dir.name.
     Extraction times are added as overhead when computing metrics.
+    Instances with extraction_time >= feature_timeout are skipped for training and scored as SBS at evaluation.
 
     Args:
         splits_dir: Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/ABV)
         feature_csv_path: Path or list of paths to feature CSV(s)
         extraction_time_by_path: Map normalized instance path -> extraction time (sec) for overhead
+        feature_timeout: Skip training and use SBS at eval for instances with extraction_time >= this (default 5)
         xg_flag: Use XGBoost if True else SVM
         save_models: Save model per split (requires output_dir)
         output_dir: Where to write summary.json and optional per-split outputs
@@ -149,7 +156,11 @@ def evaluate_multi_splits(
         train_data = parse_performance_json(str(train_path), timeout)
         test_data = parse_performance_json(str(test_path), timeout)
 
-        logging.info(f"Train instances: {len(train_data)}, Test instances: {len(test_data)}")
+        logging.info(
+            "Train instances: %d, Test instances: %d",
+            len(train_data),
+            len(test_data),
+        )
 
         if save_models and output_dir:
             model_save_dir = output_dir / "models" / f"seed{seed_val}"
@@ -178,6 +189,8 @@ def evaluate_multi_splits(
                 feature_csv_path=feature_csv_path,
                 svm_c=svm_c,
                 random_seed=random_seed,
+                extraction_time_by_path=extraction_time_by_path,
+                feature_timeout=feature_timeout,
             )
         finally:
             if log_handler is not None:
@@ -187,6 +200,10 @@ def evaluate_multi_splits(
         as_model = PwcSelector.load(str(model_save_dir / "model.joblib"))
         if as_model.feature_csv_path is None:
             as_model.feature_csv_path = feature_csv_path
+        # So selector uses SBS for instances with extraction_time >= feature_timeout
+        as_model.feature_timeout = feature_timeout
+        as_model.extraction_time_by_path = extraction_time_by_path
+        as_model.sbs_solver_id = train_data.get_best_solver_id()
 
         train_output_csv = None
         test_output_csv = None
@@ -340,6 +357,12 @@ def main():
         help="Timeout in seconds (default: 1200)",
     )
     parser.add_argument(
+        "--feature-timeout",
+        type=float,
+        default=5.0,
+        help="If extraction_time >= this (seconds), skip instance for training and use SBS at evaluation (default: 5)",
+    )
+    parser.add_argument(
         "--xg",
         action="store_true",
         help="Use XGBoost instead of SVM",
@@ -407,6 +430,7 @@ def main():
         splits_dir,
         str(feature_csv),
         extraction_time_by_path,
+        feature_timeout=args.feature_timeout,
         xg_flag=args.xg,
         save_models=args.save_models,
         output_dir=output_dir,
