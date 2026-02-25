@@ -4,7 +4,7 @@ Evaluate Fusion-PWC (GIN + text embeddings, project, LayerNorm, projection, PWC 
 
 Expects:
   - Splits: --splits-dir with seed subdirs (train.json, test.json); paths rebased with --benchmark-root.
-  - GIN embeddings: --gin-features-base/{division}/seed{N}/embeddings.csv (and extraction_times.csv for failed paths).
+  - GIN embeddings: --gin-features-base/{division}/seed{N}/features.csv (and extraction_times.csv for failed paths).
   - Text embeddings: --desc-features-dir/{division}.csv (e.g. all-mpnet-base-v2).
 
 For each seed: build emb_by_path (L2-normalize GIN), train Fusion-PWC, evaluate on train and test, write summary and per-seed CSVs.
@@ -155,7 +155,7 @@ def evaluate_multi_splits_fusion(
         train_data = _rebase_perf_data(train_data, root)
         test_data = _rebase_perf_data(test_data, root)
 
-        gin_csv = gin_base / division / f"seed{seed_val}" / "embeddings.csv"
+        gin_csv = gin_base / division / f"seed{seed_val}" / "features.csv"
         extraction_times_csv = gin_base / division / f"seed{seed_val}" / "extraction_times.csv"
         if not gin_csv.is_file():
             raise FileNotFoundError(f"GIN embeddings not found: {gin_csv}")

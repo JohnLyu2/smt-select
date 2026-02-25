@@ -5,7 +5,7 @@ Extract GIN-PWC backbone embeddings for benchmarks listed in a performance JSON.
 Loads a saved GIN-PWC model (e.g. models/gin_pwc/ABV/seed0), iterates over all
 benchmark paths from a JSON file (e.g. data/cp26/raw_data/smtcomp24_performance/ABV.json),
 builds the graph for each instance, runs the backbone, and saves:
-  - <out_dir>/embeddings.csv: path + columns emb_0 .. emb_{d-1}
+  - <out_dir>/features.csv: path + columns emb_0 .. emb_{d-1}
   - <out_dir>/extraction_times.csv: path, time_sec, status (status is "ok" or "failed"; graph build is capped at graph_timeout)
 
 Instance paths in the JSON are rebased with --benchmark-root to get full .smt2 paths.
@@ -51,7 +51,7 @@ def main() -> None:
         "--output-dir",
         type=Path,
         default=Path("data/features/gin_pwc"),
-        help="Output directory for embeddings.csv and extraction_times.csv (default: data/features/gin_pwc)",
+        help="Output directory for features.csv and extraction_times.csv (default: data/features/gin_pwc)",
     )
     parser.add_argument(
         "--benchmark-root",
@@ -91,7 +91,7 @@ def run_extraction(
     graph_timeout: int | None = None,
     device: str | None = None,
 ) -> None:
-    """Extract GIN-PWC backbone embeddings; writes embeddings.csv and extraction_times.csv under output_dir/<division>/<seed>."""
+    """Extract GIN-PWC backbone embeddings; writes features.csv and extraction_times.csv under output_dir/<division>/<seed>."""
     model_dir = Path(model_dir).resolve()
     if not model_dir.is_dir() or not (model_dir / "config.json").exists():
         raise FileNotFoundError(f"Model directory not found or missing config.json: {model_dir}")
@@ -166,7 +166,7 @@ def run_extraction(
     subdir = out_dir / division / seed_name
     subdir.mkdir(parents=True, exist_ok=True)
 
-    csv_path = subdir / "embeddings.csv"
+    csv_path = subdir / "features.csv"
     with open(csv_path, "w") as f:
         header = ["path"] + [f"emb_{i}" for i in range(hidden_dim)]
         f.write(",".join(header) + "\n")
