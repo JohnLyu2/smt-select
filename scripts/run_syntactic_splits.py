@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Run evaluate_multi_splits.py for all logics that have syntactic feature CSV and splits.
+Run evaluate_multi_splits.py for all logics that have syntactic features and splits.
 
-Uses features from data/features/syntactic/catalog_all/<logic>.csv and
-splits from data/cp26/performance_splits/smtcomp24/<logic>/.
-Saves results to data/cp26/results/synt/catalog_0_pwc_svm/<logic>/.
+Expects folder structure like data/features/syntactic with one dir per logic (ABV, ALIA, ...),
+each containing features.csv (and optionally extraction_times.csv).
+Uses splits from data/cp26/performance_splits/smtcomp24/<logic>/.
+Saves results to data/cp26/results/synt/<logic>/.
 
 Usage (from project root, with venv activated):
   python scripts/run_syntactic_splits.py
@@ -20,15 +21,14 @@ from pathlib import Path
 
 # Project root when run as: python scripts/run_syntactic_splits.py
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-FEATURE_DIR = PROJECT_ROOT / "data" / "features" / "syntactic" / "catalog_all"
+FEATURES_DIR = PROJECT_ROOT / "data" / "features" / "syntactic"
 SPLITS_BASE = PROJECT_ROOT / "data" / "cp26" / "performance_splits" / "smtcomp24"
-RESULTS_BASE = PROJECT_ROOT / "data" / "cp26" / "results" / "synt" / "catalog_0_pwc_svm"
+RESULTS_BASE = PROJECT_ROOT / "data" / "cp26" / "results" / "synt"
 SCRIPT = PROJECT_ROOT / "scripts" / "evaluate_multi_splits.py"
 
 
-def _run_one(csv_path: Path, results_base: Path) -> str | None:
+def _run_one(logic: str, results_base: Path, features_dir: Path) -> str | None:
     """Run evaluate_multi_splits for one logic. Returns logic name on failure, None on success."""
-    logic = csv_path.stem
     splits_dir = SPLITS_BASE / logic
     output_dir = results_base / logic
     if not splits_dir.is_dir():
@@ -40,7 +40,7 @@ def _run_one(csv_path: Path, results_base: Path) -> str | None:
             sys.executable,
             str(SCRIPT),
             "--splits-dir", str(splits_dir),
-            "--feature-csv", str(csv_path),
+            "--features-dir", str(features_dir),
             "--output-dir", str(output_dir),
         ],
         cwd=str(PROJECT_ROOT),
@@ -58,37 +58,54 @@ def main() -> int:
         default=1,
         help="Max number of logics to run in parallel (default: 1)",
     )
+    parser.add_argument(
+        "--features-dir",
+        type=Path,
+        default=FEATURES_DIR,
+        help=f"Base dir with per-logic subdirs containing features.csv (default: {FEATURES_DIR})",
+    )
+    parser.add_argument(
+        "--results-dir",
+        type=Path,
+        default=RESULTS_BASE,
+        help=f"Base dir for results (default: {RESULTS_BASE})",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
-    if not FEATURE_DIR.is_dir():
-        logging.error("Feature dir not found: %s", FEATURE_DIR)
+    features_dir = args.features_dir.resolve()
+    if not features_dir.is_dir():
+        logging.error("Features dir not found: %s", features_dir)
         return 1
     if not SCRIPT.is_file():
         logging.error("Script not found: %s", SCRIPT)
         return 1
 
-    csv_files = sorted(FEATURE_DIR.glob("*.csv"))
-    if not csv_files:
-        logging.error("No CSV files in %s", FEATURE_DIR)
+    # Find logic dirs that contain features.csv
+    logics = sorted(
+        d.name for d in features_dir.iterdir()
+        if d.is_dir() and (d / "features.csv").is_file()
+    )
+    if not logics:
+        logging.error("No logic dirs with features.csv in %s", features_dir)
         return 1
 
-    results_base = RESULTS_BASE.resolve()
+    results_base = args.results_dir.resolve()
     results_base.mkdir(parents=True, exist_ok=True)
     failed: list[str] = []
     jobs = max(1, args.jobs)
 
     if jobs == 1:
-        for csv_path in csv_files:
-            f = _run_one(csv_path, results_base)
+        for logic in logics:
+            f = _run_one(logic, results_base, features_dir)
             if f is not None:
                 failed.append(f)
     else:
         with ThreadPoolExecutor(max_workers=jobs) as executor:
-            futures = {executor.submit(_run_one, csv_path, results_base): csv_path for csv_path in csv_files}
+            futures = {executor.submit(_run_one, logic, results_base, features_dir): logic for logic in logics}
             for future in as_completed(futures):
                 f = future.result()
                 if f is not None:

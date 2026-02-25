@@ -73,6 +73,25 @@ def _load_setfit_selector(setfit_model: str, desc_json: str):
     return SetfitSelector(setfit_model, desc_json)
 
 
+def _normalize_path(path: str) -> str:
+    """Normalize path for matching (strip, normalize separators)."""
+    return path.strip().replace("\\", "/")
+
+
+def load_extraction_times_csv(csv_path: Path) -> dict[str, float]:
+    """Load path -> time_sec from extraction_times.csv (path, time_sec, status)."""
+    out: dict[str, float] = {}
+    with open(csv_path, encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            p = _normalize_path(row["path"])
+            try:
+                out[p] = float(row["time_sec"])
+            except (KeyError, ValueError):
+                continue
+    return out
+
+
 def _csv_benchmark(path: str, csv_benchmark_root: Path | None) -> str:
     """Return path for CSV: relative to csv_benchmark_root if set, else path as-is."""
     if csv_benchmark_root is None:
@@ -94,6 +113,7 @@ def as_evaluate_parallel(
     result_timeout: int = 30,
     fallback_solver_id: int | None = None,
     csv_benchmark_root: Path | str | None = None,
+    extra_overhead_by_path: dict[str, float] | None = None,
 ):
     """
     Evaluate algorithm selection in parallel. Each worker loads the selector via loader_fn(*loader_args).
@@ -116,6 +136,7 @@ def as_evaluate_parallel(
     perf_dict: dict = {}
     path_to_selected: dict[str, int] = {}
     path_to_overhead: dict[str, float | None] = {}
+    path_to_extra_overhead: dict[str, float] = {}
     path_to_solver_runtime: dict[str, float] = {}
     path_to_feature_fail: dict[str, bool] = {}
     ctx = multiprocessing.get_context("spawn")
@@ -158,21 +179,36 @@ def as_evaluate_parallel(
             )
             path_to_solver_runtime[instance_path] = raw_runtime
             timeout = multi_perf_data.get_timeout()
+            extra = (extra_overhead_by_path or {}).get(
+                _normalize_path(instance_path), 0.0
+            )
+            path_to_extra_overhead[instance_path] = extra
+            total_overhead = (overhead if overhead is not None else 0.0) + extra
             perf_dict[instance_path] = _apply_overhead_to_perf(
-                raw_is_solved, raw_runtime, overhead, timeout
+                raw_is_solved, raw_runtime, total_overhead, timeout
             )
     csv_root = Path(csv_benchmark_root) if csv_benchmark_root else None
     if write_csv_path is not None:
         with Path(write_csv_path).open(mode="w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(
-                ["benchmark", "selected", "solved", "runtime", "solver_runtime", "overhead", "feature_fail"]
+                [
+                    "benchmark",
+                    "selected",
+                    "solved",
+                    "runtime",
+                    "solver_runtime",
+                    "selector_overhead",
+                    "extra_overhead",
+                    "feature_fail",
+                ]
             )
             for path in instance_paths:
                 selected = path_to_selected[path]
                 is_solved, runtime = perf_dict[path]
                 solver_runtime = path_to_solver_runtime[path]
                 ov = path_to_overhead[path]
+                extra_sec = path_to_extra_overhead[path]
                 ff = path_to_feature_fail[path]
                 csv_writer.writerow(
                     [
@@ -182,6 +218,7 @@ def as_evaluate_parallel(
                         runtime,
                         solver_runtime,
                         f"{ov:.6f}" if ov is not None else "",
+                        f"{extra_sec:.6f}" if extra_sec else "",
                         1 if ff else 0,
                     ]
                 )
@@ -198,14 +235,17 @@ def as_evaluate(
     write_csv_path: str | None = None,
     show_progress: bool = True,
     csv_benchmark_root: Path | str | None = None,
+    extra_overhead_by_path: dict[str, float] | None = None,
 ):
     """
-    Evaluate the performance of the algorithm selection model based on the provided multi_perf_data;
+    Evaluate the performance of the algorithm selection model based on the provided multi_perf_data.
+    Overhead = selector-reported overhead (if any) + extra_overhead_by_path.get(path, 0).
     If write_csv_path is not None, write the result to the csv file.
     If show_progress is True, show a tqdm progress bar over instances.
     If csv_benchmark_root is set, the CSV benchmark column is written as path relative to it (e.g. logic-relative).
     """
     csv_root = Path(csv_benchmark_root) if csv_benchmark_root else None
+    extra = extra_overhead_by_path or {}
     if write_csv_path is not None:
         with Path(write_csv_path).open(mode="w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
@@ -216,7 +256,8 @@ def as_evaluate(
                     "solved",
                     "runtime",
                     "solver_runtime",
-                    "overhead",
+                    "selector_overhead",
+                    "extra_overhead",
                     "feature_fail",
                 ]
             )
@@ -231,8 +272,10 @@ def as_evaluate(
         raw_is_solved, raw_runtime = multi_perf_data.get_performance(
             instance_path, selected
         )
+        extra_sec = extra.get(_normalize_path(instance_path), 0.0)
+        total_overhead = (overhead if overhead is not None else 0.0) + extra_sec
         perf_dict[instance_path] = _apply_overhead_to_perf(
-            raw_is_solved, raw_runtime, overhead, timeout
+            raw_is_solved, raw_runtime, total_overhead, timeout
         )
         if write_csv_path is not None:
             with Path(write_csv_path).open(mode="a", newline="") as csv_file:
@@ -247,6 +290,7 @@ def as_evaluate(
                         runtime,
                         raw_runtime,
                         f"{overhead:.6f}" if overhead is not None else "",
+                        f"{extra_sec:.6f}" if extra_sec else "",
                         1 if feature_fail else 0,
                     ]
                 )

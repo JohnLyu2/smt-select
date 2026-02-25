@@ -8,6 +8,13 @@ Expects --splits-dir to point at a division folder containing seed subdirs, e.g.
     seed10/train.json, test.json
     ...
 
+Features: --features-dir DIR must point to a directory with one logic folder per division
+  (e.g. data/features/syntactic). Each division folder (ABV, ALIA, ...) must contain features.csv
+  and extraction_times.csv. The script uses <features-dir>/<division>/features.csv and
+  <features-dir>/<division>/extraction_times.csv. Extraction times are added as overhead when
+  computing all evaluation metrics: both solved count (instances where solver_time + extraction_time
+  exceeds timeout count as unsolved) and PAR-2 / gap closed.
+
 For each split (seed):
   1. Load train.json and test.json (performance JSON format).
   2. Train a model on the train set.
@@ -16,6 +23,7 @@ For each split (seed):
 
 Results are aggregated across splits (mean ± std) and saved to summary.json. Per-seed CSVs
 are written under output_dir as seed0/train_eval.csv, seed0/test_eval.csv, seed10/..., etc.
+When output_dir is set, training logs are saved to output_dir/train_log/seed{N}.log per seed.
 """
 
 import argparse
@@ -29,63 +37,11 @@ from pathlib import Path
 import numpy as np
 
 from src.evaluate import as_evaluate
+from src.evaluate import compute_metrics
+from src.evaluate import load_extraction_times_csv
 from src.feature import validate_feature_coverage
 from src.performance import parse_performance_json
 from src.pwc import PwcSelector, train_pwc
-
-
-def compute_metrics(result_dataset, multi_perf_data):
-    """
-    Compute evaluation metrics for a result dataset.
-    Handles edge case where SBS and VBS are identical (no division by zero).
-
-    Args:
-        result_dataset: SingleSolverDataset with algorithm selection results
-        multi_perf_data: MultiSolverDataset for comparison metrics
-
-    Returns:
-        Dictionary of metrics (no solve_rate fields; gap_cls_* used for aggregation).
-    """
-    total_count = len(result_dataset)
-    solved_count = result_dataset.get_solved_count()
-
-    total_par2 = sum(result_dataset.get_par2(path) for path in result_dataset.keys())
-    avg_par2 = total_par2 / total_count if total_count > 0 else 0.0
-
-    sbs_dataset = multi_perf_data.get_best_solver_dataset()
-    sbs_solved = sbs_dataset.get_solved_count()
-    total_par2_sbs = sum(sbs_dataset.get_par2(path) for path in sbs_dataset.keys())
-    avg_par2_sbs = total_par2_sbs / total_count if total_count > 0 else 0.0
-
-    vbs_dataset = multi_perf_data.get_virtual_best_solver_dataset()
-    vbs_solved = vbs_dataset.get_solved_count()
-    total_par2_vbs = sum(vbs_dataset.get_par2(path) for path in vbs_dataset.keys())
-    avg_par2_vbs = total_par2_vbs / total_count if total_count > 0 else 0.0
-
-    solved_denom = vbs_solved - sbs_solved
-    par2_denom = avg_par2_vbs - avg_par2_sbs
-    gap_cls_solved = (
-        (solved_count - sbs_solved) / solved_denom
-        if solved_denom != 0
-        else (1.0 if solved_count == vbs_solved else 0.0)
-    )
-    gap_cls_par2 = (
-        (avg_par2 - avg_par2_sbs) / par2_denom
-        if par2_denom != 0
-        else (1.0 if avg_par2 == avg_par2_vbs else 0.0)
-    )
-
-    return {
-        "solved": solved_count,
-        "avg_par2": avg_par2,
-        "sbs_name": sbs_dataset.get_solver_name(),
-        "sbs_solved": sbs_solved,
-        "sbs_avg_par2": avg_par2_sbs,
-        "vbs_solved": vbs_solved,
-        "vbs_avg_par2": avg_par2_vbs,
-        "gap_cls_solved": gap_cls_solved,
-        "gap_cls_par2": gap_cls_par2,
-    }
 
 
 def discover_seed_dirs(splits_dir: Path) -> list[tuple[int, Path]]:
@@ -109,6 +65,7 @@ def discover_seed_dirs(splits_dir: Path) -> list[tuple[int, Path]]:
 def evaluate_multi_splits(
     splits_dir: Path,
     feature_csv_path: str | list[str],
+    extraction_time_by_path: dict[str, float],
     *,
     xg_flag: bool = False,
     save_models: bool = False,
@@ -120,10 +77,12 @@ def evaluate_multi_splits(
     """
     Run train/test evaluation for each split (seed) under splits_dir (seed0/, seed10/, ...),
     then aggregate metrics across splits. Division name for outputs is taken from splits_dir.name.
+    Extraction times are added as overhead when computing metrics.
 
     Args:
         splits_dir: Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/ABV)
         feature_csv_path: Path or list of paths to feature CSV(s)
+        extraction_time_by_path: Map normalized instance path -> extraction time (sec) for overhead
         xg_flag: Use XGBoost if True else SVM
         save_models: Save model per split (requires output_dir)
         output_dir: Where to write summary.json and optional per-split outputs
@@ -198,14 +157,32 @@ def evaluate_multi_splits(
         else:
             model_save_dir = Path(tempfile.mkdtemp())
 
-        train_pwc(
-            train_data,
-            save_dir=str(model_save_dir),
-            xg_flag=xg_flag,
-            feature_csv_path=feature_csv_path,
-            svm_c=svm_c,
-            random_seed=random_seed,
-        )
+        log_handler: logging.FileHandler | None = None
+        if output_dir:
+            train_log_dir = output_dir / "train_log"
+            train_log_dir.mkdir(parents=True, exist_ok=True)
+            log_file = train_log_dir / f"seed{seed_val}.log"
+            log_handler = logging.FileHandler(log_file, mode="w", encoding="utf-8")
+            log_handler.setLevel(logging.DEBUG)
+            log_handler.setFormatter(
+                logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+            )
+            logging.getLogger().addHandler(log_handler)
+
+        logging.info("Training started for seed %d", seed_val)
+        try:
+            train_pwc(
+                train_data,
+                save_dir=str(model_save_dir),
+                xg_flag=xg_flag,
+                feature_csv_path=feature_csv_path,
+                svm_c=svm_c,
+                random_seed=random_seed,
+            )
+        finally:
+            if log_handler is not None:
+                logging.getLogger().removeHandler(log_handler)
+                log_handler.close()
 
         as_model = PwcSelector.load(str(model_save_dir / "model.joblib"))
         if as_model.feature_csv_path is None:
@@ -220,11 +197,19 @@ def evaluate_multi_splits(
             test_output_csv = str(seed_out_dir / "test_eval.csv")
 
         train_result = as_evaluate(
-            as_model, train_data, write_csv_path=train_output_csv
+            as_model,
+            train_data,
+            write_csv_path=train_output_csv,
+            extra_overhead_by_path=extraction_time_by_path,
         )
         train_metrics = compute_metrics(train_result, train_data)
 
-        test_result = as_evaluate(as_model, test_data, write_csv_path=test_output_csv)
+        test_result = as_evaluate(
+            as_model,
+            test_data,
+            write_csv_path=test_output_csv,
+            extra_overhead_by_path=extraction_time_by_path,
+        )
         test_metrics = compute_metrics(test_result, test_data)
 
         seed_results.append({
@@ -343,13 +328,10 @@ def main():
         help="Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/ABV)",
     )
     parser.add_argument(
-        "--feature-csv",
+        "--features-dir",
         type=str,
-        action="append",
-        default=None,
-        dest="feature_csv",
-        metavar="PATH",
-        help="Path to a feature CSV. Repeat to use multiple CSVs (e.g. syntactic + description).",
+        required=True,
+        help="Directory with one logic folder per division (e.g. data/features/syntactic). Each must contain features.csv.",
     )
     parser.add_argument(
         "--timeout",
@@ -399,16 +381,32 @@ def main():
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
 
-    if not args.feature_csv:
-        parser.error("At least one --feature-csv is required")
+    splits_dir = Path(args.splits_dir).resolve()
+    division = splits_dir.name
+
+    features_base = Path(args.features_dir).resolve()
+    division_dir = features_base / division
+    feature_csv = division_dir / "features.csv"
+    extraction_times_csv = division_dir / "extraction_times.csv"
+    if not feature_csv.is_file():
+        parser.error(
+            f"--features-dir: expected {feature_csv} for division {division!r}"
+        )
+    if not extraction_times_csv.is_file():
+        parser.error(
+            f"--features-dir: expected {extraction_times_csv} for division {division!r}"
+        )
+
+    extraction_time_by_path = load_extraction_times_csv(extraction_times_csv)
 
     output_dir = Path(args.output_dir) if args.output_dir else None
     if output_dir:
         output_dir.mkdir(parents=True, exist_ok=True)
 
     evaluate_multi_splits(
-        Path(args.splits_dir),
-        args.feature_csv,
+        splits_dir,
+        str(feature_csv),
+        extraction_time_by_path,
         xg_flag=args.xg,
         save_models=args.save_models,
         output_dir=output_dir,
