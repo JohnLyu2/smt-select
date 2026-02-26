@@ -32,7 +32,11 @@ from src.fusion_pwc import (
     train_fusion_pwc,
     FusionPWCSelector,
 )
-from src.performance import parse_performance_json, MultiSolverDataset
+from src.performance import (
+    filter_training_instances,
+    parse_performance_json,
+    MultiSolverDataset,
+)
 
 DEFAULT_GIN_FEATURES_BASE = Path("data/features/gin_pwc")
 DEFAULT_DESC_FEATURES_DIR = Path("data/features/smtlib_desc/all-mpnet-base-v2")
@@ -98,6 +102,8 @@ def evaluate_multi_splits_fusion(
     patience: int = 50,
     val_split_seed: int = 42,
     min_epochs: int = 100,
+    skip_easy_unsolvable: bool = False,
+    skip_trivial_under: float = 24.0,
     seeds: list[int] | None = None,
 ) -> dict:
     """
@@ -154,6 +160,27 @@ def evaluate_multi_splits_fusion(
         train_data = _rebase_perf_data(train_data, root)
         test_data = _rebase_perf_data(test_data, root)
 
+        if skip_easy_unsolvable:
+            paths_to_keep, filter_stats = filter_training_instances(
+                train_data,
+                skip_unsolvable=True,
+                skip_trivial_under=skip_trivial_under,
+            )
+            train_data_for_training = MultiSolverDataset(
+                {p: train_data[p] for p in paths_to_keep},
+                train_data.get_solver_id_dict(),
+                train_data.get_timeout(),
+            )
+            logging.info(
+                "Training on %d instances (dropped %d unsolvable, %d trivial); train eval will use full %d",
+                filter_stats["n_kept"],
+                filter_stats["n_unsolvable"],
+                filter_stats["n_trivial"],
+                len(train_data),
+            )
+        else:
+            train_data_for_training = train_data
+
         gin_csv = gin_base / division / f"seed{seed_val}" / "features.csv"
         extraction_times_csv = gin_base / division / f"seed{seed_val}" / "extraction_times.csv"
         if not gin_csv.is_file():
@@ -208,11 +235,13 @@ def evaluate_multi_splits_fusion(
                 logging.getLogger().addHandler(log_handler)
 
             try:
-                train_paths_with_emb = [p for p in train_data.keys() if p in emb_by_path]
+                train_paths_with_emb = [
+                    p for p in train_data_for_training.keys() if p in emb_by_path
+                ]
                 train_fusion_pwc(
                     emb_by_path,
                     train_paths_with_emb,
-                    train_data,
+                    train_data_for_training,
                     str(model_save_dir),
                     d_gin=64,
                     d_text=768,
@@ -387,6 +416,17 @@ def main() -> None:
     )
     parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--eval-only", action="store_true", help="Load models from --models-base, skip training.")
+    parser.add_argument(
+        "--skip-easy-unsolvable",
+        action="store_true",
+        help="Exclude train instances where no solver solves or all solve in <= N seconds; saves train time",
+    )
+    parser.add_argument(
+        "--skip-trivial-under",
+        type=float,
+        default=24.0,
+        help="When --skip-easy-unsolvable: exclude train instances where every solver solved with runtime <= this (default 24)",
+    )
     parser.add_argument("--models-base", type=str, default=None, help="Base for saved models (required if --eval-only).")
     parser.add_argument("--save-models", action="store_true")
     parser.add_argument("--timeout", type=float, default=1200.0)
@@ -446,6 +486,8 @@ def main() -> None:
         patience=args.patience,
         val_split_seed=args.val_split_seed,
         min_epochs=args.min_epochs,
+        skip_easy_unsolvable=args.skip_easy_unsolvable,
+        skip_trivial_under=args.skip_trivial_under,
         seeds=args.seeds,
     )
 
