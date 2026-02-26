@@ -1,23 +1,24 @@
 \begin{table}[t]
 \centering
-\begin{tabular}{lcccc}
+\begin{tabular}{lccccc}
 \toprule
- & \multicolumn{3}{c}{\textbf{Without Description}} & \textbf{With Description} \\
+ & \multicolumn{3}{c}{\textbf{Without Description}} & \multicolumn{2}{c}{\textbf{With Description}} \\
 \cmidrule(lr){2-4}
-\cmidrule(lr){5-5}
- & \multirow{2}{*}{MachSMT} & \multicolumn{2}{c}{SMT-Select} & SMT-Select \\
+\cmidrule(lr){5-6}
+ & \multirow{2}{*}{MachSMT} & \multicolumn{2}{c}{SMT-Select} & \multicolumn{2}{c}{SMT-Select} \\
 \cmidrule(lr){3-4}
- &  & Lite & Graph & Lite+Text \\
+\cmidrule(lr){5-6}
+ &  & Lite & Graph & Lite+Text & Graph+Text \\
 \midrule
-ABV & 7.8 $\pm$ 19.5 & 71.5 $\pm$ 1.6 & \textbf{76.6} $\pm$ 5.9 & 72.0 $\pm$ 2.3 \\
-ALIA & 27.7 $\pm$ 19.2 & \textbf{55.3} $\pm$ 5.8 & 55.1 $\pm$ 4.8 & 37.9 $\pm$ 14.2 \\
-BV & 17.1 $\pm$ 6.9 & 38.2 $\pm$ 15.6 & \textbf{42.4} $\pm$ 28.2 & 46.5 $\pm$ 13.1 \\
-QF\_BV & 7.3 $\pm$ 23.7 & 33.4 $\pm$ 15.0 & \textbf{46.8} $\pm$ 3.2 & 56.8 $\pm$ 7.9 \\
-QF\_IDL & 6.1 $\pm$ 32.5 & 64.5 $\pm$ 27.6 & \textbf{69.7} $\pm$ 16.0 & 75.0 $\pm$ 9.5 \\
-QF\_LIA & 84.7 $\pm$ 3.9 & 89.0 $\pm$ 1.6 & \textbf{92.6} $\pm$ 1.9 & 91.5 $\pm$ 1.8 \\
-QF\_NRA & 17.2 $\pm$ 10.5 & 44.6 $\pm$ 12.9 & \textbf{50.7} $\pm$ 10.2 & 53.4 $\pm$ 4.6 \\
-QF\_SLIA & 77.0 $\pm$ 18.9 & 90.7 $\pm$ 2.0 & \textbf{92.8} $\pm$ 2.3 & 93.5 $\pm$ 1.2 \\
-UFNIA & -129.2 $\pm$ 99.2 & 14.8 $\pm$ 21.5 & \textbf{24.5} $\pm$ 13.2 & 24.0 $\pm$ 16.3 \\
+ABV & 7.8 $\pm$ 19.5 & 71.5 $\pm$ 1.6 & \textbf{76.6} $\pm$ 5.9 & 72.0 $\pm$ 2.3 & --- \\
+ALIA & 27.7 $\pm$ 19.2 & \textbf{55.3} $\pm$ 5.8 & 55.1 $\pm$ 4.8 & 37.9 $\pm$ 14.2 & --- \\
+BV & 17.1 $\pm$ 6.9 & 38.2 $\pm$ 15.6 & \textbf{42.4} $\pm$ 28.2 & 46.5 $\pm$ 13.1 & 53.9 $\pm$ 19.3 \\
+QF\_BV & 7.3 $\pm$ 23.7 & 33.4 $\pm$ 15.0 & \textbf{46.8} $\pm$ 3.2 & 56.8 $\pm$ 7.9 & --- \\
+QF\_IDL & 6.1 $\pm$ 32.5 & 64.5 $\pm$ 27.6 & \textbf{69.7} $\pm$ 16.0 & 75.0 $\pm$ 9.5 & --- \\
+QF\_LIA & 84.7 $\pm$ 3.9 & 89.0 $\pm$ 1.6 & \textbf{92.6} $\pm$ 1.9 & 91.5 $\pm$ 1.8 & --- \\
+QF\_NRA & 17.2 $\pm$ 10.5 & 44.6 $\pm$ 12.9 & \textbf{50.7} $\pm$ 10.2 & 53.4 $\pm$ 4.6 & 50.9 $\pm$ 3.9 \\
+QF\_SLIA & 77.0 $\pm$ 18.9 & 90.7 $\pm$ 2.0 & \textbf{92.8} $\pm$ 2.3 & 93.5 $\pm$ 1.2 & --- \\
+UFNIA & -129.2 $\pm$ 99.2 & 14.8 $\pm$ 21.5 & \textbf{24.5} $\pm$ 13.2 & 24.0 $\pm$ 16.3 & --- \\
 \bottomrule
 \end{tabular}
 \caption{Experimental results on the held-out test set, measured by the PAR-2 SBS–VBS gap closed (\%). Results are averaged over five random train–test splits and reported as mean $\pm$ standard deviation. Bold values indicate the best result within each feature setting.}

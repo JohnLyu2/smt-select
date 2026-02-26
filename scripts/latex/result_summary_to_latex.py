@@ -88,16 +88,16 @@ def main() -> None:
         value_columns = ["mach_ehm"] + [c for c in value_columns if c != "mach_ehm"]
     if "synt_mpnet" in value_columns:
         value_columns = [c for c in value_columns if c != "synt_mpnet"] + ["synt_mpnet"]
+    if "fusion_pwc" in value_columns and "synt_mpnet" in value_columns:
+        # With Description order: Lite+Text then Graph+Text (synt_mpnet then fusion_pwc)
+        value_columns = [c for c in value_columns if c != "fusion_pwc"] + ["fusion_pwc"]
     columns = ["logic"] + value_columns
 
-    # Two-line headers: first row "SMT-Select" before and after vertical line, second row variant names
-    variant_map = {"synt": "Lite", "gin_pwc": "Graph", "synt_mpnet": "Lite+Text"}
-    smt_select_columns = [c for c in value_columns if c in variant_map]
-    # Columns before the vertical line (Lite, Graph); after (Lite-Text)
-    n_smt_before = max(0, len(smt_select_columns) - 1)
-    n_smt_after = 1 if smt_select_columns else 0
-    # First vertical block: all value columns before the last (before synt_mpnet)
-    first_block_columns = value_columns[:-1] if len(value_columns) > 1 else []
+    # Header blocks: Without Description (first 3 cols), With Description (rest)
+    variant_map = {"synt": "Lite", "gin_pwc": "Graph", "synt_mpnet": "Lite+Text", "fusion_pwc": "Graph+Text"}
+    n_without = 3  # MachSMT, Lite, Graph
+    n_with = len(value_columns) - n_without
+    first_block_columns = value_columns[:n_without] if len(value_columns) >= n_without else value_columns
 
     ncols = len(columns)
     col_spec = "l" + "c" * (ncols - 1)
@@ -110,15 +110,16 @@ def main() -> None:
     ]
 
     if not args.no_header:
-        # Row 1: Without Description (cols 2-4), With Description (col 5)
-        lines.append(" & \\multicolumn{3}{c}{\\textbf{Without Description}} & \\textbf{With Description} \\\\")
-        lines.append("\\cmidrule(lr){2-4}")
-        lines.append("\\cmidrule(lr){5-5}")
-        # Row 2: MachSMT (multirow 2 for vertical center), SMT-Select (cols 3-4), SMT-Select (col 5)
-        lines.append(" & \\multirow{2}{*}{MachSMT} & \\multicolumn{2}{c}{SMT-Select} & SMT-Select \\\\")
+        # Row 1: Without Description (first n_without cols), With Description (n_with cols)
+        lines.append(" & \\multicolumn{" + str(n_without) + "}{c}{\\textbf{Without Description}} & \\multicolumn{" + str(n_with) + "}{c}{\\textbf{With Description}} \\\\")
+        lines.append("\\cmidrule(lr){2-" + str(1 + n_without) + "}")
+        lines.append("\\cmidrule(lr){" + str(2 + n_without) + "-" + str(ncols) + "}")
+        # Row 2: MachSMT (multirow 2), SMT-Select (cols 3-4), SMT-Select (cols 5-6 if n_with==2)
+        lines.append(" & \\multirow{2}{*}{MachSMT} & \\multicolumn{2}{c}{SMT-Select} & \\multicolumn{" + str(n_with) + "}{c}{SMT-Select} \\\\")
         lines.append("\\cmidrule(lr){3-4}")
-        # Row 3: variant names
-        row3_cells = ["", ""] + [variant_map.get(k, "") for k in smt_select_columns]
+        lines.append("\\cmidrule(lr){" + str(2 + n_without) + "-" + str(ncols) + "}")
+        # Row 3: variant names (empty for logic, empty under MachSMT, then Lite, Graph, Graph+Text, Lite+Text)
+        row3_cells = [""] + [variant_map.get(k, "") for k in value_columns]
         lines.append(" & ".join(row3_cells) + " \\\\")
         lines.append("\\midrule")
 
