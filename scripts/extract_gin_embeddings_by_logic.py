@@ -11,6 +11,7 @@ data/cp26/raw_data/smtcomp24_performance/<logic>.json.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
 from pathlib import Path
@@ -73,6 +74,17 @@ def main() -> None:
         default=None,
         help="Device for model (default: cuda if available else cpu)",
     )
+    parser.add_argument(
+        "--no-resume",
+        action="store_true",
+        help="Do not skip already-completed seeds or resume partial extraction; run from scratch",
+    )
+    parser.add_argument(
+        "--checkpoint-interval",
+        type=int,
+        default=10,
+        help="Write partial results every N instances (default: 10); 0 to disable mid-run checkpoints",
+    )
     args = parser.parse_args()
 
     logic = args.logic
@@ -97,7 +109,22 @@ def main() -> None:
         )
     logger.info("Logic %s: %d seeds -> %s", logic, len(seed_dirs), [d.name for d in seed_dirs])
 
+    with open(benchmarks_json) as f:
+        n_benchmarks = len(json.load(f))
+
+    def seed_complete(seed_out: Path) -> bool:
+        times_csv = seed_out / "extraction_times.csv"
+        if not times_csv.is_file():
+            return False
+        with open(times_csv) as f:
+            return sum(1 for _ in f) == n_benchmarks + 1  # header + one row per benchmark
+
+    resume = not args.no_resume
     for seed_dir in seed_dirs:
+        seed_out = out_base / logic / seed_dir.name
+        if resume and seed_complete(seed_out):
+            logger.info("Skipping %s / %s (already complete)", logic, seed_dir.name)
+            continue
         logger.info("Extracting %s / %s ...", logic, seed_dir.name)
         run_extraction(
             model_dir=seed_dir,
@@ -106,6 +133,8 @@ def main() -> None:
             benchmark_root=args.benchmark_root,
             graph_timeout=args.graph_timeout,
             device=args.device,
+            resume=resume,
+            checkpoint_interval=args.checkpoint_interval,
         )
     logger.info("Done. Features written under %s/%s/", out_base, logic)
 

@@ -14,6 +14,7 @@ Instance paths in the JSON are rebased with --benchmark-root to get full .smt2 p
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import logging
 import time
@@ -82,6 +83,72 @@ def main() -> None:
     )
 
 
+def _write_checkpoint(
+    subdir: Path,
+    hidden_dim: int,
+    embeddings: list[tuple[str, list[float]]],
+    extraction_times: list[tuple[str, float]],
+    failed: list[str],
+) -> None:
+    """Write current state to features.csv and extraction_times.csv for resume/partial results."""
+    failed_set = set(failed)
+    csv_path = subdir / "features.csv"
+    with open(csv_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["path"] + [f"emb_{i}" for i in range(hidden_dim)])
+        for rel_path, vec in embeddings:
+            writer.writerow([rel_path] + [str(x) for x in vec])
+    times_path = subdir / "extraction_times.csv"
+    with open(times_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["path", "time_sec", "failed"])
+        for rel_path, sec in extraction_times:
+            writer.writerow([rel_path, sec, "1" if rel_path in failed_set else "0"])
+
+
+def _load_existing_checkpoint(
+    subdir: Path,
+) -> tuple[list[tuple[str, list[float]]], list[tuple[str, float]], list[str], int] | None:
+    """Load existing features.csv and extraction_times.csv if present. Returns (embeddings, times, failed, hidden_dim) or None."""
+    csv_path = subdir / "features.csv"
+    times_path = subdir / "extraction_times.csv"
+    if not csv_path.is_file() or not times_path.is_file():
+        return None
+    embeddings: list[tuple[str, list[float]]] = []
+    with open(csv_path, newline="") as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        if not header or header[0] != "path":
+            return None
+        hidden_dim = len(header) - 1
+        for row in reader:
+            if len(row) < 2:
+                continue
+            path, *rest = row
+            try:
+                vec = [float(x) for x in rest[:hidden_dim]]
+            except ValueError:
+                continue
+            embeddings.append((path, vec))
+    extraction_times: list[tuple[str, float]] = []
+    failed: list[str] = []
+    with open(times_path, newline="") as f:
+        reader = csv.reader(f)
+        next(reader, None)  # header
+        for row in reader:
+            if len(row) < 3:
+                continue
+            path, time_str, failed_val = row[0], row[1], row[2]
+            try:
+                sec = float(time_str)
+            except ValueError:
+                sec = 0.0
+            extraction_times.append((path, sec))
+            if failed_val.strip() == "1":
+                failed.append(path)
+    return embeddings, extraction_times, failed, hidden_dim
+
+
 def run_extraction(
     model_dir: Path | str,
     benchmarks_json: Path | str,
@@ -90,8 +157,11 @@ def run_extraction(
     benchmark_root: Path | str | None = None,
     graph_timeout: int | None = None,
     device: str | None = None,
+    resume: bool = True,
+    checkpoint_interval: int = 10,
 ) -> None:
-    """Extract GIN-PWC backbone embeddings; writes features.csv and extraction_times.csv under output_dir/<division>/<seed>."""
+    """Extract GIN-PWC backbone embeddings; writes features.csv and extraction_times.csv under output_dir/<division>/<seed>.
+    If resume=True and partial results exist, skips already-done instances and appends; checkpoints every checkpoint_interval instances."""
     model_dir = Path(model_dir).resolve()
     if not model_dir.is_dir() or not (model_dir / "config.json").exists():
         raise FileNotFoundError(f"Model directory not found or missing config.json: {model_dir}")
@@ -106,11 +176,15 @@ def run_extraction(
 
     out_dir = Path(output_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
+    division = model_dir.parent.name
+    seed_name = model_dir.name
+    subdir = out_dir / division / seed_name
+    subdir.mkdir(parents=True, exist_ok=True)
 
     with open(benchmarks_path) as f:
         perf = json.load(f)
-    relative_paths = list(perf.keys())
-    logger.info("Loaded %d benchmark keys from %s", len(relative_paths), benchmarks_path)
+    all_relative_paths = list(perf.keys())
+    logger.info("Loaded %d benchmark keys from %s", len(all_relative_paths), benchmarks_path)
 
     selector = GINPwcSelector.load(model_dir, device=device)
     graph_timeout_val = graph_timeout if graph_timeout is not None else selector.graph_timeout
@@ -119,12 +193,33 @@ def run_extraction(
     embeddings: list[tuple[str, list[float]]] = []
     extraction_times: list[tuple[str, float]] = []
     failed: list[str] = []
+    relative_paths = all_relative_paths
 
-    for rel_path in tqdm(relative_paths, desc="Extracting embeddings", unit="instance"):
+    if resume:
+        existing = _load_existing_checkpoint(subdir)
+        if existing is not None:
+            embeddings, extraction_times, failed, loaded_dim = existing
+            if loaded_dim != hidden_dim:
+                logger.warning(
+                    "Existing checkpoint hidden_dim=%d != model hidden_dim=%d; ignoring checkpoint",
+                    loaded_dim,
+                    hidden_dim,
+                )
+            else:
+                completed = {p for p, _ in extraction_times}
+                relative_paths = [p for p in all_relative_paths if p not in completed]
+                logger.info(
+                    "Resuming: %d already done, %d remaining",
+                    len(completed),
+                    len(relative_paths),
+                )
+
+    # Every branch below appends exactly one (rel_path, time) to extraction_times so nothing is missed.
+    for idx, rel_path in enumerate(tqdm(relative_paths, desc="Extracting embeddings", unit="instance")):
         t0 = time.perf_counter()
         full_path = root / rel_path
         if not full_path.exists():
-            logger.debug("Benchmark file not found: %s", full_path)
+            logger.error("Benchmark file not found: %s", full_path)
             failed.append(rel_path)
             extraction_times.append((rel_path, time.perf_counter() - t0))
             continue
@@ -160,30 +255,14 @@ def run_extraction(
         ):
             torch.cuda.empty_cache()
 
-    # Output under out_dir / division / seed (e.g. data/features/gin_pwc/ABV/seed0)
-    division = model_dir.parent.name
-    seed_name = model_dir.name
-    subdir = out_dir / division / seed_name
-    subdir.mkdir(parents=True, exist_ok=True)
+        if checkpoint_interval > 0 and (idx + 1) % checkpoint_interval == 0:
+            _write_checkpoint(subdir, hidden_dim, embeddings, extraction_times, failed)
+            logger.debug("Checkpoint: %d instances written", len(extraction_times))
 
-    csv_path = subdir / "features.csv"
-    with open(csv_path, "w") as f:
-        header = ["path"] + [f"emb_{i}" for i in range(hidden_dim)]
-        f.write(",".join(header) + "\n")
-        for rel_path, vec in embeddings:
-            row = [rel_path] + [str(x) for x in vec]
-            f.write(",".join(row) + "\n")
-    logger.info("Wrote %d embeddings to %s", len(embeddings), csv_path)
-
-    failed_set = set(failed)
-    times_path = subdir / "extraction_times.csv"
-    with open(times_path, "w") as f:
-        f.write("path,time_sec,failed\n")
-        for rel_path, sec in extraction_times:
-            failed_val = "1" if rel_path in failed_set else "0"
-            f.write(f"{rel_path},{sec},{failed_val}\n")
-    logger.info("Wrote extraction times for %d instances to %s", len(extraction_times), times_path)
-    logger.info("Failed: %d of %d instances", len(failed), len(relative_paths))
+    _write_checkpoint(subdir, hidden_dim, embeddings, extraction_times, failed)
+    logger.info("Wrote %d embeddings to %s", len(embeddings), subdir / "features.csv")
+    logger.info("Wrote extraction times for %d instances to %s", len(extraction_times), subdir / "extraction_times.csv")
+    logger.info("Failed: %d of %d instances", len(failed), len(all_relative_paths))
 
 
 if __name__ == "__main__":
