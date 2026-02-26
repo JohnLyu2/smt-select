@@ -1,0 +1,26 @@
+---
+description: Treat missing files as errors, not warnings
+alwaysApply: true
+---
+
+# Missing File Handling
+
+When code checks for file existence or reads files:
+
+- **Do not** log a warning and continue when a required file is missing.
+- **Do** raise an error (e.g. `FileNotFoundError`, `ValueError`, or a clear custom exception) so the process fails fast.
+
+Examples:
+
+```python
+# ❌ BAD – warn and continue
+if not path.exists():
+    logger.warning(f"File not found: {path}")
+    return None
+
+# ✅ GOOD – fail with a clear error
+if not path.exists():
+    raise FileNotFoundError(f"Required file not found: {path}")
+```
+
+Apply this for any expected file (configs, data files, model paths, etc.). Use warnings only for optional or best-effort resources; required resources must error when missing.
