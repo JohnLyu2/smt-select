@@ -1,0 +1,21 @@
+---
+description: For nontrivial code changes, propose a plan first and implement only after user confirmation
+alwaysApply: true
+---
+
+# Plan Before Implement
+
+For **nontrivial** code changes:
+
+1. **First** describe a short plan (steps, affected files, and main approach).
+2. **Wait** for the user to confirm before writing or editing code.
+3. **Then** implement according to the confirmed plan.
+
+Treat as nontrivial when any of these apply:
+
+- Touching multiple files or modules
+- Changing behavior, APIs, or data flow
+- Refactors, new features, or non-obvious fixes
+- Anything that could break existing behavior
+
+For trivial changes (single-file typo, obvious one-line fix, renaming a local variable), you may implement directly without asking. When in doubt, prefer showing a plan first.
