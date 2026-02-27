@@ -73,8 +73,9 @@ def main() -> None:
             PROJECT_ROOT / "data" / "cp26" / "results" / "gnn" / "gin_pwc_fb",
             PROJECT_ROOT / "data" / "cp26" / "results" / "machsmt" / "ehm",
             PROJECT_ROOT / "data" / "cp26" / "results" / "fusion_pwc",
+            PROJECT_ROOT / "data" / "cp26" / "results" / "sibyl" / "evaluation",
         ],
-        help="Result directories (each contains <logic>/summary.json). Default: synt, synt+mpnet, gin_pwc_fb, mach_ehm, fusion_pwc",
+        help="Result directories (each contains <logic>/summary.json). Default: synt, synt+mpnet, gin_pwc_fb, mach_ehm, fusion_pwc, sibyl",
     )
     args = parser.parse_args()
 
@@ -92,14 +93,22 @@ def main() -> None:
     logics = sorted(all_logics)
 
     # Column labels: short names for default dirs
-    default_names = ["synt", "synt_mpnet", "gin_pwc", "mach_ehm", "fusion_pwc"]
-    if (len(result_dirs) == 5
+    default_names = ["synt", "synt_mpnet", "gin_pwc", "mach_ehm", "fusion_pwc", "sibyl"]
+    if (len(result_dirs) == 6
+            and default_names[0] in str(result_dirs[0])
+            and "mpnet" in str(result_dirs[1])
+            and "gin_pwc_fb" in str(result_dirs[2])
+            and "machsmt" in str(result_dirs[3]) and "ehm" in str(result_dirs[3])
+            and "fusion_pwc" in str(result_dirs[4])
+            and "sibyl" in str(result_dirs[5])):
+        labels = default_names
+    elif (len(result_dirs) == 5
             and default_names[0] in str(result_dirs[0])
             and "mpnet" in str(result_dirs[1])
             and "gin_pwc_fb" in str(result_dirs[2])
             and "machsmt" in str(result_dirs[3]) and "ehm" in str(result_dirs[3])
             and "fusion_pwc" in str(result_dirs[4])):
-        labels = default_names
+        labels = default_names[:5]
     elif (len(result_dirs) == 4
             and default_names[0] in str(result_dirs[0])
             and "mpnet" in str(result_dirs[1])

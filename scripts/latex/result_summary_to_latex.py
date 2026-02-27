@@ -85,7 +85,11 @@ def main() -> None:
     # Display columns: logic plus value columns (exclude *_std; those are paired with value columns)
     value_columns = [k for k in fieldnames if k != "logic" and not k.endswith("_std")]
     if "mach_ehm" in value_columns:
-        value_columns = ["mach_ehm"] + [c for c in value_columns if c != "mach_ehm"]
+        ordered = ["mach_ehm"]
+        if "sibyl" in value_columns:
+            ordered.append("sibyl")
+        ordered += [c for c in value_columns if c not in ordered]
+        value_columns = ordered
     if "synt_mpnet" in value_columns:
         value_columns = [c for c in value_columns if c != "synt_mpnet"] + ["synt_mpnet"]
     if "fusion_pwc" in value_columns and "synt_mpnet" in value_columns:
@@ -93,9 +97,16 @@ def main() -> None:
         value_columns = [c for c in value_columns if c != "fusion_pwc"] + ["fusion_pwc"]
     columns = ["logic"] + value_columns
 
-    # Header blocks: Without Description (first 3 cols), With Description (rest)
-    variant_map = {"synt": "Lite", "gin_pwc": "Graph", "synt_mpnet": "Lite+Text", "fusion_pwc": "Graph+Text"}
-    n_without = 3  # MachSMT, Lite, Graph
+    # Header blocks: Without Description (first 3 or 4 cols), With Description (rest)
+    variant_map = {
+        "synt": "Lite",
+        "gin_pwc": "Graph",
+        "synt_mpnet": "Lite+Text",
+        "fusion_pwc": "Graph+Text",
+        "sibyl": "",
+    }
+    has_sibyl = "sibyl" in value_columns
+    n_without = 4 if has_sibyl else 3  # MachSMT, (optional Sibyl), Lite, Graph
     n_with = len(value_columns) - n_without
     first_block_columns = value_columns[:n_without] if len(value_columns) >= n_without else value_columns
 
@@ -114,10 +125,23 @@ def main() -> None:
         lines.append(" & \\multicolumn{" + str(n_without) + "}{c}{\\textbf{Without Description}} & \\multicolumn{" + str(n_with) + "}{c}{\\textbf{With Description}} \\\\")
         lines.append("\\cmidrule(lr){2-" + str(1 + n_without) + "}")
         lines.append("\\cmidrule(lr){" + str(2 + n_without) + "-" + str(ncols) + "}")
-        # Row 2: MachSMT (multirow 2), SMT-Select (cols 3-4), SMT-Select (cols 5-6 if n_with==2)
-        lines.append(" & \\multirow{2}{*}{MachSMT} & \\multicolumn{2}{c}{SMT-Select} & \\multicolumn{" + str(n_with) + "}{c}{SMT-Select} \\\\")
-        lines.append("\\cmidrule(lr){3-4}")
-        lines.append("\\cmidrule(lr){" + str(2 + n_without) + "-" + str(ncols) + "}")
+        # Row 2: MachSMT (multirow 2), optional Sibyl (own column), then SMT-Select blocks
+        if has_sibyl:
+            # Columns: logic | MachSMT | Sibyl | Lite | Graph | (With-description SMT-Select...)
+            lines.append(
+                " & \\multirow{2}{*}{MachSMT} & \\multirow{2}{*}{Sibyl} & "
+                "\\multicolumn{2}{c}{SMT-Select} & \\multicolumn{" + str(n_with) + "}{c}{SMT-Select} \\\\"
+            )
+            lines.append("\\cmidrule(lr){4-5}")
+            lines.append("\\cmidrule(lr){" + str(2 + n_without) + "-" + str(ncols) + "}")
+        else:
+            # Original layout: MachSMT, then SMT-Select blocks
+            lines.append(
+                " & \\multirow{2}{*}{MachSMT} & \\multicolumn{2}{c}{SMT-Select} & "
+                "\\multicolumn{" + str(n_with) + "}{c}{SMT-Select} \\\\"
+            )
+            lines.append("\\cmidrule(lr){3-4}")
+            lines.append("\\cmidrule(lr){" + str(2 + n_without) + "-" + str(ncols) + "}")
         # Row 3: variant names (empty for logic, empty under MachSMT, then Lite, Graph, Graph+Text, Lite+Text)
         row3_cells = [""] + [variant_map.get(k, "") for k in value_columns]
         lines.append(" & ".join(row3_cells) + " \\\\")
