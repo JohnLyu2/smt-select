@@ -2,18 +2,14 @@
 """
 Evaluate algorithm selection over multiple train/test splits (evaluate_multi_splits).
 
-Expects --splits-dir to point at a division folder containing seed subdirs, e.g.:
-  data/cp26/performance_splits/smtcomp24/ABV/
-    seed0/train.json, test.json
-    seed10/train.json, test.json
-    ...
+Use --logic (e.g. BV, QF_BV) to run one division; omit --logic to run all logics found in feature dir(s).
+  Splits are read from data/cp26/performance_splits/smtcomp24/<logic>/ (seed0/, seed10/, ... with train.json, test.json).
 
-Features: --features-dir DIR must point to a directory with one logic folder per division
-  (e.g. data/features/syntactic). Each division folder (ABV, ALIA, ...) must contain features.csv
-  and extraction_times.csv. The script uses <features-dir>/<division>/features.csv and
-  <features-dir>/<division>/extraction_times.csv. Extraction times are added as overhead when
-  computing all evaluation metrics: both solved count (instances where solver_time + extraction_time
-  exceeds timeout count as unsolved) and PAR-2 / gap closed.
+Features: --features-dir DIR [DIR ...] can be given one or more directories. Each must have one
+  logic folder per division (e.g. data/features/syntactic, data/features/desc/all-mpnet-base-v2).
+  Each division folder must contain features.csv and extraction_times.csv. Feature vectors from
+  multiple dirs are concatenated; every instance must appear in every features.csv (no missing).
+  Extraction times from all dirs are summed per path; each feature source's time is capped at FEATURE_TIMEOUT (5s) before summing, then used as overhead for evaluation metrics.
 
 For each split (seed):
   1. Load train.json and test.json (performance JSON format).
@@ -43,10 +39,27 @@ from src.evaluate import load_failed_paths_from_extraction_times_csv
 from src.feature import validate_feature_coverage
 from src.performance import parse_performance_json
 from src.pwc import PwcSelector, train_pwc
+from src.utils import normalize_path
+
+# Per-instance extraction-time overhead cap (seconds) when computing metrics
+FEATURE_TIMEOUT = 5.0
+# Default splits base when using --logic (relative to project root)
+SPLITS_BASE = "data/cp26/performance_splits/smtcomp24"
 
 
-def _normalize_path(path: str) -> str:
-    return path.strip().replace("\\", "/")
+def _to_python_for_json(obj) -> int | float | list | dict | str | bool | None:
+    """Convert numpy types to native Python for JSON serialization."""
+    if isinstance(obj, (np.integer, np.int64)):
+        return int(obj)
+    if isinstance(obj, (np.floating, np.float64)):
+        return float(obj)
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    if isinstance(obj, dict):
+        return {k: _to_python_for_json(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_to_python_for_json(x) for x in obj]
+    return obj
 
 
 def discover_seed_dirs(splits_dir: Path) -> list[tuple[int, Path]]:
@@ -83,9 +96,9 @@ def evaluate_multi_splits(
     """
     Run train/test evaluation for each split (seed) under splits_dir (seed0/, seed10/, ...),
     then aggregate metrics across splits. Division name for outputs is taken from splits_dir.name.
-    Extraction times are added as overhead when computing metrics.
-    Only instances with failed=1 in extraction_times.csv are excluded from training (timeout_paths)
-    and get SBS at evaluation. The CSV label failed=1 is the single source for this.
+    Extraction times are added as overhead when computing metrics; each feature source's time
+    is capped at FEATURE_TIMEOUT (5s) before summing. Only instances with failed=1 in
+    extraction_times.csv are excluded from training and get SBS at evaluation.
 
     Args:
         splits_dir: Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/ABV)
@@ -113,19 +126,31 @@ def evaluate_multi_splits(
             f"No seed dirs (seedN with train.json and test.json) found in {splits_dir}"
         )
 
-    # Validate feature coverage using first seed's train+test
+    # Validate feature coverage using first seed's train+test. Instances in
+    # failed_paths_from_csv (failed=1 in extraction_times) are excluded from
+    # training and get SBS at eval, so we do not require them in any feature CSV.
     first_seed_dir = seed_entries[0][1]
     train_data_0 = parse_performance_json(
         str(first_seed_dir / "train.json"), timeout
     )
     test_data_0 = parse_performance_json(str(first_seed_dir / "test.json"), timeout)
     all_instance_paths = set(train_data_0.keys()) | set(test_data_0.keys())
+    failed_set = failed_paths_from_csv or set()
+    instances_requiring_features = all_instance_paths - failed_set
 
-    logging.info(
-        f"Validating feature coverage for {len(all_instance_paths)} instances..."
-    )
+    if isinstance(feature_csv_path, list):
+        logging.info(
+            f"Validating feature coverage for {len(instances_requiring_features)} instances "
+            f"(every path must appear in all {len(feature_csv_path)} feature CSV(s)); "
+            f"{len(failed_set)} failed paths excluded from check",
+        )
+    else:
+        logging.info(
+            f"Validating feature coverage for {len(instances_requiring_features)} instances "
+            f"({len(failed_set)} failed paths excluded from check)",
+        )
     missing_instances, instance_missing_in_csvs = validate_feature_coverage(
-        all_instance_paths, feature_csv_path
+        instances_requiring_features, feature_csv_path
     )
     if missing_instances:
         error_msg = (
@@ -135,8 +160,24 @@ def evaluate_multi_splits(
         logging.error(error_msg)
         raise ValueError(error_msg)
     if isinstance(feature_csv_path, list) and instance_missing_in_csvs:
+        sample = list(instance_missing_in_csvs.items())[:3]
+        details = "; ".join(f"{p!r} missing in {len(csvs)} CSV(s)" for p, csvs in sample)
         error_msg = (
-            f"ERROR: {len(instance_missing_in_csvs)} instance(s) missing in some CSV(s)."
+            f"ERROR: {len(instance_missing_in_csvs)} instance(s) missing in at least one feature CSV. "
+            f"Every path (except failed=1 in extraction_times) must have features in all {len(feature_csv_path)} source(s). Example: {details}"
+        )
+        logging.error(error_msg)
+        raise ValueError(error_msg)
+
+    missing_from_extraction_times = {
+        p for p in instances_requiring_features
+        if normalize_path(p) not in extraction_time_by_path
+    }
+    if missing_from_extraction_times:
+        error_msg = (
+            f"ERROR: {len(missing_from_extraction_times)} instance(s) missing from all extraction_times.csv. "
+            f"Every path that has features must appear in extraction_times.csv from every feature dir. "
+            f"Missing (first 10): {list(missing_from_extraction_times)[:10]}"
         )
         logging.error(error_msg)
         raise ValueError(error_msg)
@@ -147,11 +188,11 @@ def evaluate_multi_splits(
     )
 
     # Paths to exclude from training and use SBS at eval (only CSV label failed=1)
-    timeout_paths = list(failed_paths_from_csv) if failed_paths_from_csv else []
-    if timeout_paths:
+    failed_paths_list = list(failed_paths_from_csv or set())
+    if failed_paths_list:
         logging.info(
             "%d instances with failed=1 (excluded from training, SBS at eval)",
-            len(timeout_paths),
+            len(failed_paths_list),
         )
 
     seed_results: list[dict] = []
@@ -192,11 +233,13 @@ def evaluate_multi_splits(
 
         logging.info("Training started for seed %d", seed_val)
         try:
-            # Write timeout paths to temp file for train_pwc (exclude from training, fallback ranking)
+            # Write failed paths to temp file for train_pwc (exclude from training, fallback ranking)
             timeout_file: Path | None = None
-            if timeout_paths:
-                timeout_file = Path(tempfile.mkstemp(suffix=".txt", prefix="timeout_paths_")[1])
-                timeout_file.write_text("\n".join(timeout_paths), encoding="utf-8")
+            if failed_paths_list:
+                timeout_file = Path(
+                    tempfile.mkstemp(suffix=".txt", prefix="timeout_paths_")[1]
+                )
+                timeout_file.write_text("\n".join(failed_paths_list), encoding="utf-8")
             train_pwc(
                 train_data,
                 save_dir=str(model_save_dir),
@@ -256,8 +299,16 @@ def evaluate_multi_splits(
         })
 
         n_train, n_test = len(train_data), len(test_data)
-        train_gap_pct = (train_metrics["gap_cls_par2"] * 100) if train_metrics.get("gap_cls_par2") is not None else 0.0
-        test_gap_pct = (test_metrics["gap_cls_par2"] * 100) if test_metrics.get("gap_cls_par2") is not None else 0.0
+        train_gap_pct = (
+            (train_metrics["gap_cls_par2"] * 100)
+            if train_metrics.get("gap_cls_par2") is not None
+            else 0.0
+        )
+        test_gap_pct = (
+            (test_metrics["gap_cls_par2"] * 100)
+            if test_metrics.get("gap_cls_par2") is not None
+            else 0.0
+        )
         logging.info(
             f"  Train: solved {train_metrics['solved']}/{n_train}, gap closed (PAR-2): {train_gap_pct:.2f}%"
         )
@@ -271,28 +322,22 @@ def evaluate_multi_splits(
     test_metrics_list = [r["test_metrics"] for r in seed_results]
     train_metrics_list = [r["train_metrics"] for r in seed_results]
 
-    def agg(key: str):
-        return np.mean([m[key] for m in test_metrics_list]), np.std(
-            [m[key] for m in test_metrics_list]
-        )
-
-    def agg_train(key: str):
-        return np.mean([m[key] for m in train_metrics_list]), np.std(
-            [m[key] for m in train_metrics_list]
-        )
+    def _agg(metrics_list: list[dict], key: str) -> tuple[float, float]:
+        vals = [m[key] for m in metrics_list]
+        return float(np.mean(vals)), float(np.std(vals))
 
     aggregated = {
         "train": {
-            "gap_cls_solved_mean": agg_train("gap_cls_solved")[0],
-            "gap_cls_solved_std": agg_train("gap_cls_solved")[1],
-            "gap_cls_par2_mean": agg_train("gap_cls_par2")[0],
-            "gap_cls_par2_std": agg_train("gap_cls_par2")[1],
+            "gap_cls_solved_mean": _agg(train_metrics_list, "gap_cls_solved")[0],
+            "gap_cls_solved_std": _agg(train_metrics_list, "gap_cls_solved")[1],
+            "gap_cls_par2_mean": _agg(train_metrics_list, "gap_cls_par2")[0],
+            "gap_cls_par2_std": _agg(train_metrics_list, "gap_cls_par2")[1],
         },
         "test": {
-            "gap_cls_solved_mean": agg("gap_cls_solved")[0],
-            "gap_cls_solved_std": agg("gap_cls_solved")[1],
-            "gap_cls_par2_mean": agg("gap_cls_par2")[0],
-            "gap_cls_par2_std": agg("gap_cls_par2")[1],
+            "gap_cls_solved_mean": _agg(test_metrics_list, "gap_cls_solved")[0],
+            "gap_cls_solved_std": _agg(test_metrics_list, "gap_cls_solved")[1],
+            "gap_cls_par2_mean": _agg(test_metrics_list, "gap_cls_par2")[0],
+            "gap_cls_par2_std": _agg(test_metrics_list, "gap_cls_par2")[1],
         },
     }
 
@@ -309,23 +354,8 @@ def evaluate_multi_splits(
 
     if output_dir:
         summary_path = output_dir / "summary.json"
-        summary_path.parent.mkdir(parents=True, exist_ok=True)
-
-        def to_python(obj):
-            if isinstance(obj, (np.integer, np.int64)):
-                return int(obj)
-            if isinstance(obj, (np.floating, np.float64)):
-                return float(obj)
-            if isinstance(obj, np.ndarray):
-                return obj.tolist()
-            if isinstance(obj, dict):
-                return {k: to_python(v) for k, v in obj.items()}
-            if isinstance(obj, list):
-                return [to_python(x) for x in obj]
-            return obj
-
         with open(summary_path, "w") as f:
-            json.dump(to_python(results), f, indent=2)
+            json.dump(_to_python_for_json(results), f, indent=2)
         logging.info(f"Saved summary to {summary_path}")
 
     agg = results["aggregated"]
@@ -357,16 +387,19 @@ def main():
         description="Evaluate algorithm selection over multiple train/test splits (per seed)"
     )
     parser.add_argument(
-        "--splits-dir",
+        "--logic",
         type=str,
-        required=True,
-        help="Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/ABV)",
+        default=None,
+        metavar="LOGIC",
+        help="Division name (e.g. BV, QF_BV). If not given, run all logics found in feature dir(s).",
     )
     parser.add_argument(
         "--features-dir",
         type=str,
+        nargs="+",
         required=True,
-        help="Directory with one logic folder per division (e.g. data/features/syntactic). Each must contain features.csv.",
+        metavar="DIR",
+        help="Two or more base dirs (e.g. synt + desc); each must contain <logic>/features.csv and extraction_times.csv.",
     )
     parser.add_argument(
         "--timeout",
@@ -383,7 +416,7 @@ def main():
         "--output-dir",
         type=str,
         default=None,
-        help="Directory for summary.json and optional train/test CSVs and models",
+        help="Base directory for results. With --logic, output is written to <output-dir>/<logic>/.",
     )
     parser.add_argument(
         "--save-models",
@@ -411,46 +444,98 @@ def main():
     )
 
     args = parser.parse_args()
+
     logging.basicConfig(
         level=getattr(logging, args.log_level),
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
 
-    splits_dir = Path(args.splits_dir).resolve()
-    division = splits_dir.name
+    project_root = Path(__file__).resolve().parent.parent
+    features_dirs = [
+        (project_root / d).resolve() if not Path(d).is_absolute() else Path(d).resolve()
+        for d in args.features_dir
+    ]
+    splits_base = (project_root / SPLITS_BASE).resolve()
 
-    features_base = Path(args.features_dir).resolve()
-    division_dir = features_base / division
-    feature_csv = division_dir / "features.csv"
-    extraction_times_csv = division_dir / "extraction_times.csv"
-    if not feature_csv.is_file():
-        parser.error(
-            f"--features-dir: expected {feature_csv} for division {division!r}"
-        )
-    if not extraction_times_csv.is_file():
-        parser.error(
-            f"--features-dir: expected {extraction_times_csv} for division {division!r}"
-        )
+    def discover_logics_from_feature_dir() -> list[str]:
+        """Logics that have features in every feature dir and have splits in SPLITS_BASE."""
+        first_base = features_dirs[0]
+        candidates = [
+            sub.name for sub in first_base.iterdir()
+            if sub.is_dir()
+            and (sub / "features.csv").is_file()
+            and (sub / "extraction_times.csv").is_file()
+        ]
+        logics = [
+            name for name in sorted(candidates)
+            if (splits_base / name).is_dir()
+            and all(
+                (base / name / "features.csv").is_file()
+                and (base / name / "extraction_times.csv").is_file()
+                for base in features_dirs
+            )
+        ]
+        return logics
 
-    extraction_time_by_path = load_extraction_times_csv(extraction_times_csv)
-    failed_paths = load_failed_paths_from_extraction_times_csv(extraction_times_csv)
+    if args.logic is not None:
+        divisions_to_run = [args.logic]
+        if not (splits_base / args.logic).is_dir():
+            parser.error(f"Splits directory not found for logic {args.logic!r}: {splits_base / args.logic}")
+    else:
+        divisions_to_run = discover_logics_from_feature_dir()
+        if not divisions_to_run:
+            parser.error(
+                f"No logics found: need subdirs with features.csv and extraction_times.csv in "
+                f"{features_dirs[0]!s} and matching splits in {splits_base!s}"
+            )
+        logging.info("Running all %d logics: %s", len(divisions_to_run), divisions_to_run)
 
-    output_dir = Path(args.output_dir) if args.output_dir else None
-    if output_dir:
-        output_dir.mkdir(parents=True, exist_ok=True)
+    base_output_dir = Path(args.output_dir).resolve() if args.output_dir else None
 
-    evaluate_multi_splits(
-        splits_dir,
-        str(feature_csv),
-        extraction_time_by_path,
-        failed_paths_from_csv=set(failed_paths),
-        xg_flag=args.xg,
-        save_models=args.save_models,
-        output_dir=output_dir,
-        timeout=args.timeout,
-        svm_c=args.svm_c,
-        random_seed=args.random_seed,
-    )
+    for division in divisions_to_run:
+        splits_dir = splits_base / division
+
+        feature_csv_paths = []
+        extraction_time_by_path = {}
+        failed_paths_set = set()
+        for base in features_dirs:
+            division_dir = base / division
+            feature_csv = division_dir / "features.csv"
+            extraction_times_csv = division_dir / "extraction_times.csv"
+            if not feature_csv.is_file():
+                logging.warning("Skipping %s: missing %s", division, feature_csv)
+                break
+            if not extraction_times_csv.is_file():
+                logging.warning("Skipping %s: missing %s", division, extraction_times_csv)
+                break
+            feature_csv_paths.append(str(feature_csv))
+            times = load_extraction_times_csv(extraction_times_csv)
+            for p, t in times.items():
+                extraction_time_by_path[p] = extraction_time_by_path.get(p, 0.0) + min(
+                    t, FEATURE_TIMEOUT
+                )
+            failed_paths_set.update(
+                load_failed_paths_from_extraction_times_csv(extraction_times_csv)
+            )
+        else:
+            feature_csv_path = feature_csv_paths[0] if len(feature_csv_paths) == 1 else feature_csv_paths
+            output_dir = (base_output_dir / division).resolve() if base_output_dir else None
+            if output_dir:
+                output_dir.mkdir(parents=True, exist_ok=True)
+            evaluate_multi_splits(
+                splits_dir,
+                feature_csv_path,
+                extraction_time_by_path,
+                failed_paths_from_csv=failed_paths_set,
+                xg_flag=args.xg,
+                save_models=args.save_models,
+                output_dir=output_dir,
+                timeout=args.timeout,
+                svm_c=args.svm_c,
+                random_seed=args.random_seed,
+            )
+            continue
+        # warning was logged; skip this division
 
 
 if __name__ == "__main__":
