@@ -84,6 +84,13 @@ def main() -> int:
         default=None,
         help="Output directory (default: <meta-dir>/descriptions)",
     )
+    parser.add_argument(
+        "--logic",
+        type=str,
+        default=None,
+        metavar="LOGIC",
+        help="Process only this logic (e.g. QF_NRA). Default: all JSON files in meta-dir.",
+    )
     args = parser.parse_args()
 
     meta_dir = args.meta_dir.resolve()
@@ -94,7 +101,14 @@ def main() -> int:
         return 1
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    json_files = sorted(meta_dir.glob("*.json"))
+    if args.logic:
+        json_path = meta_dir / f"{args.logic}.json"
+        if not json_path.is_file():
+            print(f"Error: no such file {json_path}", file=sys.stderr)
+            return 1
+        json_files = [json_path]
+    else:
+        json_files = sorted(meta_dir.glob("*.json"))
 
     if not json_files:
         print(f"No JSON files found in {meta_dir}", file=sys.stderr)
