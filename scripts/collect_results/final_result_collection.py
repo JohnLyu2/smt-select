@@ -4,11 +4,12 @@ Build a result summary CSV in doc/result_summary with one row per logic and PAR2
 (test, mean ± std over seeds) from selected result directories.
 
 Default result dirs:
-- data/cp26/results/synt
-- data/cp26/results/synt+smtlib_desc/synt+mpnet
-- data/cp26/results/gnn/gin_pwc_fb
+- data/cp26/results/lite
+- data/cp26/results/lite+text
+- data/cp26/results/graph/lite_fallback
 - data/cp26/results/machsmt/ehm
-- data/cp26/results/fusion_pwc
+- data/cp26/results/graph+text
+- data/cp26/results/sibyl/evaluation
 
 Output columns: logic, <name1>, <name1>_std, <name2>, <name2>_std, ... Missing logic/result pairs are left empty.
 """
@@ -20,6 +21,16 @@ from pathlib import Path
 
 # Script is under scripts/collect_results/
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+RESULT_DIRS = [
+    PROJECT_ROOT / "data" / "cp26" / "results" / "lite",
+    PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text",
+    PROJECT_ROOT / "data" / "cp26" / "results" / "graph" / "lite_fallback",
+    PROJECT_ROOT / "data" / "cp26" / "results" / "machsmt" / "ehm",
+    PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text",
+    PROJECT_ROOT / "data" / "cp26" / "results" / "sibyl" / "evaluation",
+]
+LABELS = ["synt", "synt_mpnet", "gin_pwc", "mach_ehm", "fusion_pwc", "sibyl"]
 
 
 def get_test_gap_cls_par2_mean_std(summary_path: Path) -> tuple[float | None, float | None]:
@@ -63,23 +74,9 @@ def main() -> None:
         default=PROJECT_ROOT / "doc" / "result_summary" / "final_res.csv",
         help="Output CSV path",
     )
-    parser.add_argument(
-        "result_dirs",
-        nargs="*",
-        type=Path,
-        default=[
-            PROJECT_ROOT / "data" / "cp26" / "results" / "synt",
-            PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text",
-            PROJECT_ROOT / "data" / "cp26" / "results" / "gnn" / "gin_pwc_fb",
-            PROJECT_ROOT / "data" / "cp26" / "results" / "machsmt" / "ehm",
-            PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text",
-            PROJECT_ROOT / "data" / "cp26" / "results" / "sibyl" / "evaluation",
-        ],
-        help="Result directories (each contains <logic>/summary.json). Default: synt, synt+mpnet, gin_pwc_fb, mach_ehm, fusion_pwc, sibyl",
-    )
     args = parser.parse_args()
 
-    result_dirs = [Path(p).resolve() for p in args.result_dirs]
+    result_dirs = [d.resolve() for d in RESULT_DIRS]
     for d in result_dirs:
         if not d.is_dir():
             raise SystemExit(f"Result directory not found: {d}")
@@ -92,43 +89,10 @@ def main() -> None:
                 all_logics.add(p.name)
     logics = sorted(all_logics)
 
-    # Column labels: short names for default dirs
-    default_names = ["synt", "synt_mpnet", "gin_pwc", "mach_ehm", "fusion_pwc", "sibyl"]
-    if (len(result_dirs) == 6
-            and default_names[0] in str(result_dirs[0])
-            and "lite+text" in str(result_dirs[1])
-            and "gin_pwc_fb" in str(result_dirs[2])
-            and "machsmt" in str(result_dirs[3]) and "ehm" in str(result_dirs[3])
-            and "graph+text" in str(result_dirs[4])
-            and "sibyl" in str(result_dirs[5])):
-        labels = default_names
-    elif (len(result_dirs) == 5
-            and default_names[0] in str(result_dirs[0])
-            and "mpnet" in str(result_dirs[1])
-            and "gin_pwc_fb" in str(result_dirs[2])
-            and "machsmt" in str(result_dirs[3]) and "ehm" in str(result_dirs[3])
-            and "fusion_pwc" in str(result_dirs[4])):
-        labels = default_names[:5]
-    elif (len(result_dirs) == 4
-            and default_names[0] in str(result_dirs[0])
-            and "mpnet" in str(result_dirs[1])
-            and "gin_pwc_fb" in str(result_dirs[2])
-            and "machsmt" in str(result_dirs[3]) and "ehm" in str(result_dirs[3])):
-        labels = default_names[:4]
-    elif (len(result_dirs) == 3
-            and default_names[0] in str(result_dirs[0])
-            and "mpnet" in str(result_dirs[1])
-            and "gin_pwc_fb" in str(result_dirs[2])):
-        labels = default_names[:3]
-    elif len(result_dirs) == 2 and default_names[0] in str(result_dirs[0]) and "mpnet" in str(result_dirs[1]):
-        labels = default_names[:2]
-    else:
-        labels = [d.name for d in result_dirs]
-
     rows: list[dict[str, str | float]] = []
     for logic in logics:
         row: dict[str, str | float] = {"logic": logic}
-        for res_dir, label in zip(result_dirs, labels):
+        for res_dir, label in zip(result_dirs, LABELS):
             summary_path = res_dir / logic / "summary.json"
             mean, std = get_test_gap_cls_par2_mean_std(summary_path)
             row[label] = round(mean, 4) if mean is not None else ""
@@ -136,7 +100,7 @@ def main() -> None:
         rows.append(row)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    fieldnames = ["logic"] + [item for label in labels for item in (label, f"{label}_std")]
+    fieldnames = ["logic"] + [item for label in LABELS for item in (label, f"{label}_std")]
     with open(args.output, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
         writer.writeheader()

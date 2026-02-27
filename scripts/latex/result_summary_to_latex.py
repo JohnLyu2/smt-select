@@ -12,6 +12,8 @@ from pathlib import Path
 
 # Script is under scripts/latex/
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+CSV_PATH = PROJECT_ROOT / "doc" / "result_summary" / "final_res.csv"
+TEX_PATH = PROJECT_ROOT / "doc" / "cp26" / "final_res.tex"
 
 
 def latex_escape(s: str) -> str:
@@ -53,48 +55,23 @@ def main() -> None:
         description="Convert result summary CSV (PAR2 gap closed) into a LaTeX table."
     )
     parser.add_argument(
-        "csv",
-        type=Path,
-        nargs="?",
-        default=PROJECT_ROOT / "doc" / "result_summary" / "final_res.csv",
-        help="Input CSV path (default: doc/result_summary/final_res.csv)",
-    )
-    parser.add_argument(
-        "-o",
-        "--output",
-        type=Path,
-        default=PROJECT_ROOT / "doc" / "cp26" / "final_res.tex",
-        help="Output .tex path (default: doc/cp26/final_res.tex)",
-    )
-    parser.add_argument(
         "--no-header",
         action="store_true",
         help="Omit the tabular header row",
     )
     args = parser.parse_args()
 
-    csv_path = args.csv.resolve()
-    if not csv_path.is_file():
-        raise SystemExit(f"File not found: {csv_path}")
+    if not CSV_PATH.is_file():
+        raise SystemExit(f"File not found: {CSV_PATH}")
 
-    with open(csv_path, encoding="utf-8") as f:
+    with open(CSV_PATH, encoding="utf-8") as f:
         reader = csv.DictReader(f)
         rows = list(reader)
         fieldnames = reader.fieldnames or []
 
-    # Display columns: logic plus value columns (exclude *_std; those are paired with value columns)
-    value_columns = [k for k in fieldnames if k != "logic" and not k.endswith("_std")]
-    if "mach_ehm" in value_columns:
-        ordered = ["mach_ehm"]
-        if "sibyl" in value_columns:
-            ordered.append("sibyl")
-        ordered += [c for c in value_columns if c not in ordered]
-        value_columns = ordered
-    if "synt_mpnet" in value_columns:
-        value_columns = [c for c in value_columns if c != "synt_mpnet"] + ["synt_mpnet"]
-    if "fusion_pwc" in value_columns and "synt_mpnet" in value_columns:
-        # With Description order: Lite+Text then Graph+Text (synt_mpnet then fusion_pwc)
-        value_columns = [c for c in value_columns if c != "fusion_pwc"] + ["fusion_pwc"]
+    # Display order: Without Description (MachSMT, Sibyl, Lite, Graph), then With Description (Lite+Text, Graph+Text)
+    display_order = ["mach_ehm", "sibyl", "synt", "gin_pwc", "synt_mpnet", "fusion_pwc"]
+    value_columns = [c for c in display_order if c in fieldnames]
     columns = ["logic"] + value_columns
 
     # Header blocks: Without Description (first 3 or 4 cols), With Description (rest)
@@ -187,10 +164,9 @@ def main() -> None:
     ])
 
     out = "\n".join(lines) + "\n"
-    args.output = args.output.resolve()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(out, encoding="utf-8")
-    print(f"Wrote {args.output}")
+    TEX_PATH.parent.mkdir(parents=True, exist_ok=True)
+    TEX_PATH.write_text(out, encoding="utf-8")
+    print(f"Wrote {TEX_PATH}")
 
 
 if __name__ == "__main__":
