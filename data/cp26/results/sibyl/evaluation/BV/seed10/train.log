@@ -1,0 +1,391 @@
+2026-02-27T02:50:11 - INFO - Log file: /workspace/smt-select/sibyl/smt-select/model/BV/seed10/train.log
+2026-02-27T02:50:11 - INFO - Training on GPU: cuda:0 (NVIDIA GeForce RTX 3090)
+2026-02-27T02:50:14 - INFO - Train-epoch 0, Avg-Loss: 1.8048, Avg-Corr:0.1903, TopK-Acc:0.1429, Success-Acc:0.7971
+2026-02-27T02:50:15 - INFO - Train progress epoch 0 step 100/695
+2026-02-27T02:50:16 - INFO - Train-epoch 0, Avg-Loss: 1.5423, Avg-Corr:0.2828, TopK-Acc:0.2071, Success-Acc:0.7826
+2026-02-27T02:50:17 - INFO - Train progress epoch 0 step 200/695
+2026-02-27T02:50:17 - INFO - Train-epoch 0, Avg-Loss: 1.4024, Avg-Corr:0.3526, TopK-Acc:0.2048, Success-Acc:0.8173
+2026-02-27T02:50:19 - INFO - Train-epoch 0, Avg-Loss: 1.3676, Avg-Corr:0.3671, TopK-Acc:0.2143, Success-Acc:0.8175
+2026-02-27T02:50:20 - INFO - Train progress epoch 0 step 300/695
+2026-02-27T02:50:21 - INFO - Train-epoch 0, Avg-Loss: 1.3285, Avg-Corr:0.3745, TopK-Acc:0.2086, Success-Acc:0.8099
+2026-02-27T02:50:23 - INFO - Train progress epoch 0 step 400/695
+2026-02-27T02:50:23 - INFO - Train-epoch 0, Avg-Loss: 1.2924, Avg-Corr:0.3884, TopK-Acc:0.219, Success-Acc:0.8083
+2026-02-27T02:50:25 - INFO - Train-epoch 0, Avg-Loss: 1.2933, Avg-Corr:0.4014, TopK-Acc:0.2306, Success-Acc:0.8084
+2026-02-27T02:50:25 - INFO - Train progress epoch 0 step 500/695
+2026-02-27T02:50:27 - INFO - Train-epoch 0, Avg-Loss: 1.2767, Avg-Corr:0.4165, TopK-Acc:0.2464, Success-Acc:0.8118
+2026-02-27T02:50:27 - INFO - Train progress epoch 0 step 600/695
+2026-02-27T02:50:28 - INFO - Train-epoch 0, Avg-Loss: 1.2575, Avg-Corr:0.4255, TopK-Acc:0.2429, Success-Acc:0.8088
+2026-02-27T02:50:30 - INFO - Train progress epoch 0 step 695/695
+2026-02-27T02:50:30 - INFO - Train-epoch 0, Avg-Loss: 1.2447, Avg-Corr:0.4382, TopK-Acc:0.2417, Success-Acc:0.8131
+2026-02-27T02:50:31 - INFO - Val progress epoch 0 step 77/77
+2026-02-27T02:50:31 - INFO - Valid-epoch 0, Avg-Loss: 0.8167, Avg-Corr:0.7038, TopK-Acc:0.3766, Success-Acc:0.9211
+2026-02-27T02:50:32 - INFO - Train-epoch 1, Avg-Loss: 0.9919, Avg-Corr:0.5754, TopK-Acc:0.3857, Success-Acc:0.8696
+2026-02-27T02:50:33 - INFO - Train progress epoch 1 step 100/695
+2026-02-27T02:50:34 - INFO - Train-epoch 1, Avg-Loss: 0.9496, Avg-Corr:0.6101, TopK-Acc:0.3786, Success-Acc:0.8841
+2026-02-27T02:50:35 - INFO - Train progress epoch 1 step 200/695
+2026-02-27T02:50:36 - INFO - Train-epoch 1, Avg-Loss: 0.9235, Avg-Corr:0.628, TopK-Acc:0.4333, Success-Acc:0.8889
+2026-02-27T02:50:37 - INFO - Train-epoch 1, Avg-Loss: 0.8972, Avg-Corr:0.6326, TopK-Acc:0.4571, Success-Acc:0.8917
+2026-02-27T02:50:38 - INFO - Train progress epoch 1 step 300/695
+2026-02-27T02:50:39 - INFO - Train-epoch 1, Avg-Loss: 0.8884, Avg-Corr:0.6336, TopK-Acc:0.4771, Success-Acc:0.8905
+2026-02-27T02:50:40 - INFO - Train progress epoch 1 step 400/695
+2026-02-27T02:50:40 - INFO - Train-epoch 1, Avg-Loss: 0.8699, Avg-Corr:0.6393, TopK-Acc:0.5024, Success-Acc:0.8921
+2026-02-27T02:50:42 - INFO - Train-epoch 1, Avg-Loss: 0.8501, Avg-Corr:0.6476, TopK-Acc:0.5204, Success-Acc:0.8951
+2026-02-27T02:50:42 - INFO - Train progress epoch 1 step 500/695
+2026-02-27T02:50:43 - INFO - Train-epoch 1, Avg-Loss: 0.844, Avg-Corr:0.6511, TopK-Acc:0.5161, Success-Acc:0.8921
+2026-02-27T02:50:44 - INFO - Train progress epoch 1 step 600/695
+2026-02-27T02:50:45 - INFO - Train-epoch 1, Avg-Loss: 0.8447, Avg-Corr:0.6556, TopK-Acc:0.5238, Success-Acc:0.896
+2026-02-27T02:50:46 - INFO - Train progress epoch 1 step 695/695
+2026-02-27T02:50:46 - INFO - Train-epoch 1, Avg-Loss: 0.8443, Avg-Corr:0.6624, TopK-Acc:0.5338, Success-Acc:0.9014
+2026-02-27T02:50:47 - INFO - Val progress epoch 1 step 77/77
+2026-02-27T02:50:47 - INFO - Valid-epoch 1, Avg-Loss: 0.6837, Avg-Corr:0.7615, TopK-Acc:0.6623, Success-Acc:0.9467
+2026-02-27T02:50:49 - INFO - Train-epoch 2, Avg-Loss: 0.8157, Avg-Corr:0.7073, TopK-Acc:0.6714, Success-Acc:0.9143
+2026-02-27T02:50:50 - INFO - Train progress epoch 2 step 100/695
+2026-02-27T02:50:50 - INFO - Train-epoch 2, Avg-Loss: 0.7979, Avg-Corr:0.701, TopK-Acc:0.5714, Success-Acc:0.9357
+2026-02-27T02:50:52 - INFO - Train progress epoch 2 step 200/695
+2026-02-27T02:50:52 - INFO - Train-epoch 2, Avg-Loss: 0.8102, Avg-Corr:0.6779, TopK-Acc:0.5143, Success-Acc:0.9238
+2026-02-27T02:50:53 - INFO - Train-epoch 2, Avg-Loss: 0.8366, Avg-Corr:0.6779, TopK-Acc:0.5071, Success-Acc:0.9283
+2026-02-27T02:50:54 - INFO - Train progress epoch 2 step 300/695
+2026-02-27T02:50:55 - INFO - Train-epoch 2, Avg-Loss: 0.8336, Avg-Corr:0.6811, TopK-Acc:0.5114, Success-Acc:0.9222
+2026-02-27T02:50:56 - INFO - Train progress epoch 2 step 400/695
+2026-02-27T02:50:56 - INFO - Train-epoch 2, Avg-Loss: 0.8576, Avg-Corr:0.6713, TopK-Acc:0.5095, Success-Acc:0.9181
+2026-02-27T02:50:58 - INFO - Train-epoch 2, Avg-Loss: 0.8425, Avg-Corr:0.6728, TopK-Acc:0.5265, Success-Acc:0.913
+2026-02-27T02:50:58 - INFO - Train progress epoch 2 step 500/695
+2026-02-27T02:50:59 - INFO - Train-epoch 2, Avg-Loss: 0.8301, Avg-Corr:0.6806, TopK-Acc:0.5446, Success-Acc:0.9149
+2026-02-27T02:51:00 - INFO - Train progress epoch 2 step 600/695
+2026-02-27T02:51:01 - INFO - Train-epoch 2, Avg-Loss: 0.819, Avg-Corr:0.6848, TopK-Acc:0.546, Success-Acc:0.9194
+2026-02-27T02:51:02 - INFO - Train progress epoch 2 step 695/695
+2026-02-27T02:51:02 - INFO - Train-epoch 2, Avg-Loss: 0.8134, Avg-Corr:0.6872, TopK-Acc:0.5453, Success-Acc:0.9255
+2026-02-27T02:51:03 - INFO - Val progress epoch 2 step 77/77
+2026-02-27T02:51:03 - INFO - Valid-epoch 2, Avg-Loss: 0.749, Avg-Corr:0.7142, TopK-Acc:0.5195, Success-Acc:0.96
+2026-02-27T02:51:05 - INFO - Train-epoch 3, Avg-Loss: 0.8988, Avg-Corr:0.6146, TopK-Acc:0.5714, Success-Acc:0.913
+2026-02-27T02:51:06 - INFO - Train progress epoch 3 step 100/695
+2026-02-27T02:51:07 - INFO - Train-epoch 3, Avg-Loss: 0.9286, Avg-Corr:0.6229, TopK-Acc:0.5, Success-Acc:0.9185
+2026-02-27T02:51:08 - INFO - Train progress epoch 3 step 200/695
+2026-02-27T02:51:08 - INFO - Train-epoch 3, Avg-Loss: 0.8466, Avg-Corr:0.6602, TopK-Acc:0.5333, Success-Acc:0.9216
+2026-02-27T02:51:10 - INFO - Train-epoch 3, Avg-Loss: 0.8471, Avg-Corr:0.6686, TopK-Acc:0.5286, Success-Acc:0.9158
+2026-02-27T02:51:10 - INFO - Train progress epoch 3 step 300/695
+2026-02-27T02:51:11 - INFO - Train-epoch 3, Avg-Loss: 0.8668, Avg-Corr:0.6655, TopK-Acc:0.5371, Success-Acc:0.9169
+2026-02-27T02:51:12 - INFO - Train progress epoch 3 step 400/695
+2026-02-27T02:51:13 - INFO - Train-epoch 3, Avg-Loss: 0.8697, Avg-Corr:0.6704, TopK-Acc:0.5381, Success-Acc:0.9284
+2026-02-27T02:51:14 - INFO - Train-epoch 3, Avg-Loss: 0.8733, Avg-Corr:0.6687, TopK-Acc:0.5551, Success-Acc:0.9321
+2026-02-27T02:51:15 - INFO - Train progress epoch 3 step 500/695
+2026-02-27T02:51:16 - INFO - Train-epoch 3, Avg-Loss: 0.8596, Avg-Corr:0.6724, TopK-Acc:0.5607, Success-Acc:0.9333
+2026-02-27T02:51:17 - INFO - Train progress epoch 3 step 600/695
+2026-02-27T02:51:18 - INFO - Train-epoch 3, Avg-Loss: 0.8556, Avg-Corr:0.6728, TopK-Acc:0.5587, Success-Acc:0.9293
+2026-02-27T02:51:19 - INFO - Train progress epoch 3 step 695/695
+2026-02-27T02:51:19 - INFO - Train-epoch 3, Avg-Loss: 0.8428, Avg-Corr:0.6796, TopK-Acc:0.5683, Success-Acc:0.9331
+2026-02-27T02:51:20 - INFO - Val progress epoch 3 step 77/77
+2026-02-27T02:51:20 - INFO - Valid-epoch 3, Avg-Loss: 0.7672, Avg-Corr:0.7629, TopK-Acc:0.6234, Success-Acc:0.9861
+2026-02-27T02:51:21 - INFO - Train-epoch 4, Avg-Loss: 0.7503, Avg-Corr:0.7122, TopK-Acc:0.6, Success-Acc:0.9429
+2026-02-27T02:51:22 - INFO - Train progress epoch 4 step 100/695
+2026-02-27T02:51:23 - INFO - Train-epoch 4, Avg-Loss: 0.7199, Avg-Corr:0.7117, TopK-Acc:0.5429, Success-Acc:0.9493
+2026-02-27T02:51:24 - INFO - Train progress epoch 4 step 200/695
+2026-02-27T02:51:24 - INFO - Train-epoch 4, Avg-Loss: 0.7413, Avg-Corr:0.7124, TopK-Acc:0.5524, Success-Acc:0.9563
+2026-02-27T02:51:26 - INFO - Train-epoch 4, Avg-Loss: 0.7359, Avg-Corr:0.7182, TopK-Acc:0.55, Success-Acc:0.9564
+2026-02-27T02:51:26 - INFO - Train progress epoch 4 step 300/695
+2026-02-27T02:51:27 - INFO - Train-epoch 4, Avg-Loss: 0.7739, Avg-Corr:0.707, TopK-Acc:0.5429, Success-Acc:0.9331
+2026-02-27T02:51:28 - INFO - Train progress epoch 4 step 400/695
+2026-02-27T02:51:29 - INFO - Train-epoch 4, Avg-Loss: 0.773, Avg-Corr:0.7057, TopK-Acc:0.5429, Success-Acc:0.9223
+2026-02-27T02:51:30 - INFO - Train-epoch 4, Avg-Loss: 0.7699, Avg-Corr:0.707, TopK-Acc:0.551, Success-Acc:0.925
+2026-02-27T02:51:30 - INFO - Train progress epoch 4 step 500/695
+2026-02-27T02:51:32 - INFO - Train-epoch 4, Avg-Loss: 0.7568, Avg-Corr:0.7152, TopK-Acc:0.5643, Success-Acc:0.929
+2026-02-27T02:51:32 - INFO - Train progress epoch 4 step 600/695
+2026-02-27T02:51:33 - INFO - Train-epoch 4, Avg-Loss: 0.7578, Avg-Corr:0.7141, TopK-Acc:0.5667, Success-Acc:0.9318
+2026-02-27T02:51:34 - INFO - Train progress epoch 4 step 695/695
+2026-02-27T02:51:34 - INFO - Train-epoch 4, Avg-Loss: 0.76, Avg-Corr:0.714, TopK-Acc:0.5741, Success-Acc:0.9294
+2026-02-27T02:51:36 - INFO - Val progress epoch 4 step 77/77
+2026-02-27T02:51:36 - INFO - Valid-epoch 4, Avg-Loss: 0.7125, Avg-Corr:0.7527, TopK-Acc:0.6104, Success-Acc:0.9583
+2026-02-27T02:51:37 - INFO - Train-epoch 5, Avg-Loss: 0.6728, Avg-Corr:0.7244, TopK-Acc:0.5857, Success-Acc:0.9429
+2026-02-27T02:51:38 - INFO - Train progress epoch 5 step 100/695
+2026-02-27T02:51:39 - INFO - Train-epoch 5, Avg-Loss: 0.6814, Avg-Corr:0.7249, TopK-Acc:0.5714, Success-Acc:0.9357
+2026-02-27T02:51:40 - INFO - Train progress epoch 5 step 200/695
+2026-02-27T02:51:41 - INFO - Train-epoch 5, Avg-Loss: 0.6848, Avg-Corr:0.7362, TopK-Acc:0.5762, Success-Acc:0.9522
+2026-02-27T02:51:42 - INFO - Train-epoch 5, Avg-Loss: 0.7177, Avg-Corr:0.7263, TopK-Acc:0.5821, Success-Acc:0.946
+2026-02-27T02:51:42 - INFO - Train progress epoch 5 step 300/695
+2026-02-27T02:51:43 - INFO - Train-epoch 5, Avg-Loss: 0.7301, Avg-Corr:0.721, TopK-Acc:0.5829, Success-Acc:0.9393
+2026-02-27T02:51:44 - INFO - Train progress epoch 5 step 400/695
+2026-02-27T02:51:45 - INFO - Train-epoch 5, Avg-Loss: 0.7465, Avg-Corr:0.7158, TopK-Acc:0.5929, Success-Acc:0.9395
+2026-02-27T02:51:46 - INFO - Train-epoch 5, Avg-Loss: 0.7418, Avg-Corr:0.7172, TopK-Acc:0.6082, Success-Acc:0.9417
+2026-02-27T02:51:46 - INFO - Train progress epoch 5 step 500/695
+2026-02-27T02:51:48 - INFO - Train-epoch 5, Avg-Loss: 0.725, Avg-Corr:0.7257, TopK-Acc:0.6089, Success-Acc:0.9453
+2026-02-27T02:51:49 - INFO - Train progress epoch 5 step 600/695
+2026-02-27T02:51:49 - INFO - Train-epoch 5, Avg-Loss: 0.7204, Avg-Corr:0.7315, TopK-Acc:0.6095, Success-Acc:0.9515
+2026-02-27T02:51:51 - INFO - Train progress epoch 5 step 695/695
+2026-02-27T02:51:51 - INFO - Train-epoch 5, Avg-Loss: 0.7148, Avg-Corr:0.7339, TopK-Acc:0.6115, Success-Acc:0.956
+2026-02-27T02:51:52 - INFO - Val progress epoch 5 step 77/77
+2026-02-27T02:51:52 - INFO - Valid-epoch 5, Avg-Loss: 0.6553, Avg-Corr:0.7976, TopK-Acc:0.6234, Success-Acc:0.973
+2026-02-27T02:51:53 - INFO - Train-epoch 6, Avg-Loss: 0.6797, Avg-Corr:0.7393, TopK-Acc:0.6143, Success-Acc:0.971
+2026-02-27T02:51:54 - INFO - Train progress epoch 6 step 100/695
+2026-02-27T02:51:54 - INFO - Train-epoch 6, Avg-Loss: 0.6725, Avg-Corr:0.727, TopK-Acc:0.65, Success-Acc:0.9704
+2026-02-27T02:51:56 - INFO - Train progress epoch 6 step 200/695
+2026-02-27T02:51:56 - INFO - Train-epoch 6, Avg-Loss: 0.6741, Avg-Corr:0.7288, TopK-Acc:0.6333, Success-Acc:0.9557
+2026-02-27T02:51:57 - INFO - Train-epoch 6, Avg-Loss: 0.6802, Avg-Corr:0.7351, TopK-Acc:0.6321, Success-Acc:0.9483
+2026-02-27T02:51:58 - INFO - Train progress epoch 6 step 300/695
+2026-02-27T02:51:59 - INFO - Train-epoch 6, Avg-Loss: 0.6739, Avg-Corr:0.7378, TopK-Acc:0.6314, Success-Acc:0.9559
+2026-02-27T02:52:00 - INFO - Train progress epoch 6 step 400/695
+2026-02-27T02:52:00 - INFO - Train-epoch 6, Avg-Loss: 0.6987, Avg-Corr:0.7303, TopK-Acc:0.6167, Success-Acc:0.951
+2026-02-27T02:52:02 - INFO - Train-epoch 6, Avg-Loss: 0.7262, Avg-Corr:0.7208, TopK-Acc:0.6122, Success-Acc:0.9492
+2026-02-27T02:52:02 - INFO - Train progress epoch 6 step 500/695
+2026-02-27T02:52:04 - INFO - Train-epoch 6, Avg-Loss: 0.7333, Avg-Corr:0.7202, TopK-Acc:0.6107, Success-Acc:0.948
+2026-02-27T02:52:05 - INFO - Train progress epoch 6 step 600/695
+2026-02-27T02:52:05 - INFO - Train-epoch 6, Avg-Loss: 0.7296, Avg-Corr:0.7216, TopK-Acc:0.6048, Success-Acc:0.9455
+2026-02-27T02:52:06 - INFO - Train progress epoch 6 step 695/695
+2026-02-27T02:52:06 - INFO - Train-epoch 6, Avg-Loss: 0.7278, Avg-Corr:0.7247, TopK-Acc:0.6101, Success-Acc:0.9463
+2026-02-27T02:52:08 - INFO - Val progress epoch 6 step 77/77
+2026-02-27T02:52:08 - INFO - Valid-epoch 6, Avg-Loss: 0.8091, Avg-Corr:0.7422, TopK-Acc:0.5844, Success-Acc:0.9296
+2026-02-27T02:52:09 - INFO - Train-epoch 7, Avg-Loss: 0.6296, Avg-Corr:0.7409, TopK-Acc:0.5143, Success-Acc:0.9571
+2026-02-27T02:52:09 - INFO - Train progress epoch 7 step 100/695
+2026-02-27T02:52:10 - INFO - Train-epoch 7, Avg-Loss: 0.6266, Avg-Corr:0.753, TopK-Acc:0.5643, Success-Acc:0.9714
+2026-02-27T02:52:11 - INFO - Train progress epoch 7 step 200/695
+2026-02-27T02:52:12 - INFO - Train-epoch 7, Avg-Loss: 0.6278, Avg-Corr:0.7441, TopK-Acc:0.5238, Success-Acc:0.9522
+2026-02-27T02:52:13 - INFO - Train-epoch 7, Avg-Loss: 0.6834, Avg-Corr:0.7311, TopK-Acc:0.5357, Success-Acc:0.946
+2026-02-27T02:52:13 - INFO - Train progress epoch 7 step 300/695
+2026-02-27T02:52:14 - INFO - Train-epoch 7, Avg-Loss: 0.7158, Avg-Corr:0.7249, TopK-Acc:0.54, Success-Acc:0.9509
+2026-02-27T02:52:15 - INFO - Train progress epoch 7 step 400/695
+2026-02-27T02:52:16 - INFO - Train-epoch 7, Avg-Loss: 0.7219, Avg-Corr:0.7239, TopK-Acc:0.5643, Success-Acc:0.9471
+2026-02-27T02:52:18 - INFO - Train-epoch 7, Avg-Loss: 0.7209, Avg-Corr:0.7227, TopK-Acc:0.5633, Success-Acc:0.9423
+2026-02-27T02:52:18 - INFO - Train progress epoch 7 step 500/695
+2026-02-27T02:52:19 - INFO - Train-epoch 7, Avg-Loss: 0.7241, Avg-Corr:0.7215, TopK-Acc:0.5696, Success-Acc:0.944
+2026-02-27T02:52:20 - INFO - Train progress epoch 7 step 600/695
+2026-02-27T02:52:21 - INFO - Train-epoch 7, Avg-Loss: 0.7018, Avg-Corr:0.7304, TopK-Acc:0.5841, Success-Acc:0.9454
+2026-02-27T02:52:22 - INFO - Train progress epoch 7 step 695/695
+2026-02-27T02:52:22 - INFO - Train-epoch 7, Avg-Loss: 0.7051, Avg-Corr:0.7316, TopK-Acc:0.5871, Success-Acc:0.9445
+2026-02-27T02:52:23 - INFO - Val progress epoch 7 step 77/77
+2026-02-27T02:52:23 - INFO - Valid-epoch 7, Avg-Loss: 0.6149, Avg-Corr:0.7873, TopK-Acc:0.5455, Success-Acc:0.9324
+2026-02-27T02:52:24 - INFO - Train-epoch 8, Avg-Loss: 0.5911, Avg-Corr:0.729, TopK-Acc:0.6, Success-Acc:0.9286
+2026-02-27T02:52:25 - INFO - Train progress epoch 8 step 100/695
+2026-02-27T02:52:26 - INFO - Train-epoch 8, Avg-Loss: 0.6727, Avg-Corr:0.708, TopK-Acc:0.5857, Success-Acc:0.9343
+2026-02-27T02:52:27 - INFO - Train progress epoch 8 step 200/695
+2026-02-27T02:52:27 - INFO - Train-epoch 8, Avg-Loss: 0.6721, Avg-Corr:0.7192, TopK-Acc:0.6095, Success-Acc:0.9417
+2026-02-27T02:52:28 - INFO - Train-epoch 8, Avg-Loss: 0.7023, Avg-Corr:0.7201, TopK-Acc:0.6, Success-Acc:0.9524
+2026-02-27T02:52:29 - INFO - Train progress epoch 8 step 300/695
+2026-02-27T02:52:30 - INFO - Train-epoch 8, Avg-Loss: 0.6954, Avg-Corr:0.7207, TopK-Acc:0.62, Success-Acc:0.9417
+2026-02-27T02:52:31 - INFO - Train progress epoch 8 step 400/695
+2026-02-27T02:52:31 - INFO - Train-epoch 8, Avg-Loss: 0.681, Avg-Corr:0.7251, TopK-Acc:0.6238, Success-Acc:0.9442
+2026-02-27T02:52:32 - INFO - Train-epoch 8, Avg-Loss: 0.6714, Avg-Corr:0.7294, TopK-Acc:0.6265, Success-Acc:0.9439
+2026-02-27T02:52:33 - INFO - Train progress epoch 8 step 500/695
+2026-02-27T02:52:34 - INFO - Train-epoch 8, Avg-Loss: 0.663, Avg-Corr:0.7331, TopK-Acc:0.6304, Success-Acc:0.9455
+2026-02-27T02:52:35 - INFO - Train progress epoch 8 step 600/695
+2026-02-27T02:52:35 - INFO - Train-epoch 8, Avg-Loss: 0.6743, Avg-Corr:0.7318, TopK-Acc:0.6254, Success-Acc:0.9481
+2026-02-27T02:52:36 - INFO - Train progress epoch 8 step 695/695
+2026-02-27T02:52:36 - INFO - Train-epoch 8, Avg-Loss: 0.6832, Avg-Corr:0.7307, TopK-Acc:0.6273, Success-Acc:0.9485
+2026-02-27T02:52:38 - INFO - Val progress epoch 8 step 77/77
+2026-02-27T02:52:38 - INFO - Valid-epoch 8, Avg-Loss: 0.5635, Avg-Corr:0.8057, TopK-Acc:0.6104, Success-Acc:0.9865
+2026-02-27T02:52:39 - INFO - Train-epoch 9, Avg-Loss: 0.6195, Avg-Corr:0.7409, TopK-Acc:0.6143, Success-Acc:0.942
+2026-02-27T02:52:39 - INFO - Train progress epoch 9 step 100/695
+2026-02-27T02:52:40 - INFO - Train-epoch 9, Avg-Loss: 0.5898, Avg-Corr:0.7673, TopK-Acc:0.6786, Success-Acc:0.9493
+2026-02-27T02:52:41 - INFO - Train progress epoch 9 step 200/695
+2026-02-27T02:52:41 - INFO - Train-epoch 9, Avg-Loss: 0.6307, Avg-Corr:0.7552, TopK-Acc:0.6714, Success-Acc:0.9606
+2026-02-27T02:52:42 - INFO - Train-epoch 9, Avg-Loss: 0.6745, Avg-Corr:0.7386, TopK-Acc:0.6679, Success-Acc:0.9631
+2026-02-27T02:52:43 - INFO - Train progress epoch 9 step 300/695
+2026-02-27T02:52:44 - INFO - Train-epoch 9, Avg-Loss: 0.6438, Avg-Corr:0.7507, TopK-Acc:0.6714, Success-Acc:0.9677
+2026-02-27T02:52:45 - INFO - Train progress epoch 9 step 400/695
+2026-02-27T02:52:45 - INFO - Train-epoch 9, Avg-Loss: 0.6637, Avg-Corr:0.749, TopK-Acc:0.669, Success-Acc:0.9682
+2026-02-27T02:52:47 - INFO - Train-epoch 9, Avg-Loss: 0.664, Avg-Corr:0.7506, TopK-Acc:0.6653, Success-Acc:0.9623
+2026-02-27T02:52:47 - INFO - Train progress epoch 9 step 500/695
+2026-02-27T02:52:48 - INFO - Train-epoch 9, Avg-Loss: 0.6455, Avg-Corr:0.7566, TopK-Acc:0.6661, Success-Acc:0.9634
+2026-02-27T02:52:49 - INFO - Train progress epoch 9 step 600/695
+2026-02-27T02:52:50 - INFO - Train-epoch 9, Avg-Loss: 0.6513, Avg-Corr:0.753, TopK-Acc:0.6587, Success-Acc:0.9627
+2026-02-27T02:52:51 - INFO - Train progress epoch 9 step 695/695
+2026-02-27T02:52:51 - INFO - Train-epoch 9, Avg-Loss: 0.6469, Avg-Corr:0.7533, TopK-Acc:0.6576, Success-Acc:0.9618
+2026-02-27T02:52:52 - INFO - Val progress epoch 9 step 77/77
+2026-02-27T02:52:52 - INFO - Valid-epoch 9, Avg-Loss: 0.4261, Avg-Corr:0.8695, TopK-Acc:0.7013, Success-Acc:1.0
+2026-02-27T02:52:53 - INFO - Train-epoch 10, Avg-Loss: 0.7566, Avg-Corr:0.752, TopK-Acc:0.7, Success-Acc:0.9706
+2026-02-27T02:52:54 - INFO - Train progress epoch 10 step 100/695
+2026-02-27T02:52:55 - INFO - Train-epoch 10, Avg-Loss: 0.7384, Avg-Corr:0.7487, TopK-Acc:0.6571, Success-Acc:0.963
+2026-02-27T02:52:56 - INFO - Train progress epoch 10 step 200/695
+2026-02-27T02:52:56 - INFO - Train-epoch 10, Avg-Loss: 0.6943, Avg-Corr:0.7601, TopK-Acc:0.6952, Success-Acc:0.9608
+2026-02-27T02:52:58 - INFO - Train-epoch 10, Avg-Loss: 0.6851, Avg-Corr:0.7607, TopK-Acc:0.6786, Success-Acc:0.9632
+2026-02-27T02:52:58 - INFO - Train progress epoch 10 step 300/695
+2026-02-27T02:52:59 - INFO - Train-epoch 10, Avg-Loss: 0.6883, Avg-Corr:0.7546, TopK-Acc:0.6657, Success-Acc:0.9588
+2026-02-27T02:53:00 - INFO - Train progress epoch 10 step 400/695
+2026-02-27T02:53:00 - INFO - Train-epoch 10, Avg-Loss: 0.6915, Avg-Corr:0.7475, TopK-Acc:0.669, Success-Acc:0.9487
+2026-02-27T02:53:02 - INFO - Train-epoch 10, Avg-Loss: 0.6905, Avg-Corr:0.7433, TopK-Acc:0.6653, Success-Acc:0.9415
+2026-02-27T02:53:02 - INFO - Train progress epoch 10 step 500/695
+2026-02-27T02:53:04 - INFO - Train-epoch 10, Avg-Loss: 0.6844, Avg-Corr:0.7468, TopK-Acc:0.6661, Success-Acc:0.9489
+2026-02-27T02:53:04 - INFO - Train progress epoch 10 step 600/695
+2026-02-27T02:53:05 - INFO - Train-epoch 10, Avg-Loss: 0.6859, Avg-Corr:0.7429, TopK-Acc:0.6571, Success-Acc:0.9449
+2026-02-27T02:53:06 - INFO - Train progress epoch 10 step 695/695
+2026-02-27T02:53:06 - INFO - Train-epoch 10, Avg-Loss: 0.6884, Avg-Corr:0.7412, TopK-Acc:0.6504, Success-Acc:0.9413
+2026-02-27T02:53:07 - INFO - Val progress epoch 10 step 77/77
+2026-02-27T02:53:07 - INFO - Valid-epoch 10, Avg-Loss: 0.5465, Avg-Corr:0.8171, TopK-Acc:0.6753, Success-Acc:0.9863
+2026-02-27T02:53:08 - INFO - Train-epoch 11, Avg-Loss: 0.6307, Avg-Corr:0.7621, TopK-Acc:0.6714, Success-Acc:0.9851
+2026-02-27T02:53:09 - INFO - Train progress epoch 11 step 100/695
+2026-02-27T02:53:10 - INFO - Train-epoch 11, Avg-Loss: 0.6466, Avg-Corr:0.7622, TopK-Acc:0.7, Success-Acc:0.9706
+2026-02-27T02:53:11 - INFO - Train progress epoch 11 step 200/695
+2026-02-27T02:53:11 - INFO - Train-epoch 11, Avg-Loss: 0.6428, Avg-Corr:0.7597, TopK-Acc:0.6952, Success-Acc:0.9756
+2026-02-27T02:53:12 - INFO - Train-epoch 11, Avg-Loss: 0.6464, Avg-Corr:0.7638, TopK-Acc:0.6857, Success-Acc:0.9636
+2026-02-27T02:53:12 - INFO - Train progress epoch 11 step 300/695
+2026-02-27T02:53:13 - INFO - Train-epoch 11, Avg-Loss: 0.6794, Avg-Corr:0.7547, TopK-Acc:0.6743, Success-Acc:0.9617
+2026-02-27T02:53:14 - INFO - Train progress epoch 11 step 400/695
+2026-02-27T02:53:15 - INFO - Train-epoch 11, Avg-Loss: 0.6721, Avg-Corr:0.7498, TopK-Acc:0.6571, Success-Acc:0.9581
+2026-02-27T02:53:16 - INFO - Train-epoch 11, Avg-Loss: 0.6659, Avg-Corr:0.7516, TopK-Acc:0.6612, Success-Acc:0.9537
+2026-02-27T02:53:17 - INFO - Train progress epoch 11 step 500/695
+2026-02-27T02:53:18 - INFO - Train-epoch 11, Avg-Loss: 0.6598, Avg-Corr:0.7522, TopK-Acc:0.6696, Success-Acc:0.9468
+2026-02-27T02:53:19 - INFO - Train progress epoch 11 step 600/695
+2026-02-27T02:53:20 - INFO - Train-epoch 11, Avg-Loss: 0.6577, Avg-Corr:0.751, TopK-Acc:0.6619, Success-Acc:0.9496
+2026-02-27T02:53:21 - INFO - Train progress epoch 11 step 695/695
+2026-02-27T02:53:21 - INFO - Train-epoch 11, Avg-Loss: 0.6603, Avg-Corr:0.7493, TopK-Acc:0.6576, Success-Acc:0.9454
+2026-02-27T02:53:22 - INFO - Val progress epoch 11 step 77/77
+2026-02-27T02:53:22 - INFO - Valid-epoch 11, Avg-Loss: 0.6403, Avg-Corr:0.7771, TopK-Acc:0.5844, Success-Acc:0.9583
+2026-02-27T02:53:23 - INFO - Train-epoch 12, Avg-Loss: 0.6121, Avg-Corr:0.7535, TopK-Acc:0.6714, Success-Acc:0.9412
+2026-02-27T02:53:23 - INFO - Train progress epoch 12 step 100/695
+2026-02-27T02:53:24 - INFO - Train-epoch 12, Avg-Loss: 0.6353, Avg-Corr:0.7539, TopK-Acc:0.65, Success-Acc:0.942
+2026-02-27T02:53:25 - INFO - Train progress epoch 12 step 200/695
+2026-02-27T02:53:26 - INFO - Train-epoch 12, Avg-Loss: 0.6363, Avg-Corr:0.7542, TopK-Acc:0.6571, Success-Acc:0.942
+2026-02-27T02:53:27 - INFO - Train-epoch 12, Avg-Loss: 0.68, Avg-Corr:0.7435, TopK-Acc:0.6357, Success-Acc:0.9455
+2026-02-27T02:53:27 - INFO - Train progress epoch 12 step 300/695
+2026-02-27T02:53:28 - INFO - Train-epoch 12, Avg-Loss: 0.6755, Avg-Corr:0.7417, TopK-Acc:0.64, Success-Acc:0.9419
+2026-02-27T02:53:29 - INFO - Train progress epoch 12 step 400/695
+2026-02-27T02:53:30 - INFO - Train-epoch 12, Avg-Loss: 0.6612, Avg-Corr:0.7485, TopK-Acc:0.6571, Success-Acc:0.9492
+2026-02-27T02:53:31 - INFO - Train-epoch 12, Avg-Loss: 0.6879, Avg-Corr:0.7417, TopK-Acc:0.6571, Success-Acc:0.9479
+2026-02-27T02:53:31 - INFO - Train progress epoch 12 step 500/695
+2026-02-27T02:53:33 - INFO - Train-epoch 12, Avg-Loss: 0.68, Avg-Corr:0.7465, TopK-Acc:0.6589, Success-Acc:0.949
+2026-02-27T02:53:34 - INFO - Train progress epoch 12 step 600/695
+2026-02-27T02:53:34 - INFO - Train-epoch 12, Avg-Loss: 0.661, Avg-Corr:0.7514, TopK-Acc:0.6714, Success-Acc:0.9499
+2026-02-27T02:53:36 - INFO - Train progress epoch 12 step 695/695
+2026-02-27T02:53:36 - INFO - Train-epoch 12, Avg-Loss: 0.6703, Avg-Corr:0.7475, TopK-Acc:0.6647, Success-Acc:0.9501
+2026-02-27T02:53:37 - INFO - Val progress epoch 12 step 77/77
+2026-02-27T02:53:37 - INFO - Valid-epoch 12, Avg-Loss: 0.5789, Avg-Corr:0.7709, TopK-Acc:0.6494, Success-Acc:0.9733
+2026-02-27T02:53:38 - INFO - Train-epoch 13, Avg-Loss: 0.7652, Avg-Corr:0.7132, TopK-Acc:0.6, Success-Acc:0.9412
+2026-02-27T02:53:39 - INFO - Train progress epoch 13 step 100/695
+2026-02-27T02:53:40 - INFO - Train-epoch 13, Avg-Loss: 0.7543, Avg-Corr:0.7266, TopK-Acc:0.5857, Success-Acc:0.9343
+2026-02-27T02:53:41 - INFO - Train progress epoch 13 step 200/695
+2026-02-27T02:53:41 - INFO - Train-epoch 13, Avg-Loss: 0.754, Avg-Corr:0.7283, TopK-Acc:0.6048, Success-Acc:0.9512
+2026-02-27T02:53:43 - INFO - Train-epoch 13, Avg-Loss: 0.7584, Avg-Corr:0.7258, TopK-Acc:0.6143, Success-Acc:0.9557
+2026-02-27T02:53:43 - INFO - Train progress epoch 13 step 300/695
+2026-02-27T02:53:44 - INFO - Train-epoch 13, Avg-Loss: 0.7686, Avg-Corr:0.719, TopK-Acc:0.6, Success-Acc:0.9528
+2026-02-27T02:53:45 - INFO - Train progress epoch 13 step 400/695
+2026-02-27T02:53:45 - INFO - Train-epoch 13, Avg-Loss: 0.7509, Avg-Corr:0.7249, TopK-Acc:0.6048, Success-Acc:0.951
+2026-02-27T02:53:47 - INFO - Train-epoch 13, Avg-Loss: 0.7332, Avg-Corr:0.7298, TopK-Acc:0.6041, Success-Acc:0.9519
+2026-02-27T02:53:47 - INFO - Train progress epoch 13 step 500/695
+2026-02-27T02:53:48 - INFO - Train-epoch 13, Avg-Loss: 0.7143, Avg-Corr:0.7382, TopK-Acc:0.6161, Success-Acc:0.956
+2026-02-27T02:53:49 - INFO - Train progress epoch 13 step 600/695
+2026-02-27T02:53:50 - INFO - Train-epoch 13, Avg-Loss: 0.7076, Avg-Corr:0.7411, TopK-Acc:0.6095, Success-Acc:0.9577
+2026-02-27T02:53:51 - INFO - Train progress epoch 13 step 695/695
+2026-02-27T02:53:51 - INFO - Train-epoch 13, Avg-Loss: 0.7043, Avg-Corr:0.7392, TopK-Acc:0.6115, Success-Acc:0.9529
+2026-02-27T02:53:52 - INFO - Val progress epoch 13 step 77/77
+2026-02-27T02:53:52 - INFO - Valid-epoch 13, Avg-Loss: 0.6449, Avg-Corr:0.7327, TopK-Acc:0.5195, Success-Acc:0.973
+2026-02-27T02:53:53 - INFO - Train-epoch 14, Avg-Loss: 0.5532, Avg-Corr:0.812, TopK-Acc:0.6429, Success-Acc:0.9706
+2026-02-27T02:53:54 - INFO - Train progress epoch 14 step 100/695
+2026-02-27T02:53:55 - INFO - Train-epoch 14, Avg-Loss: 0.5932, Avg-Corr:0.7814, TopK-Acc:0.6571, Success-Acc:0.942
+2026-02-27T02:53:56 - INFO - Train progress epoch 14 step 200/695
+2026-02-27T02:53:56 - INFO - Train-epoch 14, Avg-Loss: 0.619, Avg-Corr:0.7686, TopK-Acc:0.6429, Success-Acc:0.9515
+2026-02-27T02:53:58 - INFO - Train-epoch 14, Avg-Loss: 0.6267, Avg-Corr:0.7611, TopK-Acc:0.6286, Success-Acc:0.9455
+2026-02-27T02:53:58 - INFO - Train progress epoch 14 step 300/695
+2026-02-27T02:53:59 - INFO - Train-epoch 14, Avg-Loss: 0.6261, Avg-Corr:0.7613, TopK-Acc:0.6371, Success-Acc:0.9448
+2026-02-27T02:54:00 - INFO - Train progress epoch 14 step 400/695
+2026-02-27T02:54:01 - INFO - Train-epoch 14, Avg-Loss: 0.6565, Avg-Corr:0.7458, TopK-Acc:0.6333, Success-Acc:0.9416
+2026-02-27T02:54:02 - INFO - Train-epoch 14, Avg-Loss: 0.6459, Avg-Corr:0.7469, TopK-Acc:0.6347, Success-Acc:0.9396
+2026-02-27T02:54:02 - INFO - Train progress epoch 14 step 500/695
+2026-02-27T02:54:03 - INFO - Train-epoch 14, Avg-Loss: 0.638, Avg-Corr:0.7512, TopK-Acc:0.6357, Success-Acc:0.9435
+2026-02-27T02:54:04 - INFO - Train progress epoch 14 step 600/695
+2026-02-27T02:54:04 - INFO - Train-epoch 14, Avg-Loss: 0.6207, Avg-Corr:0.7594, TopK-Acc:0.6444, Success-Acc:0.9467
+2026-02-27T02:54:06 - INFO - Train progress epoch 14 step 695/695
+2026-02-27T02:54:06 - INFO - Train-epoch 14, Avg-Loss: 0.6177, Avg-Corr:0.7617, TopK-Acc:0.6489, Success-Acc:0.9503
+2026-02-27T02:54:06 - INFO - Val progress epoch 14 step 77/77
+2026-02-27T02:54:07 - INFO - Valid-epoch 14, Avg-Loss: 0.4158, Avg-Corr:0.8412, TopK-Acc:0.6364, Success-Acc:0.987
+2026-02-27T02:54:08 - INFO - Train-epoch 15, Avg-Loss: 0.687, Avg-Corr:0.7522, TopK-Acc:0.6143, Success-Acc:0.971
+2026-02-27T02:54:08 - INFO - Train progress epoch 15 step 100/695
+2026-02-27T02:54:09 - INFO - Train-epoch 15, Avg-Loss: 0.6618, Avg-Corr:0.7479, TopK-Acc:0.65, Success-Acc:0.9635
+2026-02-27T02:54:10 - INFO - Train progress epoch 15 step 200/695
+2026-02-27T02:54:10 - INFO - Train-epoch 15, Avg-Loss: 0.642, Avg-Corr:0.7536, TopK-Acc:0.6429, Success-Acc:0.9563
+2026-02-27T02:54:11 - INFO - Train-epoch 15, Avg-Loss: 0.6439, Avg-Corr:0.7534, TopK-Acc:0.65, Success-Acc:0.9457
+2026-02-27T02:54:12 - INFO - Train progress epoch 15 step 300/695
+2026-02-27T02:54:13 - INFO - Train-epoch 15, Avg-Loss: 0.6302, Avg-Corr:0.7619, TopK-Acc:0.66, Success-Acc:0.9536
+2026-02-27T02:54:14 - INFO - Train progress epoch 15 step 400/695
+2026-02-27T02:54:14 - INFO - Train-epoch 15, Avg-Loss: 0.6281, Avg-Corr:0.7595, TopK-Acc:0.6571, Success-Acc:0.9517
+2026-02-27T02:54:16 - INFO - Train-epoch 15, Avg-Loss: 0.6225, Avg-Corr:0.7593, TopK-Acc:0.651, Success-Acc:0.9502
+2026-02-27T02:54:16 - INFO - Train progress epoch 15 step 500/695
+2026-02-27T02:54:17 - INFO - Train-epoch 15, Avg-Loss: 0.6247, Avg-Corr:0.7559, TopK-Acc:0.6321, Success-Acc:0.951
+2026-02-27T02:54:18 - INFO - Train progress epoch 15 step 600/695
+2026-02-27T02:54:18 - INFO - Train-epoch 15, Avg-Loss: 0.6392, Avg-Corr:0.7521, TopK-Acc:0.619, Success-Acc:0.9499
+2026-02-27T02:54:19 - INFO - Train progress epoch 15 step 695/695
+2026-02-27T02:54:19 - INFO - Train-epoch 15, Avg-Loss: 0.6326, Avg-Corr:0.7537, TopK-Acc:0.6273, Success-Acc:0.9488
+2026-02-27T02:54:20 - INFO - Val progress epoch 15 step 77/77
+2026-02-27T02:54:20 - INFO - Valid-epoch 15, Avg-Loss: 0.3801, Avg-Corr:0.8728, TopK-Acc:0.6364, Success-Acc:0.987
+2026-02-27T02:54:21 - INFO - Train-epoch 16, Avg-Loss: 0.6796, Avg-Corr:0.6992, TopK-Acc:0.5857, Success-Acc:0.8714
+2026-02-27T02:54:22 - INFO - Train progress epoch 16 step 100/695
+2026-02-27T02:54:22 - INFO - Train-epoch 16, Avg-Loss: 0.7236, Avg-Corr:0.7108, TopK-Acc:0.6286, Success-Acc:0.8986
+2026-02-27T02:54:24 - INFO - Train progress epoch 16 step 200/695
+2026-02-27T02:54:24 - INFO - Train-epoch 16, Avg-Loss: 0.7048, Avg-Corr:0.7232, TopK-Acc:0.5905, Success-Acc:0.9135
+2026-02-27T02:54:26 - INFO - Train-epoch 16, Avg-Loss: 0.6868, Avg-Corr:0.7339, TopK-Acc:0.6179, Success-Acc:0.9134
+2026-02-27T02:54:26 - INFO - Train progress epoch 16 step 300/695
+2026-02-27T02:54:27 - INFO - Train-epoch 16, Avg-Loss: 0.6667, Avg-Corr:0.7434, TopK-Acc:0.6343, Success-Acc:0.9275
+2026-02-27T02:54:28 - INFO - Train progress epoch 16 step 400/695
+2026-02-27T02:54:28 - INFO - Train-epoch 16, Avg-Loss: 0.6497, Avg-Corr:0.7503, TopK-Acc:0.6381, Success-Acc:0.9396
+2026-02-27T02:54:29 - INFO - Train-epoch 16, Avg-Loss: 0.6474, Avg-Corr:0.7459, TopK-Acc:0.6327, Success-Acc:0.9419
+2026-02-27T02:54:30 - INFO - Train progress epoch 16 step 500/695
+2026-02-27T02:54:31 - INFO - Train-epoch 16, Avg-Loss: 0.6397, Avg-Corr:0.7486, TopK-Acc:0.6446, Success-Acc:0.9419
+2026-02-27T02:54:31 - INFO - Train progress epoch 16 step 600/695
+2026-02-27T02:54:32 - INFO - Train-epoch 16, Avg-Loss: 0.6589, Avg-Corr:0.7395, TopK-Acc:0.6365, Success-Acc:0.935
+2026-02-27T02:54:33 - INFO - Train progress epoch 16 step 695/695
+2026-02-27T02:54:33 - INFO - Train-epoch 16, Avg-Loss: 0.6508, Avg-Corr:0.7409, TopK-Acc:0.6403, Success-Acc:0.9324
+2026-02-27T02:54:34 - INFO - Val progress epoch 16 step 77/77
+2026-02-27T02:54:35 - INFO - Valid-epoch 16, Avg-Loss: 0.56, Avg-Corr:0.7958, TopK-Acc:0.6104, Success-Acc:0.973
+2026-02-27T02:54:36 - INFO - Train-epoch 17, Avg-Loss: 0.6272, Avg-Corr:0.7588, TopK-Acc:0.7143, Success-Acc:0.9565
+2026-02-27T02:54:36 - INFO - Train progress epoch 17 step 100/695
+2026-02-27T02:54:37 - INFO - Train-epoch 17, Avg-Loss: 0.5882, Avg-Corr:0.7715, TopK-Acc:0.6786, Success-Acc:0.964
+2026-02-27T02:54:38 - INFO - Train progress epoch 17 step 200/695
+2026-02-27T02:54:38 - INFO - Train-epoch 17, Avg-Loss: 0.5915, Avg-Corr:0.7747, TopK-Acc:0.6619, Success-Acc:0.9663
+2026-02-27T02:54:40 - INFO - Train-epoch 17, Avg-Loss: 0.6301, Avg-Corr:0.7596, TopK-Acc:0.6429, Success-Acc:0.9674
+2026-02-27T02:54:40 - INFO - Train progress epoch 17 step 300/695
+2026-02-27T02:54:41 - INFO - Train-epoch 17, Avg-Loss: 0.6308, Avg-Corr:0.758, TopK-Acc:0.6571, Success-Acc:0.9681
+2026-02-27T02:54:42 - INFO - Train progress epoch 17 step 400/695
+2026-02-27T02:54:43 - INFO - Train-epoch 17, Avg-Loss: 0.6358, Avg-Corr:0.7573, TopK-Acc:0.6595, Success-Acc:0.9659
+2026-02-27T02:54:44 - INFO - Train-epoch 17, Avg-Loss: 0.6332, Avg-Corr:0.7565, TopK-Acc:0.6551, Success-Acc:0.9647
+2026-02-27T02:54:44 - INFO - Train progress epoch 17 step 500/695
+2026-02-27T02:54:46 - INFO - Train-epoch 17, Avg-Loss: 0.6167, Avg-Corr:0.7631, TopK-Acc:0.6679, Success-Acc:0.9655
+2026-02-27T02:54:47 - INFO - Train progress epoch 17 step 600/695
+2026-02-27T02:54:48 - INFO - Train-epoch 17, Avg-Loss: 0.6151, Avg-Corr:0.762, TopK-Acc:0.6571, Success-Acc:0.9661
+2026-02-27T02:54:49 - INFO - Train progress epoch 17 step 695/695
+2026-02-27T02:54:49 - INFO - Train-epoch 17, Avg-Loss: 0.6121, Avg-Corr:0.7637, TopK-Acc:0.6619, Success-Acc:0.965
+2026-02-27T02:54:50 - INFO - Val progress epoch 17 step 77/77
+2026-02-27T02:54:50 - INFO - Valid-epoch 17, Avg-Loss: 0.5084, Avg-Corr:0.8138, TopK-Acc:0.6364, Success-Acc:0.96
+2026-02-27T02:54:51 - INFO - Train-epoch 18, Avg-Loss: 0.5861, Avg-Corr:0.7847, TopK-Acc:0.6143, Success-Acc:0.9565
+2026-02-27T02:54:52 - INFO - Train progress epoch 18 step 100/695
+2026-02-27T02:54:53 - INFO - Train-epoch 18, Avg-Loss: 0.5577, Avg-Corr:0.8, TopK-Acc:0.6286, Success-Acc:0.971
+2026-02-27T02:54:54 - INFO - Train progress epoch 18 step 200/695
+2026-02-27T02:54:54 - INFO - Train-epoch 18, Avg-Loss: 0.5962, Avg-Corr:0.7724, TopK-Acc:0.6429, Success-Acc:0.9517
+2026-02-27T02:54:55 - INFO - Train-epoch 18, Avg-Loss: 0.608, Avg-Corr:0.7665, TopK-Acc:0.6429, Success-Acc:0.9527
+2026-02-27T02:54:56 - INFO - Train progress epoch 18 step 300/695
+2026-02-27T02:54:57 - INFO - Train-epoch 18, Avg-Loss: 0.6048, Avg-Corr:0.7696, TopK-Acc:0.6543, Success-Acc:0.9565
+2026-02-27T02:54:58 - INFO - Train progress epoch 18 step 400/695
+2026-02-27T02:54:58 - INFO - Train-epoch 18, Avg-Loss: 0.6063, Avg-Corr:0.7668, TopK-Acc:0.6524, Success-Acc:0.9566
+2026-02-27T02:55:00 - INFO - Train-epoch 18, Avg-Loss: 0.6197, Avg-Corr:0.7586, TopK-Acc:0.6367, Success-Acc:0.9524
+2026-02-27T02:55:00 - INFO - Train progress epoch 18 step 500/695
+2026-02-27T02:55:02 - INFO - Train-epoch 18, Avg-Loss: 0.6167, Avg-Corr:0.7593, TopK-Acc:0.625, Success-Acc:0.9529
+2026-02-27T02:55:02 - INFO - Train progress epoch 18 step 600/695
+2026-02-27T02:55:03 - INFO - Train-epoch 18, Avg-Loss: 0.6352, Avg-Corr:0.7522, TopK-Acc:0.6143, Success-Acc:0.9452
+2026-02-27T02:55:04 - INFO - Train progress epoch 18 step 695/695
+2026-02-27T02:55:04 - INFO - Train-epoch 18, Avg-Loss: 0.644, Avg-Corr:0.7517, TopK-Acc:0.6129, Success-Acc:0.9458
+2026-02-27T02:55:05 - INFO - Val progress epoch 18 step 77/77
+2026-02-27T02:55:05 - INFO - Valid-epoch 18, Avg-Loss: 0.4636, Avg-Corr:0.8256, TopK-Acc:0.5195, Success-Acc:0.987
+2026-02-27T02:55:07 - INFO - Train-epoch 19, Avg-Loss: 0.6344, Avg-Corr:0.7418, TopK-Acc:0.5571, Success-Acc:0.9403
+2026-02-27T02:55:08 - INFO - Train progress epoch 19 step 100/695
+2026-02-27T02:55:09 - INFO - Train-epoch 19, Avg-Loss: 0.595, Avg-Corr:0.755, TopK-Acc:0.5929, Success-Acc:0.9489
+2026-02-27T02:55:10 - INFO - Train progress epoch 19 step 200/695
+2026-02-27T02:55:10 - INFO - Train-epoch 19, Avg-Loss: 0.6166, Avg-Corr:0.7468, TopK-Acc:0.5762, Success-Acc:0.942
+2026-02-27T02:55:12 - INFO - Train-epoch 19, Avg-Loss: 0.6392, Avg-Corr:0.7399, TopK-Acc:0.5607, Success-Acc:0.9416
+2026-02-27T02:55:12 - INFO - Train progress epoch 19 step 300/695
+2026-02-27T02:55:13 - INFO - Train-epoch 19, Avg-Loss: 0.6211, Avg-Corr:0.7402, TopK-Acc:0.5743, Success-Acc:0.9388
+2026-02-27T02:55:14 - INFO - Train progress epoch 19 step 400/695
+2026-02-27T02:55:14 - INFO - Train-epoch 19, Avg-Loss: 0.6025, Avg-Corr:0.7454, TopK-Acc:0.5881, Success-Acc:0.9395
+2026-02-27T02:55:16 - INFO - Train-epoch 19, Avg-Loss: 0.5976, Avg-Corr:0.7509, TopK-Acc:0.6061, Success-Acc:0.9419
+2026-02-27T02:55:16 - INFO - Train progress epoch 19 step 500/695
+2026-02-27T02:55:17 - INFO - Train-epoch 19, Avg-Loss: 0.5952, Avg-Corr:0.7537, TopK-Acc:0.6071, Success-Acc:0.942
+2026-02-27T02:55:18 - INFO - Train progress epoch 19 step 600/695
+2026-02-27T02:55:19 - INFO - Train-epoch 19, Avg-Loss: 0.5956, Avg-Corr:0.7552, TopK-Acc:0.6032, Success-Acc:0.9469
+2026-02-27T02:55:20 - INFO - Train progress epoch 19 step 695/695
+2026-02-27T02:55:20 - INFO - Train-epoch 19, Avg-Loss: 0.596, Avg-Corr:0.7561, TopK-Acc:0.6129, Success-Acc:0.9459
+2026-02-27T02:55:21 - INFO - Val progress epoch 19 step 77/77
+2026-02-27T02:55:21 - INFO - Valid-epoch 19, Avg-Loss: 0.5082, Avg-Corr:0.8175, TopK-Acc:0.5714, Success-Acc:0.9865
+2026-02-27T02:55:25 - INFO - Test correlation: nan
+2026-02-27T02:55:25 - INFO - Test top-k acc: 0.9768
+2026-02-27T02:55:25 - INFO - Test best acc: 0.5367
+2026-02-27T02:55:25 - INFO - Test correct acc: 0.0000
+2026-02-27T02:55:25 - INFO - Test PAR2: 50187.30
+2026-02-27T02:55:25 - INFO - Saved test choices CSV: /workspace/smt-select/sibyl/smt-select/model/BV/seed10/time_steps=0_epochs=20_edge_sets=[AST_Back-AST_Data]_mode=cat_no_jump=True_cpu=False_data_weight=best_dropout=0_track=None_cross_valid=0_pool_type=attention_1772160921_test_choices.csv
+2026-02-27T02:55:25 - INFO - Saved model: /workspace/smt-select/sibyl/smt-select/model/BV/seed10/time_steps=0_epochs=20_edge_sets=[AST_Back-AST_Data]_mode=cat_no_jump=True_cpu=False_data_weight=best_dropout=0_track=None_cross_valid=0_pool_type=attention_1772160921.pt
+2026-02-27T02:55:25 - INFO - Saved curves + test metrics: /workspace/smt-select/sibyl/smt-select/model/BV/seed10/time_steps=0_epochs=20_edge_sets=[AST_Back-AST_Data]_mode=cat_no_jump=True_cpu=False_data_weight=best_dropout=0_track=None_cross_valid=0_pool_type=attention_1772160921.npz
+2026-02-27T02:55:25 - INFO - Saved test predictions: /workspace/smt-select/sibyl/smt-select/model/BV/seed10/time_steps=0_epochs=20_edge_sets=[AST_Back-AST_Data]_mode=cat_no_jump=True_cpu=False_data_weight=best_dropout=0_track=None_cross_valid=0_pool_type=attention_1772160921_test_predictions.json
