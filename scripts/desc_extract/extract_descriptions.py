@@ -6,7 +6,8 @@ and write per-logic JSON files under data/meta_info_24/descriptions/.
 Output format: one JSON per logic; top-level keys are smt-lib paths; each value has
   - raw_description: the original description (unchanged, may be empty)
   - description: same as used by encode_all_logic_desc: placeholder if missing/empty,
-    otherwise stripped text.
+    otherwise stripped text. When available, "Application: XXX" and "Category: XXX"
+    are prepended.
 """
 
 import argparse
@@ -35,6 +36,20 @@ def description_for_benchmark(benchmark: dict) -> tuple[str, str]:
     return (raw, description)
 
 
+def _prepend_application_category(description: str, benchmark: dict) -> str:
+    """Prepend 'Application: XXX' and 'Category: XXX' to description when available."""
+    parts: list[str] = []
+    app = benchmark.get("application", "").strip()
+    if app:
+        parts.append(f"Application: {app}")
+    cat = benchmark.get("category", "").strip()
+    if cat:
+        parts.append(f"Category: {cat}")
+    if not parts:
+        return description
+    return "\n".join(parts) + "\n\n" + description
+
+
 def extract_descriptions_from_json(json_path: Path) -> dict[str, dict]:
     """Read a meta-info JSON and return a dict path -> {raw_description, description}."""
     with open(json_path, "r", encoding="utf-8") as f:
@@ -48,6 +63,7 @@ def extract_descriptions_from_json(json_path: Path) -> dict[str, dict]:
         logic = benchmark.get("logic", "")
         family = benchmark.get("family", "")
         description = apply_description_rule(logic, family, description, smtlib_path)
+        description = _prepend_application_category(description, benchmark)
         out[smtlib_path] = {"raw_description": raw, "description": description}
     return out
 
