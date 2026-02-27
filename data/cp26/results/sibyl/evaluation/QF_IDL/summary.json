@@ -1,0 +1,96 @@
+{
+  "division": "QF_IDL",
+  "n_seeds": 5,
+  "seed_values": [
+    0,
+    10,
+    20,
+    30,
+    40
+  ],
+  "seeds": [
+    {
+      "seed": 0,
+      "test_size": 302,
+      "test_metrics": {
+        "total_count": 302,
+        "solved": 255,
+        "avg_par2": 423.59212885899416,
+        "sbs_solved": 268,
+        "sbs_avg_par2": 307.6482111294636,
+        "vbs_solved": 276,
+        "vbs_avg_par2": 237.45217402473602,
+        "gap_cls_solved": -1.625,
+        "gap_cls_par2": -1.651716001525133
+      }
+    },
+    {
+      "seed": 10,
+      "test_size": 302,
+      "test_metrics": {
+        "total_count": 302,
+        "solved": 248,
+        "avg_par2": 469.9791982439707,
+        "sbs_solved": 251,
+        "sbs_avg_par2": 444.624062643791,
+        "vbs_solved": 272,
+        "vbs_avg_par2": 284.9122160509899,
+        "gap_cls_solved": -0.14285714285714285,
+        "gap_cls_par2": -0.15875550963244947
+      }
+    },
+    {
+      "seed": 20,
+      "test_size": 302,
+      "test_metrics": {
+        "total_count": 302,
+        "solved": 258,
+        "avg_par2": 386.30910979017574,
+        "sbs_solved": 260,
+        "sbs_avg_par2": 373.5353092746125,
+        "vbs_solved": 275,
+        "vbs_avg_par2": 247.61569937833735,
+        "gap_cls_solved": -0.13333333333333333,
+        "gap_cls_par2": -0.1014440921956917
+      }
+    },
+    {
+      "seed": 30,
+      "test_size": 302,
+      "test_metrics": {
+        "total_count": 302,
+        "solved": 263,
+        "avg_par2": 359.1057667036489,
+        "sbs_solved": 259,
+        "sbs_avg_par2": 382.18003240001286,
+        "vbs_solved": 273,
+        "vbs_avg_par2": 266.80753397454953,
+        "gap_cls_solved": 0.2857142857142857,
+        "gap_cls_par2": 0.1999979718847048
+      }
+    },
+    {
+      "seed": 40,
+      "test_size": 302,
+      "test_metrics": {
+        "total_count": 302,
+        "solved": 258,
+        "avg_par2": 399.77027915321173,
+        "sbs_solved": 255,
+        "sbs_avg_par2": 425.36001206360356,
+        "vbs_solved": 270,
+        "vbs_avg_par2": 289.417805652672,
+        "gap_cls_solved": 0.2,
+        "gap_cls_par2": 0.18823979385061732
+      }
+    }
+  ],
+  "aggregated": {
+    "test": {
+      "gap_cls_solved_mean": -0.2830952380952381,
+      "gap_cls_solved_std": 0.6927812100430136,
+      "gap_cls_par2_mean": -0.30473556752359043,
+      "gap_cls_par2_std": 0.6891697241683697
+    }
+  }
+}
