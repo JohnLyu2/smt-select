@@ -2,12 +2,19 @@
 """
 Encode benchmark descriptions from description JSONs in data/meta_info_24/descriptions/
 (e.g. ABV.json: path -> {raw_description, description}) and save to CSV.
-Requires --output-dir (unless --trunc-stats). Use --trunc-stats to only show truncation statistics.
+
+Output layout (like data/features/syntactic): one folder per logic, each with
+- features.csv: path + embedding columns (emb_0, emb_1, ...)
+- extraction_times.csv: path, time_sec, failed (failed is always 0).
+Output goes to --output-dir (default: data/features/desc_emb). Use --trunc-stats to only show truncation statistics.
 """
 
 import argparse
+import csv
+import json
 import os
 import sys
+import time
 from pathlib import Path
 
 # Avoid tokenizers fork warnings by disabling parallelism.
@@ -18,10 +25,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.desc_encoder import encode_all_desc_from_descriptions_file
 
-# Input: description JSONs (path -> {raw_description, description}), same as scripts/desc_extract output
-DESCRIPTIONS_DIR = Path("data") / "meta_info_24" / "descriptions"
-# Logics to skip (large or otherwise excluded)
-EXCLUDED_LOGICS = {"AUFBVDTNIRA", "QF_NIA"}
+# Fixed input directory for description JSONs (path -> {raw_description, description})
+DESCRIPTIONS_DIR = "data/meta_info_24/descriptions"
+# Default output base (one folder per logic: <output_dir>/<logic>/features.csv, extraction_times.csv)
+DEFAULT_OUTPUT_DIR = "data/features/desc/all-mpnet-base-v2"
 
 
 def main():
@@ -33,7 +40,7 @@ def main():
         "--output-dir",
         type=str,
         default=None,
-        help="Output directory for CSV files (required unless --trunc-stats is used)",
+        help=f"Output base directory: one folder per logic with features.csv and extraction_times.csv (default: {DEFAULT_OUTPUT_DIR})",
     )
     parser.add_argument(
         "--trunc-stats",
@@ -43,8 +50,8 @@ def main():
     parser.add_argument(
         "--model-name",
         type=str,
-        default="Qwen/Qwen3-Embedding-0.6B",
-        help="Text embedding model name (default: Qwen/Qwen3-Embedding-0.6B)",
+        default="sentence-transformers/all-mpnet-base-v2",
+        help="Text embedding model name (default: sentence-transformers/all-mpnet-base-v2)",
     )
     parser.add_argument(
         "--logic",
@@ -62,23 +69,18 @@ def main():
 
     args = parser.parse_args()
 
-    # Output-dir is required unless --trunc-stats is used
-    if not args.trunc_stats and not args.output_dir:
-        parser.error("--output-dir is required unless --trunc-stats is used")
-
     project_root = Path(__file__).parent.parent
-    descriptions_dir = project_root / DESCRIPTIONS_DIR
+    descriptions_dir = (project_root / DESCRIPTIONS_DIR).resolve()
     if not descriptions_dir.is_dir():
         parser.error(f"Descriptions directory is not a directory or does not exist: {descriptions_dir}")
 
-    output_dir = None
-    if args.output_dir:
-        output_dir = Path(args.output_dir)
+    output_dir: Path | None = None
+    if not args.trunc_stats:
+        output_dir = (project_root / (args.output_dir or DEFAULT_OUTPUT_DIR)).resolve()
         output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Find all description JSON files, excluding specified logics
-    all_json = sorted(descriptions_dir.glob("*.json"))
-    json_files = [f for f in all_json if f.stem not in EXCLUDED_LOGICS]
+    # Find all description JSON files
+    json_files = sorted(descriptions_dir.glob("*.json"))
     if args.logic:
         requested = set(args.logic)
         json_files = [f for f in json_files if f.stem in requested]
@@ -97,23 +99,47 @@ def main():
     else:
         print("Showing truncation statistics only\n")
 
-    failed = 0
-    # Process each JSON file
+    # Process each JSON file: one logic folder with features.csv and extraction_times.csv
     for json_file in json_files:
         logic = json_file.stem  # e.g., "ABV" from "ABV.json"
 
         print(f"Processing {logic}...")
         print(f"  Input:  {json_file}")
 
-        # Only set output_csv if we're writing (not trunc-stats only)
-        output_csv = (output_dir / f"{logic}.csv") if output_dir is not None else None
-        if output_csv is not None:
-            print(f"  Output: {output_csv}")
+        if output_dir is None:
+            print("  Truncation statistics only (no output)\n")
+            try:
+                encode_all_desc_from_descriptions_file(
+                    json_path=str(json_file),
+                    output_csv_path=None,
+                    model_name=args.model_name,
+                    normalize=False,
+                    batch_size=8,
+                    show_progress=True,
+                    show_trunc_stats=True,
+                    is_setfit=args.setfit,
+                )
+            except Exception as e:
+                print(f"  Error: {e}\n", file=sys.stderr)
+            continue
+
+        logic_dir = output_dir / logic
+        logic_dir.mkdir(parents=True, exist_ok=True)
+        features_csv = logic_dir / "features.csv"
+        times_csv = logic_dir / "extraction_times.csv"
+        print(f"  Output: {logic_dir}/ (features.csv, extraction_times.csv)")
 
         try:
+            # Get paths for extraction_times (same order as encoder will use)
+            with open(json_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            paths = [p for p in data if isinstance(data.get(p), dict) and "description" in data[p]]
+            n = len(paths)
+
+            t0 = time.perf_counter()
             csv_path = encode_all_desc_from_descriptions_file(
                 json_path=str(json_file),
-                output_csv_path=str(output_csv) if output_csv else None,
+                output_csv_path=str(features_csv),
                 model_name=args.model_name,
                 normalize=False,
                 batch_size=8,
@@ -121,17 +147,27 @@ def main():
                 show_trunc_stats=args.trunc_stats,
                 is_setfit=args.setfit,
             )
-            if csv_path:
-                print(f"  Success! Saved to {csv_path}\n")
-            else:
+            elapsed = time.perf_counter() - t0
+
+            if csv_path is None:
                 print("  Truncation statistics shown (no encoding performed)\n")
+                continue
+
+            # Write extraction_times.csv: path, time_sec (distribute total time), failed=0
+            time_per_path = elapsed / n if n else 0.0
+            with open(times_csv, "w", newline="", encoding="utf-8") as f:
+                writer = csv.writer(f)
+                writer.writerow(["path", "time_sec", "failed"])
+                for p in paths:
+                    writer.writerow([p, time_per_path, 0])
+
+            print(f"  Success! {n} instances in {elapsed:.2f}s -> {logic_dir}\n")
         except Exception as e:
             print(f"  Error processing {logic}: {e}\n", file=sys.stderr)
-            failed += 1
-            continue
+            return 1
 
-    print("All processing complete!" if failed == 0 else f"Complete with {failed} failure(s).")
-    return 0 if failed == 0 else 1
+    print("All processing complete!")
+    return 0
 
 
 if __name__ == "__main__":
