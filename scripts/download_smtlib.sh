@@ -28,7 +28,25 @@ echo "Downloading ${ARCHIVE}..."
 wget -O "$ARCHIVE" "$DOWNLOAD_URL"
 
 echo "Decompressing..."
-zstd -df "$ARCHIVE" -o "$TARFILE"
+if command -v zstd &>/dev/null; then
+  zstd -df "$ARCHIVE" -o "$TARFILE"
+else
+  # Fallback: use Python zstandard (pip install zstandard)
+  PYTHON="${PYTHON:-python3}"
+  if [[ -x "${SCRIPT_DIR}/../.venv/bin/python3" ]]; then
+    PYTHON="${SCRIPT_DIR}/../.venv/bin/python3"
+  fi
+  if ! "$PYTHON" -c "
+import zstandard as zstd
+with open('$ARCHIVE', 'rb') as f_in, open('$TARFILE', 'wb') as f_out:
+    dctx = zstd.ZstdDecompressor()
+    dctx.copy_stream(f_in, f_out)
+" 2>/dev/null; then
+    echo "Error: zstd not found and Python zstandard not available." >&2
+    echo "Install one of: (1) zstd binary, or (2) pip install zstandard" >&2
+    exit 1
+  fi
+fi
 
 echo "Extracting..."
 tar -xf "$TARFILE" --no-same-owner
