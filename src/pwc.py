@@ -19,6 +19,7 @@ from .feature import (
 )
 from .solver_selector import SolverSelector
 from .pwc_wl import sorted_fallback_solvers
+from .utils import normalize_path
 
 PERF_DIFF_THRESHOLD = 1e-1  # Threshold for considering performance differences
 
@@ -29,10 +30,6 @@ def _load_path_list(value: str | Path | None) -> list[str]:
         return []
     with open(value, encoding="utf-8") as f:
         return [p.strip() for p in f if p.strip()]
-
-
-def _normalize_path(path: str) -> str:
-    return path.strip().replace("\\", "/")
 
 
 def _wl_level_csv_paths(wl_dir: str | Path, wl_iter: int) -> list[str]:
@@ -62,7 +59,7 @@ def create_pairwise_samples(
         if str(instance_path) in failed_set:
             continue
         if extraction_time_by_path is not None and feature_timeout is not None:
-            if extraction_time_by_path.get(_normalize_path(str(instance_path)), 0.0) >= feature_timeout:
+            if extraction_time_by_path.get(normalize_path(str(instance_path)), 0.0) >= feature_timeout:
                 continue
         # Handle both single CSV path (str) and multiple CSV paths (list)
         try:
@@ -183,9 +180,6 @@ class PwcSelector(SolverSelector):
         selected, _, _ = self.algorithm_select_with_info(instance_path)
         return selected
 
-    def _normalize_path(self, path: str) -> str:
-        return path.strip().replace("\\", "/")
-
     def algorithm_select_with_info(self, instance_path):
         """
         Return (solver_id, overhead_sec, feature_fail).
@@ -195,7 +189,7 @@ class PwcSelector(SolverSelector):
         (use SBS, no overhead). The CSV label failed=1 is used for this decision, not extraction_time comparison.
         """
         path_str = str(instance_path)
-        path_norm = self._normalize_path(path_str)
+        path_norm = normalize_path(path_str)
         sbs_solver_id = getattr(self, "sbs_solver_id", None)
         failed_from_csv = getattr(self, "failed_paths_from_csv", None)
         if failed_from_csv is not None and sbs_solver_id is not None:
@@ -258,7 +252,7 @@ def train_pwc(
     if extraction_time_by_path is not None and feature_timeout is not None:
         n_skipped = sum(
             1 for p in multi_perf_data.keys()
-            if extraction_time_by_path.get(_normalize_path(str(p)), 0.0) >= feature_timeout
+            if extraction_time_by_path.get(normalize_path(str(p)), 0.0) >= feature_timeout
         )
         if n_skipped:
             logging.info(

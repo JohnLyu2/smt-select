@@ -73,9 +73,7 @@ def _load_setfit_selector(setfit_model: str, desc_json: str):
     return SetfitSelector(setfit_model, desc_json)
 
 
-def _normalize_path(path: str) -> str:
-    """Normalize path for matching (strip, normalize separators)."""
-    return path.strip().replace("\\", "/")
+from src.utils import normalize_path as _normalize_path
 
 
 def load_extraction_times_csv(csv_path: Path) -> dict[str, float]:

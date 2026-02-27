@@ -38,9 +38,7 @@ def build_smt_graph_timeout(smt_path: str | Path, timeout_sec: int) -> Graph | N
     return smt_graph_to_grakel(graph_dict)
 
 
-def _normalize_path(path: str) -> str:
-    """Normalize path for matching (same as feature.py)."""
-    return path.strip().replace("\\", "/")
+from src.utils import normalize_path
 
 
 def paths_from_performance_json(
@@ -53,7 +51,7 @@ def paths_from_performance_json(
     if not isinstance(data, dict):
         raise ValueError("Performance JSON root must be an object")
     root = Path(benchmark_root).resolve()
-    return [str(root / _normalize_path(p)) for p in data if isinstance(data.get(p), dict)]
+    return [str(root / normalize_path(p)) for p in data if isinstance(data.get(p), dict)]
 
 
 def extract_wl_features_from_fitted(
@@ -82,7 +80,7 @@ def _path_for_csv(path: str, benchmark_root: str | Path | None) -> str:
     root = Path(benchmark_root).resolve()
     try:
         rel = Path(path).resolve().relative_to(root)
-        return _normalize_path(str(rel))
+        return normalize_path(str(rel))
     except ValueError:
         return path
 

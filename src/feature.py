@@ -3,13 +3,10 @@
 import csv
 import numpy as np
 
+from src.utils import normalize_path
+
 # Global dictionary to cache features, keyed by CSV path
 _feature_cache = {}
-
-
-def _normalize_path(path: str) -> str:
-    """Normalize path for matching (strip whitespace, normalize separators)."""
-    return path.strip().replace("\\", "/")
 
 
 def _load_feature_cache(csv_path: str):
@@ -24,7 +21,7 @@ def _load_feature_cache(csv_path: str):
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            path = _normalize_path(row["path"])
+            path = normalize_path(row["path"])
             # Extract all feature values (excluding 'path' column)
             features = [float(row[key]) for key in reader.fieldnames if key != "path"]
             cache[path] = np.array(features, dtype=np.float64)
@@ -48,7 +45,7 @@ def extract_feature_from_csv(instance_path: str, feature_csv_path: str):
         KeyError: If the instance path is not found in the features CSV
     """
     cache = _load_feature_cache(feature_csv_path)
-    normalized_path = _normalize_path(instance_path)
+    normalized_path = normalize_path(instance_path)
 
     if normalized_path in cache:
         return cache[normalized_path]
@@ -74,7 +71,7 @@ def extract_feature_from_csvs_concat(instance_path: str, feature_csv_paths: list
         KeyError: If the instance path is not found in any of the features CSVs
     """
     features_list = []
-    normalized_path = _normalize_path(instance_path)
+    normalized_path = normalize_path(instance_path)
     missing_paths = []
 
     for feature_csv_path in feature_csv_paths:
@@ -132,7 +129,7 @@ def validate_feature_coverage(
 
     # Check each instance
     for instance_path in instance_paths:
-        normalized_path = _normalize_path(instance_path)
+        normalized_path = normalize_path(instance_path)
         missing_in = []
 
         for csv_path in csv_paths:
