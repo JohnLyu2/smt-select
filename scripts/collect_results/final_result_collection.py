@@ -69,10 +69,10 @@ def main() -> None:
         type=Path,
         default=[
             PROJECT_ROOT / "data" / "cp26" / "results" / "synt",
-            PROJECT_ROOT / "data" / "cp26" / "results" / "synt+smtlib_desc" / "synt+mpnet",
+            PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text",
             PROJECT_ROOT / "data" / "cp26" / "results" / "gnn" / "gin_pwc_fb",
             PROJECT_ROOT / "data" / "cp26" / "results" / "machsmt" / "ehm",
-            PROJECT_ROOT / "data" / "cp26" / "results" / "fusion_pwc",
+            PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text",
             PROJECT_ROOT / "data" / "cp26" / "results" / "sibyl" / "evaluation",
         ],
         help="Result directories (each contains <logic>/summary.json). Default: synt, synt+mpnet, gin_pwc_fb, mach_ehm, fusion_pwc, sibyl",
@@ -96,10 +96,10 @@ def main() -> None:
     default_names = ["synt", "synt_mpnet", "gin_pwc", "mach_ehm", "fusion_pwc", "sibyl"]
     if (len(result_dirs) == 6
             and default_names[0] in str(result_dirs[0])
-            and "mpnet" in str(result_dirs[1])
+            and "lite+text" in str(result_dirs[1])
             and "gin_pwc_fb" in str(result_dirs[2])
             and "machsmt" in str(result_dirs[3]) and "ehm" in str(result_dirs[3])
-            and "fusion_pwc" in str(result_dirs[4])
+            and "graph+text" in str(result_dirs[4])
             and "sibyl" in str(result_dirs[5])):
         labels = default_names
     elif (len(result_dirs) == 5
