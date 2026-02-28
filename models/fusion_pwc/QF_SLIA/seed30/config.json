@@ -1,0 +1,14 @@
+{
+  "d_gin": 64,
+  "d_text": 768,
+  "d_text_small": 64,
+  "hidden_fused": 64,
+  "num_solvers": 4,
+  "fallback_solver_ids": [
+    3,
+    1,
+    2,
+    0
+  ],
+  "random_seed": 42
+}
