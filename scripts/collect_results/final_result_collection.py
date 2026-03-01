@@ -71,7 +71,7 @@ def main() -> None:
         "-o",
         "--output",
         type=Path,
-        default=PROJECT_ROOT / "doc" / "result_summary" / "final_res.csv",
+        default=PROJECT_ROOT / "doc" / "result_summary" / "final_par2.csv",
         help="Output CSV path",
     )
     args = parser.parse_args()

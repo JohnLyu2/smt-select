@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Convert doc/result_summary/final_res.csv into a LaTeX table (doc/cp26/final_res.tex).
+Convert doc/result_summary/final_par2.csv into a LaTeX table (doc/cp26/final_par2.tex).
 
 Reads the result summary CSV (logics × PAR2 gap closed columns) and writes
 a tabular .tex file with escaped logic names and formatted numeric cells.
@@ -12,8 +12,8 @@ from pathlib import Path
 
 # Script is under scripts/latex/
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-CSV_PATH = PROJECT_ROOT / "doc" / "result_summary" / "final_res.csv"
-TEX_PATH = PROJECT_ROOT / "doc" / "cp26" / "final_res.tex"
+CSV_PATH = PROJECT_ROOT / "doc" / "result_summary" / "final_par2.csv"
+TEX_PATH = PROJECT_ROOT / "doc" / "cp26" / "final_par2.tex"
 
 
 def latex_escape(s: str) -> str:
@@ -160,7 +160,7 @@ def main() -> None:
         "\\bottomrule",
         "\\end{tabular}",
         "\\caption{Experimental results on the held-out test set, measured by the PAR-2 SBS–VBS gap closed (\\%). Results are averaged over five random train–test splits and reported as mean $\\pm$ standard deviation.}",
-        "\\label{tab:final_res}",
+        "\\label{tab:final_par2}",
         "\\end{table}",
     ])
 
