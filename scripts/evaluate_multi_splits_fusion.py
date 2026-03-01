@@ -514,8 +514,10 @@ def evaluate_multi_splits_fusion(
     logging.info("%s", "=" * 60)
     logging.info("Seeds: %s", results["seed_values"])
     t = agg["test"]
+    avg_solved = float(np.mean([m["solved"] for m in test_metrics_list]))
     logging.info(
-        "Test: gap closed (solved) %.2f%% ± %.2f%%, gap closed (PAR-2) %.2f%% ± %.2f%%",
+        "Test: avg solved %.1f, gap closed (solved) %.2f%% ± %.2f%%, gap closed (PAR-2) %.2f%% ± %.2f%%",
+        avg_solved,
         t["gap_cls_solved_mean"] * 100, t["gap_cls_solved_std"] * 100,
         t["gap_cls_par2_mean"] * 100, t["gap_cls_par2_std"] * 100,
     )
