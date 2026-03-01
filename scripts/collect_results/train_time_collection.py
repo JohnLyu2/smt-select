@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 """
-Collect training time from train logs in two locations:
-- Graph: data/cp26/results/graph/<logic>/train_log/seed*.log
+Collect training time from train logs in four locations:
 - Lite: data/cp26/results/lite/<logic>/train_log/seed*.log
+- Lite+Text: data/cp26/results/lite+text/<logic>/train_log/seed*.log
+- Graph: data/cp26/results/graph/<logic>/train_log/seed*.log
+- Graph+Text: data/cp26/results/graph+text/<logic>/train_log/seed*.log
 
 For each logic, parses each seed log: first and last timestamp determine duration in seconds.
-Adds total feature extraction time from data/features/syntactic/<logic>/extraction_times.csv to both graph and lite (capped at 5s per instance).
-Writes one CSV: doc/result_summary/train_time.csv with columns logic, graph, lite.
+Lite = lite log duration + syntactic extraction (capped at 5s per instance, divided by NUM_PARALLEL).
+Lite+Text = lite+text log duration + syntactic extraction + description extraction.
+Graph = GNN log duration (includes graph build) + whole Lite time (fallback).
+Graph+Text = desc extraction + GNN log duration (includes graph build, no fallback)
+             + graph+text fusion log duration + whole Lite+Text time (fallback).
+Writes one CSV: doc/result_summary/train_time.csv.
 """
 
 import csv
@@ -17,9 +23,12 @@ from pathlib import Path
 # Script is under scripts/collect_results/
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-GRAPH_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "graph"
 LITE_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "lite"
+LITE_TEXT_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text"
+GRAPH_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "graph"
+GRAPH_TEXT_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text"
 FEATURES_SYNTACTIC_ROOT = PROJECT_ROOT / "data" / "features" / "syntactic"
+FEATURES_DESC_ROOT = PROJECT_ROOT / "data" / "features" / "desc" / "all-mpnet-base-v2"
 OUTPUT_PATH = PROJECT_ROOT / "doc" / "result_summary" / "train_time.csv"
 
 # Log lines start with: 2026-02-20 10:29:44,327 - INFO - ...
@@ -85,16 +94,16 @@ def collect_from_root(root: Path) -> dict[str, float | str]:
 
 
 EXTRACTION_TIME_CAP_SEC = 5.0
+NUM_PARALLEL = 8
 
 
-def total_extraction_time_sec(logic: str) -> float:
-    """Sum time_sec from data/features/syntactic/<logic>/extraction_times.csv, capping each instance at 5s. Return 0 if missing."""
-    path = FEATURES_SYNTACTIC_ROOT / logic / "extraction_times.csv"
-    if not path.is_file():
+def _sum_extraction_csv(csv_path: Path) -> float:
+    """Sum time_sec from an extraction_times.csv, capping each instance at EXTRACTION_TIME_CAP_SEC. Return 0 if missing."""
+    if not csv_path.is_file():
         return 0.0
     total = 0.0
     try:
-        with open(path, encoding="utf-8") as f:
+        with open(csv_path, encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 try:
@@ -103,27 +112,50 @@ def total_extraction_time_sec(logic: str) -> float:
                     pass
     except OSError:
         return 0.0
-    return total
+    return total / NUM_PARALLEL
+
+
+def total_syntactic_extraction_sec(logic: str) -> float:
+    """Syntactic feature extraction time for a logic."""
+    return _sum_extraction_csv(FEATURES_SYNTACTIC_ROOT / logic / "extraction_times.csv")
+
+
+def total_desc_extraction_sec(logic: str) -> float:
+    """Description embedding extraction time for a logic."""
+    return _sum_extraction_csv(FEATURES_DESC_ROOT / logic / "extraction_times.csv")
 
 
 def main() -> None:
-    graph_times: dict[str, float | str] = {}
     lite_times: dict[str, float | str] = {}
+    lite_text_times: dict[str, float | str] = {}
+    graph_raw: dict[str, float | str] = {}
+    graph_times: dict[str, float | str] = {}
+    graph_text_times: dict[str, float | str] = {}
 
     if LITE_ROOT.is_dir():
         lite_times = collect_from_root(LITE_ROOT)
         for logic in lite_times:
             val = lite_times[logic]
             if val != "":
-                extraction_sec = total_extraction_time_sec(logic)
-                lite_times[logic] = round(float(val) + extraction_sec, 1)
+                lite_times[logic] = round(float(val) + total_syntactic_extraction_sec(logic), 1)
     else:
         print(f"Skipping Lite: directory not found: {LITE_ROOT}")
 
+    if LITE_TEXT_ROOT.is_dir():
+        lite_text_times = collect_from_root(LITE_TEXT_ROOT)
+        for logic in lite_text_times:
+            val = lite_text_times[logic]
+            if val != "":
+                lite_text_times[logic] = round(
+                    float(val) + total_syntactic_extraction_sec(logic) + total_desc_extraction_sec(logic), 1
+                )
+    else:
+        print(f"Skipping Lite+Text: directory not found: {LITE_TEXT_ROOT}")
+
     if GRAPH_ROOT.is_dir():
-        graph_times = collect_from_root(GRAPH_ROOT)
-        for logic in graph_times:
-            val = graph_times[logic]
+        graph_raw = collect_from_root(GRAPH_ROOT)
+        for logic in graph_raw:
+            val = graph_raw[logic]
             if val != "":
                 lite_val = lite_times.get(logic, "")
                 lite_total = float(lite_val) if lite_val != "" else 0.0
@@ -131,18 +163,38 @@ def main() -> None:
     else:
         print(f"Skipping Graph: directory not found: {GRAPH_ROOT}")
 
-    all_logics = sorted(set(graph_times) | set(lite_times))
+    if GRAPH_TEXT_ROOT.is_dir():
+        graph_text_raw = collect_from_root(GRAPH_TEXT_ROOT)
+        for logic in graph_text_raw:
+            val = graph_text_raw[logic]
+            if val != "":
+                gnn_raw = graph_raw.get(logic, "")
+                gnn_dur = float(gnn_raw) if gnn_raw != "" else 0.0
+                lite_text_val = lite_text_times.get(logic, "")
+                lite_text_total = float(lite_text_val) if lite_text_val != "" else 0.0
+                desc_ext = total_desc_extraction_sec(logic)
+                graph_text_times[logic] = round(
+                    desc_ext + gnn_dur + float(val) + lite_text_total, 1
+                )
+    else:
+        print(f"Skipping Graph+Text: directory not found: {GRAPH_TEXT_ROOT}")
+
+    all_logics = sorted(
+        set(lite_times) | set(lite_text_times) | set(graph_times) | set(graph_text_times)
+    )
     if all_logics:
         rows = [
             {
                 "logic": logic,
-                "graph": graph_times.get(logic, ""),
                 "lite": lite_times.get(logic, ""),
+                "lite_text": lite_text_times.get(logic, ""),
+                "graph": graph_times.get(logic, ""),
+                "graph_text": graph_text_times.get(logic, ""),
             }
             for logic in all_logics
         ]
         OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-        fieldnames = ["logic", "graph", "lite"]
+        fieldnames = ["logic", "lite", "lite_text", "graph", "graph_text"]
         with open(OUTPUT_PATH, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
