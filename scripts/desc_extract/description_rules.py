@@ -109,8 +109,8 @@ _ULTIMATE_SVCOMP2019_PREFIXES: dict[str, str] = {
         "The original SV-COMP benchmark checks unreachability and memory tracking"
         " in a list-splitting program.",
     "standard_running_true-unreach-call.i":
-        "The original SV-COMP benchmark checks unreachability in a standard"
-        " running example program.",
+        "The original SV-COMP benchmark checks unreachability in an array"
+        " mapping and consistency verification program.",
 }
 
 
@@ -140,6 +140,389 @@ def _preiner_modify(smtlib_path: str, description: str) -> str | None:
 
 
 # ---------------------------------------------------------------------------
+# ABV / UltimateAutomizerSvcomp2023
+# ---------------------------------------------------------------------------
+_ULTIMATE_SVCOMP2023_PREFIXES: dict[str, str] = {
+    # memsafety
+    "20020406-1.i":
+        "The original SV-COMP benchmark is about a polynomial arithmetic struct program.",
+    "960521-1_1-2.i":
+        "The original SV-COMP benchmark is about a two-array memory safety program.",
+    "test-0102-1.i":
+        "The original SV-COMP benchmark is about a Linux kernel-style doubly-linked list program.",
+    "test-0134.i":
+        "The original SV-COMP benchmark is about a Linux kernel-style linked list program that sorts elements by value.",
+    "test-0137.i":
+        "The original SV-COMP benchmark is about a Linux kernel-style linked list program that finds the maximum element.",
+    "test-0158-1.i":
+        "The original SV-COMP benchmark is about a program that stores and retrieves a pointer through a union struct.",
+    "test-0234-1.i":
+        "The original SV-COMP benchmark is about a five-level nested linked structure program.",
+    "test-0521.i":
+        "The original SV-COMP benchmark is about a nested list structure program with multi-level allocation and deallocation.",
+    "test-memleak_nexttime.i":
+        "The original SV-COMP benchmark is about a program that stores a heap pointer in a global buffer and later frees it.",
+    # list-properties
+    "alternating_list-1.i":
+        "The original SV-COMP benchmark is about an alternating list program.",
+    "list-1.i":
+        "The original SV-COMP benchmark is about an integer list program.",
+    "list-2.i":
+        "The original SV-COMP benchmark is about an integer list program.",
+    "list_flag-2.i":
+        "The original SV-COMP benchmark is about a flag-controlled list program.",
+    "list_search-1.i":
+        "The original SV-COMP benchmark is about a linked-list search program.",
+    "list_search-2.i":
+        "The original SV-COMP benchmark is about a linked-list search program.",
+    "simple-2.i":
+        "The original SV-COMP benchmark is about a simple list program.",
+    "simple_built_from_end.i":
+        "The original SV-COMP benchmark is about a simple list program built by prepending nodes.",
+    "splice-2.i":
+        "The original SV-COMP benchmark is about a list-splitting program.",
+    # list-ext-properties
+    "list-ext_1.i":
+        "The original SV-COMP benchmark is about a list program that verifies a structured sequence of values.",
+    "list-ext_flag.i":
+        "The original SV-COMP benchmark is about an extended list program where each node stores its own flag.",
+    "list-ext_flag_1.i":
+        "The original SV-COMP benchmark is about an extended list program where each node's value depends on a per-node flag.",
+    "simple-ext_1.i":
+        "The original SV-COMP benchmark is about a simple list program that builds a sequentially numbered list.",
+    "test-0232_1-1.i":
+        "The original SV-COMP benchmark is about a list program where multiple nodes share a single data pointer.",
+    "test-0232_1-2.i":
+        "The original SV-COMP benchmark is about a list program where multiple nodes share a single data pointer.",
+    "test-0504.i":
+        "The original SV-COMP benchmark is about a program with a doubly-linked outer list where each node contains a circular inner list.",
+    "test-0504_1.i":
+        "The original SV-COMP benchmark is about a program with a doubly-linked outer list where each node contains a circular inner list.",
+    "test-0513.i":
+        "The original SV-COMP benchmark is about a merge sort program that operates on singly-linked data lists organized in a circular outer list.",
+    "test-0513_1.i":
+        "The original SV-COMP benchmark is about a merge sort program that operates on singly-linked data lists organized in a circular outer list.",
+    # list-ext2-properties
+    "list_and_tree_cnstr-1.i":
+        "The original SV-COMP benchmark is about a program that simultaneously builds a binary tree and a structured list.",
+    "list_and_tree_cnstr-2.i":
+        "The original SV-COMP benchmark is about a program that simultaneously builds a binary tree and a structured list.",
+    "simple_and_skiplist_2lvl-2.i":
+        "The original SV-COMP benchmark is about a program that builds a two-level skip list alongside a simple list.",
+    "simple_search_value-1.i":
+        "The original SV-COMP benchmark is about a program that builds a sequential integer list and searches for specific values.",
+    "simple_search_value-2.i":
+        "The original SV-COMP benchmark is about a program that builds a sequential integer list and searches for specific values.",
+    # list-ext3-properties
+    "dll_circular_traversal-2.i":
+        "The original SV-COMP benchmark is about a circular doubly-linked list program with sequential data traversal.",
+    "sll_circular_traversal-1.i":
+        "The original SV-COMP benchmark is about a circular singly-linked list program with sequential data traversal.",
+    "sll_circular_traversal-2.i":
+        "The original SV-COMP benchmark is about a circular singly-linked list program with sequential data traversal.",
+    "sll_nondet_insert-1.i":
+        "The original SV-COMP benchmark is about a program that inserts nodes at nondeterministic positions into a singly-linked list.",
+    "sll_of_sll_nondet_append-2.i":
+        "The original SV-COMP benchmark is about a program with a singly-linked list of sublists of nondeterministically chosen lengths.",
+    # heap-manipulation
+    "bubble_sort_linux-1.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program that applies bubble sort.",
+    "bubble_sort_linux-2.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program that applies bubble sort.",
+    "dancing.i":
+        "The original SV-COMP benchmark is about a dancing links program.",
+    "dll_of_dll-1.i":
+        "The original SV-COMP benchmark is about a doubly-linked list of doubly-linked lists program.",
+    "dll_of_dll-2.i":
+        "The original SV-COMP benchmark is about a doubly-linked list of doubly-linked lists program.",
+    "merge_sort-2.i":
+        "The original SV-COMP benchmark is about a merge sort program on linked sublists.",
+    "sll_to_dll_rev-1.i":
+        "The original SV-COMP benchmark is about a program that builds a singly-linked list, converts it to a doubly-linked list, and reverses it.",
+    "sll_to_dll_rev-2.i":
+        "The original SV-COMP benchmark is about a program that builds a singly-linked list, converts it to a doubly-linked list, and reverses it.",
+    # forester-heap
+    "dll-circular-2.i":
+        "The original SV-COMP benchmark is about a circular doubly-linked list program.",
+    "dll-queue-1.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program that encodes and verifies a nondeterministic value sequence.",
+    "dll-rb-cnstr_1-2.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program with red-black colored nodes.",
+    "dll-rb-sentinel-1.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program with red-black colored nodes and a sentinel node.",
+    "dll-reverse.i":
+        "The original SV-COMP benchmark is about a doubly-linked list with colored nodes that is reversed.",
+    "dll-sorted-2.i":
+        "The original SV-COMP benchmark is about a sorted doubly-linked list program.",
+    "dll-token-1.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program with a token node and sentinel.",
+    "sll-circular-1.i":
+        "The original SV-COMP benchmark is about a circular singly-linked list program.",
+    "sll-optional-1.i":
+        "The original SV-COMP benchmark is about a singly-linked list program where each node optionally holds a satellite pointer.",
+    "sll-rb-cnstr_1-2.i":
+        "The original SV-COMP benchmark is about a singly-linked list program with red-black colored nodes.",
+    "sll-rb-sentinel-1.i":
+        "The original SV-COMP benchmark is about a singly-linked list program with red-black colored nodes and a sentinel node.",
+    "sll-rb-sentinel-2.i":
+        "The original SV-COMP benchmark is about a singly-linked list program with red-black colored nodes and a sentinel node.",
+    "sll-reverse_simple.i":
+        "The original SV-COMP benchmark is about a singly-linked list with colored nodes that is reversed.",
+    "sll-simple-white-blue-1.i":
+        "The original SV-COMP benchmark is about a singly-linked list program with one node of a distinct color.",
+    "sll-sorted-1.i":
+        "The original SV-COMP benchmark is about a sorted singly-linked list program.",
+    "sll-sorted-2.i":
+        "The original SV-COMP benchmark is about a sorted singly-linked list program.",
+    "sll-token-2.i":
+        "The original SV-COMP benchmark is about a singly-linked list program with a token node and sentinel.",
+    # list-simple (circular DLL)
+    "dll2c_append_unequal.i":
+        "The original SV-COMP benchmark is about a circular doubly-linked list program that appends a node with a distinct value.",
+    "dll2c_insert_equal.i":
+        "The original SV-COMP benchmark is about a circular doubly-linked list program that inserts a node with the same value.",
+    "dll2c_insert_unequal.i":
+        "The original SV-COMP benchmark is about a circular doubly-linked list program that inserts a node with a distinct value.",
+    "dll2c_prepend_equal.i":
+        "The original SV-COMP benchmark is about a circular doubly-linked list program that prepends a node with the same value.",
+    "dll2c_prepend_unequal.i":
+        "The original SV-COMP benchmark is about a circular doubly-linked list program that prepends a node with a distinct value.",
+    "dll2c_remove_all.i":
+        "The original SV-COMP benchmark is about a circular doubly-linked list program that removes all nodes.",
+    "dll2c_update_all.i":
+        "The original SV-COMP benchmark is about a circular doubly-linked list program that updates all nodes in forward order.",
+    "dll2c_update_all_reverse.i":
+        "The original SV-COMP benchmark is about a circular doubly-linked list program that updates all nodes in reverse order.",
+    # list-simple (null-terminated DLL)
+    "dll2n_append_equal.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program that appends a node with the same value.",
+    "dll2n_append_unequal.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program that appends a node with a distinct value.",
+    "dll2n_insert_equal.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program that inserts a node with the same value.",
+    "dll2n_insert_unequal.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program that inserts a node with a distinct value.",
+    "dll2n_prepend_unequal.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program that prepends a node with a distinct value.",
+    "dll2n_remove_all.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program that removes all nodes.",
+    "dll2n_update_all.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program that updates all nodes in forward order.",
+    # list-simple (circular SLL)
+    "sll2c_insert_equal.i":
+        "The original SV-COMP benchmark is about a circular singly-linked list program that inserts a node with the same value.",
+    "sll2c_insert_unequal.i":
+        "The original SV-COMP benchmark is about a circular singly-linked list program that inserts a node with a distinct value.",
+    "sll2c_prepend_equal.i":
+        "The original SV-COMP benchmark is about a circular singly-linked list program that prepends a node with the same value.",
+    "sll2c_prepend_unequal.i":
+        "The original SV-COMP benchmark is about a circular singly-linked list program that prepends a node with a distinct value.",
+    "sll2c_remove_all.i":
+        "The original SV-COMP benchmark is about a circular singly-linked list program that removes all nodes.",
+    # list-simple (null-terminated SLL)
+    "sll2n_append_equal.i":
+        "The original SV-COMP benchmark is about a singly-linked list program that appends a node with the same value.",
+    "sll2n_append_unequal.i":
+        "The original SV-COMP benchmark is about a singly-linked list program that appends a node with a distinct value.",
+    "sll2n_insert_equal.i":
+        "The original SV-COMP benchmark is about a singly-linked list program that inserts a node with the same value.",
+    "sll2n_insert_unequal.i":
+        "The original SV-COMP benchmark is about a singly-linked list program that inserts a node with a distinct value.",
+    "sll2n_prepend_equal.i":
+        "The original SV-COMP benchmark is about a singly-linked list program that prepends a node with the same value.",
+    "sll2n_remove_all.i":
+        "The original SV-COMP benchmark is about a singly-linked list program that removes all nodes.",
+    "sll2n_update_all.i":
+        "The original SV-COMP benchmark is about a singly-linked list program that updates all nodes in forward order.",
+    "sll2n_update_all_reverse.i":
+        "The original SV-COMP benchmark is about a singly-linked list program that updates all nodes in reverse order.",
+    # ldv-memsafety / memleaks tests
+    "memleaks_test1-3.i":
+        "The original SV-COMP benchmark is about a simple memory allocation and deallocation test program.",
+    "memleaks_test3-2.i":
+        "The original SV-COMP benchmark is about a memory test program with conditional deallocation.",
+    "memleaks_test4-2.i":
+        "The original SV-COMP benchmark is about a memory test program with nested conditional deallocation.",
+    "memleaks_test5.i":
+        "The original SV-COMP benchmark is about a memory management test where a pointer may be lost.",
+    "memleaks_test6.i":
+        "The original SV-COMP benchmark is about a driver-model program with conditional memory management on error paths.",
+    "memleaks_test6_1.i":
+        "The original SV-COMP benchmark is about a driver-model program with conditional memory management on error paths.",
+    "memleaks_test6_2.i":
+        "The original SV-COMP benchmark is about a driver-model program with conditional memory management.",
+    "memleaks_test6_3.i":
+        "The original SV-COMP benchmark is about a driver-model program with conditional memory management.",
+    "memleaks_test7-1.i":
+        "The original SV-COMP benchmark is about a driver-model program with conditional memory management.",
+    "memleaks_test7-2.i":
+        "The original SV-COMP benchmark is about a driver-model program where a local pointer is passed as a parameter.",
+    "memleaks_test8.i":
+        "The original SV-COMP benchmark is about a global memory allocation and deallocation test program.",
+    "memleaks_test9.i":
+        "The original SV-COMP benchmark is about a global memory allocation test with conditional deallocation.",
+    "memleaks_test10-1.i":
+        "The original SV-COMP benchmark is about a program that allocates memory through deeply nested struct pointers.",
+    "memleaks_test11.i":
+        "The original SV-COMP benchmark is about a driver-model program where memory is passed by parameter.",
+    "memleaks_test12-1.i":
+        "The original SV-COMP benchmark is about a driver-model program where a probe function frees resources on a success path.",
+    "memleaks_test12-2.i":
+        "The original SV-COMP benchmark is about a driver-model program where a probe function frees resources on a success path.",
+    "memleaks_test13.i":
+        "The original SV-COMP benchmark is about a program that stores allocated objects in a global linked list.",
+    "memleaks_test13_1.i":
+        "The original SV-COMP benchmark is about a program that stores allocated objects in a global linked list.",
+    "memleaks_test13_2.i":
+        "The original SV-COMP benchmark is about a program that stores allocated objects in a global linked list.",
+    "memleaks_test14.i":
+        "The original SV-COMP benchmark is about a program that stores allocated objects in a linked list passed as a parameter.",
+    "memleaks_test14_1.i":
+        "The original SV-COMP benchmark is about a program that stores allocated objects in a linked list passed as a parameter.",
+    "memleaks_test14_2.i":
+        "The original SV-COMP benchmark is about a program that stores allocated objects in a linked list passed as a parameter.",
+    "memleaks_test14_3.i":
+        "The original SV-COMP benchmark is about a program that stores allocated objects in a linked list passed as a parameter.",
+    "memleaks_test15-1.i":
+        "The original SV-COMP benchmark is about a HID driver model program using container_of for object tracking.",
+    "memleaks_test15-2.i":
+        "The original SV-COMP benchmark is about a HID driver model program using container_of for object tracking.",
+    "memleaks_test16.i":
+        "The original SV-COMP benchmark is about a program with conditional memory allocation based on an input parameter.",
+    "memleaks_test17_1-1.i":
+        "The original SV-COMP benchmark is about a program that stores allocated objects in an array.",
+    "memleaks_test17_1-2.i":
+        "The original SV-COMP benchmark is about a program that stores allocated objects in an array.",
+    "memleaks_test17_2-2.i":
+        "The original SV-COMP benchmark is about a program that stores allocated objects in an array.",
+    "memleaks_test17_3.i":
+        "The original SV-COMP benchmark is about a program that stores allocated objects in an array.",
+    "memleaks_test18.i":
+        "The original SV-COMP benchmark is about a program that allocates an array of objects within a single function.",
+    "memleaks_test18_3.i":
+        "The original SV-COMP benchmark is about a program that allocates an array of objects within a single function.",
+    "memleaks_test19-1.i":
+        "The original SV-COMP benchmark is about a driver-model memory management test with error-path cleanup.",
+    "memleaks_test20-2.i":
+        "The original SV-COMP benchmark is about a program that registers an object by storing a field in a global variable.",
+    "memleaks_test21-2.i":
+        "The original SV-COMP benchmark is about a program that passes an object field as a return value and parameter.",
+    "memleaks_test22_1-2.i":
+        "The original SV-COMP benchmark is about a kobject reference-counting program with a custom release function.",
+    "memleaks_test22_2-2.i":
+        "The original SV-COMP benchmark is about a kobject reference-counting program with a custom release function.",
+    "memleaks_test22_3-2.i":
+        "The original SV-COMP benchmark is about a kobject reference-counting program where a double-put leads to an invalid dereference.",
+    "memleaks_test23_3.i":
+        "The original SV-COMP benchmark is about a HID report list management program.",
+    "memleaks_test23_4.i":
+        "The original SV-COMP benchmark is about a HID report list management program.",
+    # heap-data
+    "calendar.i":
+        "The original SV-COMP benchmark is about a linked list of calendar event pairs with validity constraints.",
+    "cart.i":
+        "The original SV-COMP benchmark is about a linked list of shopping cart items with stock-order constraints.",
+    "hash_fun.i":
+        "The original SV-COMP benchmark is about a linked list of hash values bounded within a fixed interval.",
+    "min_max.i":
+        "The original SV-COMP benchmark is about a linked list program that tracks the minimum and maximum of stored values.",
+    "packet_filter.i":
+        "The original SV-COMP benchmark is about a network packet filter program that routes packets into two linked-list queues.",
+    "running_example.i":
+        "The original SV-COMP benchmark is about a linked list program that repeatedly updates values within a fixed range.",
+    "shared_mem1.i":
+        "The original SV-COMP benchmark is about a circular linked list program where all nodes share a single memory object.",
+    # memsafety-ext
+    "dll_extends_pointer.i":
+        "The original SV-COMP benchmark is about a doubly-linked list program where each node optionally holds an external or embedded pointer.",
+    "tree_cnstr.i":
+        "The original SV-COMP benchmark is about a binary tree construction and leaf-removal program.",
+    "tree_dsw.i":
+        "The original SV-COMP benchmark is about a binary tree program that uses the Deutsch-Schorr-Waite traversal algorithm.",
+    "tree_of_cslls.i":
+        "The original SV-COMP benchmark is about a binary tree program where each tree node carries a circular singly-linked list.",
+    "tree_parent_ptr.i":
+        "The original SV-COMP benchmark is about a binary tree program with parent pointers and stack-based deallocation.",
+    "tree_stack.i":
+        "The original SV-COMP benchmark is about a binary tree program that uses an explicit stack for traversal and deallocation.",
+    # memsafety-ext2
+    "complex_data_creation_test01-1.i":
+        "The original SV-COMP benchmark is about a list program where each node holds a complex data structure with an array.",
+    "complex_data_creation_test01-2.i":
+        "The original SV-COMP benchmark is about a list program where each node holds a complex data structure with an array.",
+    "complex_data_creation_test02-1.i":
+        "The original SV-COMP benchmark is about a list program where each node holds a complex data structure with a chained array.",
+    "complex_data_creation_test02-2.i":
+        "The original SV-COMP benchmark is about a list program where each node holds a complex data structure with a chained array.",
+    "optional_data_creation_test04-1.i":
+        "The original SV-COMP benchmark is about a list program where each node optionally holds a data structure with an optional array.",
+    "length_test03-1.i":
+        "The original SV-COMP benchmark is about a character list program that searches for substrings.",
+    "split_list_test05-1.i":
+        "The original SV-COMP benchmark is about a character list program that splits the list at a delimiter.",
+    "split_list_test05-2.i":
+        "The original SV-COMP benchmark is about a character list program that splits the list at a delimiter.",
+    # verifythis
+    "duplets.c":
+        "The original SV-COMP benchmark is about a program that finds a duplicate value in an array.",
+    "elimination_max.c":
+        "The original SV-COMP benchmark is about a program that finds the maximum array element using an elimination loop.",
+    "elimination_max_rec.c":
+        "The original SV-COMP benchmark is about a program that recursively finds the maximum array element.",
+    "lcp.c":
+        "The original SV-COMP benchmark is about a program that computes the longest common prefix of two array suffixes.",
+    # loops / reducercommutativity
+    "eureka_05.i":
+        "The original SV-COMP benchmark is about a selection sort program.",
+    "max05-1.i":
+        "The original SV-COMP benchmark is about a reducer commutativity program for the max function (array size 5).",
+    "sep05-2.i":
+        "The original SV-COMP benchmark is about a reducer commutativity program (array size 5).",
+    "sep10-2.i":
+        "The original SV-COMP benchmark is about a reducer commutativity program (array size 10).",
+    "sep20-1.i":
+        "The original SV-COMP benchmark is about a reducer commutativity program (array size 20).",
+    "sum_array-2-1.i":
+        "The original SV-COMP benchmark is about an element-wise array sum verification program.",
+    "sum_array-2-2.i":
+        "The original SV-COMP benchmark is about an element-wise array sum verification program.",
+    "sum_array-2.i":
+        "The original SV-COMP benchmark is about an element-wise array sum verification program.",
+    # ldv-sets
+    "test_add-2.i":
+        "The original SV-COMP benchmark is about a set data structure program that adds an element and verifies its membership.",
+    "test_mutex.i":
+        "The original SV-COMP benchmark is about a program that locks and unlocks two mutexes in sequence.",
+    "test_mutex_unbounded-1.i":
+        "The original SV-COMP benchmark is about a program that manages an unbounded list of mutex-holding structs.",
+    "test_mutex_unbounded-2.i":
+        "The original SV-COMP benchmark is about a program that manages an unbounded list of mutex-holding structs.",
+    "test_mutex_unlock_at_exit.i":
+        "The original SV-COMP benchmark is about a program that locks two mutexes but unlocks only one.",
+    # ldv-regression
+    "ex3_forlist.i":
+        "The original SV-COMP benchmark is about a pointer state-tracking program.",
+}
+
+
+_ULTIMATE_SVCOMP2023_INSERT_AFTER = "unsatisfiable cores, and interpolants."
+
+
+def _ultimate_svcomp2023_modify(smtlib_path: str, description: str) -> str | None:
+    """Insert a per-program-type sentence after the interpolants line."""
+    filename = smtlib_path.rsplit("/", 1)[-1]
+    prefix = re.sub(r"_\d+\.smt2$", "", filename)
+    sentence = _ULTIMATE_SVCOMP2023_PREFIXES.get(prefix)
+    if sentence is None:
+        return None
+    idx = description.find(_ULTIMATE_SVCOMP2023_INSERT_AFTER)
+    if idx == -1:
+        return sentence + " " + description
+    insert_pos = idx + len(_ULTIMATE_SVCOMP2023_INSERT_AFTER)
+    return description[:insert_pos] + "\n" + sentence + description[insert_pos:]
+
+
+# ---------------------------------------------------------------------------
 # Registry
 # ---------------------------------------------------------------------------
 
@@ -148,6 +531,7 @@ def _preiner_modify(smtlib_path: str, description: str) -> str | None:
 DESCRIPTION_RULES: dict[tuple[str, str], object] = {
     ("UFNIA", "Preiner"): _preiner_modify,
     ("ABV", "UltimateAutomizerSvcomp2019"): _ultimate_svcomp2019_modify,
+    ("ABV", "UltimateAutomizerSvcomp2023"): _ultimate_svcomp2023_modify,
 }
 
 
