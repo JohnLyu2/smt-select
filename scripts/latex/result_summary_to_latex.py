@@ -74,7 +74,6 @@ def main() -> None:
     value_columns = [c for c in display_order if c in fieldnames]
     columns = ["logic"] + value_columns
 
-    # Header blocks: Without Description (first 3 or 4 cols), With Description (rest)
     variant_map = {
         "synt": "Lite",
         "gin_pwc": "Graph",
@@ -85,7 +84,6 @@ def main() -> None:
     has_sibyl = "sibyl" in value_columns
     n_without = 4 if has_sibyl else 3  # MachSMT, (optional Sibyl), Lite, Graph
     n_with = len(value_columns) - n_without
-    first_block_columns = value_columns[:n_without] if len(value_columns) >= n_without else value_columns
 
     ncols = len(columns)
     col_spec = "l" + "c" * (ncols - 1)
@@ -98,13 +96,12 @@ def main() -> None:
     ]
 
     if not args.no_header:
-        # Row 1: Without Description (first n_without cols), With Description (n_with cols)
+        # Row 1: Without Description (first n_without cols), With Description (rest)
         lines.append(" & \\multicolumn{" + str(n_without) + "}{c}{\\textbf{Without Description}} & \\multicolumn{" + str(n_with) + "}{c}{\\textbf{With Description}} \\\\")
         lines.append("\\cmidrule(lr){2-" + str(1 + n_without) + "}")
         lines.append("\\cmidrule(lr){" + str(2 + n_without) + "-" + str(ncols) + "}")
-        # Row 2: MachSMT (multirow 2), optional Sibyl (own column), then SMT-Select blocks
+        # Row 2: MachSMT (multirow 2), optional Sibyl, then SMT-Select blocks
         if has_sibyl:
-            # Columns: logic | MachSMT | Sibyl | Lite | Graph | (With-description SMT-Select...)
             lines.append(
                 " & \\multirow{2}{*}{MachSMT} & \\multirow{2}{*}{Sibyl} & "
                 "\\multicolumn{2}{c}{SMT-Select} & \\multicolumn{" + str(n_with) + "}{c}{SMT-Select} \\\\"
@@ -112,30 +109,34 @@ def main() -> None:
             lines.append("\\cmidrule(lr){4-5}")
             lines.append("\\cmidrule(lr){" + str(2 + n_without) + "-" + str(ncols) + "}")
         else:
-            # Original layout: MachSMT, then SMT-Select blocks
             lines.append(
                 " & \\multirow{2}{*}{MachSMT} & \\multicolumn{2}{c}{SMT-Select} & "
                 "\\multicolumn{" + str(n_with) + "}{c}{SMT-Select} \\\\"
             )
             lines.append("\\cmidrule(lr){3-4}")
             lines.append("\\cmidrule(lr){" + str(2 + n_without) + "-" + str(ncols) + "}")
-        # Row 3: variant names (empty for logic, empty under MachSMT, then Lite, Graph, Graph+Text, Lite+Text)
+        # Row 3: variant names
         row3_cells = [""] + [variant_map.get(k, "") for k in value_columns]
         lines.append(" & ".join(row3_cells) + " \\\\")
         lines.append("\\midrule")
 
     for row in rows:
-        # Find highest mean in first block for bolding
-        first_block_vals: dict[str, float] = {}
-        for key in first_block_columns:
+        # Bold best in row (all columns)
+        row_vals: dict[str, float] = {}
+        for key in value_columns:
             val = row.get(key, "")
             if val != "" and val is not None:
                 try:
-                    first_block_vals[key] = float(val)
+                    row_vals[key] = float(val)
                 except (TypeError, ValueError):
                     pass
-        max_mean = max(first_block_vals.values()) if first_block_vals else None
-        max_keys = {k for k, v in first_block_vals.items() if v == max_mean} if max_mean is not None else set()
+        max_row = max(row_vals.values()) if row_vals else None
+        # Bold best or within 0.5 percentage points of best (values are 0–1)
+        if max_row is not None:
+            threshold = max_row - 0.005
+            max_keys = {k for k, v in row_vals.items() if v >= threshold}
+        else:
+            max_keys = set()
 
         cells = []
         for key in columns:
@@ -158,7 +159,7 @@ def main() -> None:
     lines.extend([
         "\\bottomrule",
         "\\end{tabular}",
-        "\\caption{Experimental results on the held-out test set, measured by the PAR-2 SBS–VBS gap closed (\\%). Results are averaged over five random train–test splits and reported as mean $\\pm$ standard deviation. Bold values indicate the best result within each feature setting.}",
+        "\\caption{Experimental results on the held-out test set, measured by the PAR-2 SBS–VBS gap closed (\\%). Results are averaged over five random train–test splits and reported as mean $\\pm$ standard deviation.}",
         "\\label{tab:final_res}",
         "\\end{table}",
     ])

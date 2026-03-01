@@ -1,0 +1,27 @@
+\begin{table}[t]
+\centering
+\begin{tabular}{lcccccccc}
+\toprule
+ & \multicolumn{2}{c}{\textbf{Reference}} & \multicolumn{4}{c}{\textbf{Without Description}} & \multicolumn{2}{c}{\textbf{With Description}} \\
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-7}
+\cmidrule(lr){8-9}
+ & \multirow{2}{*}{SBS} & \multirow{2}{*}{VBS} & \multirow{2}{*}{MachSMT} & \multirow{2}{*}{Sibyl} & \multicolumn{2}{c}{SMT-Select} & \multicolumn{2}{c}{SMT-Select} \\
+\cmidrule(lr){6-7}
+\cmidrule(lr){8-9}
+ &  &  &  &  & Lite & Graph & Lite+Text & Graph+Text \\
+\midrule
+ABV & 211.8 & 246.6 & 214.0 & 218.2 & 236.8 & \textbf{238.4} & --- & --- \\
+ALIA & 76.0 & 96.6 & 80.4 & 83.4 & 86.4 & \textbf{87.4} & --- & --- \\
+BV & 236.6 & 250.2 & 237.4 & 236.0 & 241.8 & 241.6 & 243.0 & \textbf{243.4} \\
+QF\_BV & 2623.2 & 2639.0 & 2623.4 & 2625.4 & 2628.2 & 2630.4 & \textbf{2632.8} & 2630.8 \\
+QF\_IDL & 258.6 & 273.2 & 259.6 & 256.4 & 269.4 & 270.0 & 270.2 & \textbf{271.4} \\
+QF\_LIA & 1131.0 & 1183.4 & 1172.6 & 1169.0 & 1178.2 & \textbf{1179.0} & 1178.2 & 1178.0 \\
+QF\_NRA & 703.2 & 735.8 & 709.8 & 703.0 & 718.8 & 721.0 & \textbf{721.2} & 720.8 \\
+QF\_SLIA & 5813.4 & 5925.8 & 5901.0 & --- & 5916.2 & 5919.4 & \textbf{5920.6} & 5920.2 \\
+UFNIA & 923.0 & 939.4 & 900.2 & --- & 924.8 & 927.4 & 927.4 & \textbf{928.8} \\
+\bottomrule
+\end{tabular}
+\caption{Number of instances solved on the held-out test set. Results are averaged over five random train–test splits.}
+\label{tab:final_solved}
+\end{table}
