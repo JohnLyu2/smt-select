@@ -32,7 +32,6 @@ from .graph_rep import (
     _suppress_z3_destructor_noise,
 )
 from .performance import MultiSolverDataset, PERF_DIFF_THRESHOLD
-from .pwc_wl import sorted_fallback_solvers
 from .solver_selector import SolverSelector
 
 
@@ -582,7 +581,6 @@ def train_fusion_e2e_pwc(
         best_state_path.unlink(missing_ok=True)
 
     # Save model, vocab, config, failed_paths
-    fallback_solver_ids = sorted_fallback_solvers(multi_perf_data, failed_list)
     config = {
         "num_node_types": num_node_types,
         "num_solvers": K,
@@ -592,7 +590,7 @@ def train_fusion_e2e_pwc(
         "d_text_small": d_text_small,
         "hidden_fused": hidden_fused,
         "graph_timeout": graph_timeout,
-        "fallback_solver_ids": fallback_solver_ids,
+        "fallback_solver_ids": [0],
         "random_seed": 42,
     }
     with open(save_dir / "config.json", "w") as f:

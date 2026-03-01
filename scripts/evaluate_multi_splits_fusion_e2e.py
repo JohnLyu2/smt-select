@@ -35,12 +35,16 @@ from src.fusion_e2e_pwc import (
 from src.fusion_pwc import load_embedding_csv
 from src.performance import (
     filter_training_instances,
+    parse_as_perf_csv,
     parse_performance_json,
     MultiSolverDataset,
 )
 
 DEFAULT_GIN_MODELS_BASE = Path("models")
 DEFAULT_DESC_FEATURES_DIR = Path("data/features/desc/all-mpnet-base-v2")
+DEFAULT_LITETEXT_DIR = Path("data/cp26/results/lite+text")
+
+CSV_HEADER = ["benchmark", "selected", "solved", "runtime", "solver_runtime", "overhead", "feature_fail"]
 
 
 def discover_seed_dirs(splits_dir: Path) -> list[tuple[int, Path]]:
@@ -89,11 +93,112 @@ def _build_text_by_full_path(
     return out
 
 
+def _load_litetext_lookup(path: Path) -> dict[str, dict]:
+    """Load Lite+Text eval CSV; return benchmark -> row dict."""
+    out: dict[str, dict] = {}
+    with path.open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            bench = (row.get("benchmark") or "").strip()
+            if bench:
+                out[bench] = row
+    return out
+
+
+def _load_eval_csv(path: Path) -> list[dict]:
+    """Load eval CSV; return list of row dicts."""
+    with path.open(newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+
+def _write_eval_csv(path: Path, rows: list[dict]) -> None:
+    """Write rows using CSV_HEADER order."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(CSV_HEADER)
+        for row in rows:
+            writer.writerow([row.get(k, "") for k in CSV_HEADER])
+
+
+def _merge_with_litetext(
+    fusion_rows: list[dict],
+    litetext_lookup: dict[str, dict],
+    timeout: float,
+) -> list[dict]:
+    """
+    Replace feature_fail rows with Lite+Text results.
+
+    For feature_fail rows:
+      overhead_out = fusion_overhead + lite_text_overhead
+      runtime_out  = lite_text_solver_runtime + overhead_out  (capped at timeout)
+    """
+    out: list[dict] = []
+    for row in fusion_rows:
+        bench = (row.get("benchmark") or "").strip()
+        try:
+            ff = int(row.get("feature_fail", 0) or 0)
+        except (ValueError, TypeError):
+            ff = 0
+
+        if ff == 0:
+            out.append(row)
+            continue
+
+        if bench not in litetext_lookup:
+            raise ValueError(
+                f"Missing Lite+Text row for feature-fail benchmark: {bench!r}"
+            )
+        lt_row = litetext_lookup[bench]
+
+        raw_fusion_overhead = row.get("overhead", "")
+        try:
+            fusion_overhead = float(raw_fusion_overhead) if raw_fusion_overhead not in ("", None) else 0.0
+        except (TypeError, ValueError):
+            fusion_overhead = 0.0
+
+        try:
+            lt_solver_runtime = float(lt_row.get("solver_runtime") or 0.0)
+        except (TypeError, ValueError):
+            lt_solver_runtime = 0.0
+        try:
+            lt_solved = int(lt_row.get("solved") or 0)
+        except (TypeError, ValueError):
+            lt_solved = 0
+        raw_lt_overhead = lt_row.get("overhead", "")
+        try:
+            lt_overhead = float(raw_lt_overhead) if raw_lt_overhead not in ("", None) else 0.0
+        except (TypeError, ValueError):
+            lt_overhead = 0.0
+
+        overhead_out = fusion_overhead + lt_overhead
+        runtime_out = lt_solver_runtime + overhead_out
+
+        if runtime_out > timeout:
+            solved = 0
+            runtime_out = timeout
+            overhead_out = max(0.0, timeout - lt_solver_runtime)
+        else:
+            solved = lt_solved
+
+        out.append({
+            "benchmark": bench,
+            "selected": lt_row.get("selected", ""),
+            "solved": str(solved),
+            "runtime": str(runtime_out),
+            "solver_runtime": str(lt_solver_runtime),
+            "overhead": f"{overhead_out:.6f}",
+            "feature_fail": "1",
+        })
+    return out
+
+
 def evaluate_multi_splits_fusion_e2e(
     splits_dir: Path,
     *,
     gin_models_base: Path | str | None = None,
     desc_features_dir: Path | str | None = None,
+    lite_text_dir: Path | str | None = None,
     benchmark_root: Path | str | None = None,
     save_models: bool = False,
     output_dir: Path | None = None,
@@ -123,6 +228,8 @@ def evaluate_multi_splits_fusion_e2e(
     splits_dir = Path(splits_dir).resolve()
     if not splits_dir.is_dir():
         raise ValueError(f"Splits directory does not exist: {splits_dir}")
+    if output_dir is None:
+        raise ValueError("output_dir is required (CSVs are needed for Lite+Text fallback merge)")
     if eval_only and models_base is None:
         raise ValueError("models_base is required when eval_only=True")
 
@@ -132,7 +239,14 @@ def evaluate_multi_splits_fusion_e2e(
 
     gin_base = Path(gin_models_base or DEFAULT_GIN_MODELS_BASE).resolve()
     desc_dir = Path(desc_features_dir or DEFAULT_DESC_FEATURES_DIR).resolve()
+    lt_dir = Path(lite_text_dir or DEFAULT_LITETEXT_DIR).resolve()
     division = splits_dir.name
+
+    lt_division_dir = lt_dir / division
+    if not lt_division_dir.is_dir():
+        raise FileNotFoundError(
+            f"Lite+Text results dir not found for division {division}: {lt_division_dir}"
+        )
 
     desc_division_dir = desc_dir / division
     desc_csv = desc_division_dir / "features.csv"
@@ -285,23 +399,11 @@ def evaluate_multi_splits_fusion_e2e(
             device="cpu",
         )
 
-        train_output_csv = None
-        test_output_csv = None
-        if output_dir:
-            seed_out_dir = output_dir / f"seed{seed_val}"
-            seed_out_dir.mkdir(parents=True, exist_ok=True)
-            train_output_csv = str(seed_out_dir / "train_eval.csv")
-            test_output_csv = str(seed_out_dir / "test_eval.csv")
+        seed_out_dir = output_dir / f"seed{seed_val}"
+        seed_out_dir.mkdir(parents=True, exist_ok=True)
+        test_output_csv = str(seed_out_dir / "test_eval.csv")
 
-        train_result = as_evaluate(
-            selector,
-            train_data,
-            write_csv_path=train_output_csv,
-            show_progress=True,
-            csv_benchmark_root=root,
-            extra_overhead_by_path=overhead_by_path,
-        )
-        test_result = as_evaluate(
+        as_evaluate(
             selector,
             test_data,
             write_csv_path=test_output_csv,
@@ -309,25 +411,37 @@ def evaluate_multi_splits_fusion_e2e(
             csv_benchmark_root=root,
             extra_overhead_by_path=overhead_by_path,
         )
-        train_metrics = compute_metrics(train_result, train_data)
+
+        # Merge feature_fail rows with Lite+Text results
+        lt_seed_dir = lt_division_dir / f"seed{seed_val}"
+        if not lt_seed_dir.is_dir():
+            raise FileNotFoundError(f"Lite+Text seed dir not found: {lt_seed_dir}")
+        lt_test_csv = lt_seed_dir / "test_eval.csv"
+        if not lt_test_csv.is_file():
+            raise FileNotFoundError(f"Lite+Text test CSV not found: {lt_test_csv}")
+
+        test_csv_path = Path(test_output_csv)
+        fusion_test_rows = _load_eval_csv(test_csv_path)
+        lt_test_lookup = _load_litetext_lookup(lt_test_csv)
+        merged_test = _merge_with_litetext(fusion_test_rows, lt_test_lookup, timeout)
+        _write_eval_csv(test_csv_path, merged_test)
+        n_fb_test = sum(1 for r in merged_test if r.get("feature_fail") == "1")
+        logging.info("  Merged test: %d/%d rows from Lite+Text fallback", n_fb_test, len(merged_test))
+
+        # Compute metrics from the merged CSV
+        test_result = parse_as_perf_csv(test_output_csv, timeout)
         test_metrics = compute_metrics(test_result, test_data)
 
         seed_results.append({
             "seed": seed_val,
             "train_size": n_train,
             "test_size": n_test,
-            "train_metrics": train_metrics,
             "test_metrics": test_metrics,
         })
 
-        train_gap_pct = (train_metrics["gap_cls_par2"] * 100) if train_metrics.get("gap_cls_par2") is not None else 0.0
         test_gap_pct = (test_metrics["gap_cls_par2"] * 100) if test_metrics.get("gap_cls_par2") is not None else 0.0
         logging.info(
-            "  Train: solved %d/%d, gap closed (PAR-2): %.2f%%",
-            train_metrics["solved"], n_train, train_gap_pct,
-        )
-        logging.info(
-            "  Test:  solved %d/%d, gap closed (PAR-2): %.2f%%",
+            "  Test: solved %d/%d, gap closed (PAR-2): %.2f%%",
             test_metrics["solved"], n_test, test_gap_pct,
         )
 
@@ -340,14 +454,7 @@ def evaluate_multi_splits_fusion_e2e(
             torch.cuda.empty_cache()
 
     test_metrics_list = [r["test_metrics"] for r in seed_results]
-    train_metrics_list = [r["train_metrics"] for r in seed_results]
     aggregated = {
-        "train": {
-            "gap_cls_solved_mean": float(np.mean([m["gap_cls_solved"] for m in train_metrics_list])),
-            "gap_cls_solved_std": float(np.std([m["gap_cls_solved"] for m in train_metrics_list])),
-            "gap_cls_par2_mean": float(np.mean([m["gap_cls_par2"] for m in train_metrics_list])),
-            "gap_cls_par2_std": float(np.std([m["gap_cls_par2"] for m in train_metrics_list])),
-        },
         "test": {
             "gap_cls_solved_mean": float(np.mean([m["gap_cls_solved"] for m in test_metrics_list])),
             "gap_cls_solved_std": float(np.std([m["gap_cls_solved"] for m in test_metrics_list])),
@@ -393,14 +500,9 @@ def evaluate_multi_splits_fusion_e2e(
     logging.info("Multi-splits summary — %s (Fusion-E2E-PWC)", results["division"])
     logging.info("%s", "=" * 60)
     logging.info("Seeds: %s", results["seed_values"])
-    tr, t = agg["train"], agg["test"]
+    t = agg["test"]
     logging.info(
-        "Train: gap closed (solved) %.2f%% ± %.2f%%, gap closed (PAR-2) %.2f%% ± %.2f%%",
-        tr["gap_cls_solved_mean"] * 100, tr["gap_cls_solved_std"] * 100,
-        tr["gap_cls_par2_mean"] * 100, tr["gap_cls_par2_std"] * 100,
-    )
-    logging.info(
-        "Test:  gap closed (solved) %.2f%% ± %.2f%%, gap closed (PAR-2) %.2f%% ± %.2f%%",
+        "Test: gap closed (solved) %.2f%% ± %.2f%%, gap closed (PAR-2) %.2f%% ± %.2f%%",
         t["gap_cls_solved_mean"] * 100, t["gap_cls_solved_std"] * 100,
         t["gap_cls_par2_mean"] * 100, t["gap_cls_par2_std"] * 100,
     )
@@ -428,6 +530,10 @@ def main() -> None:
         help=f"Directory for description CSVs (default: {DEFAULT_DESC_FEATURES_DIR})",
     )
     parser.add_argument("--output-dir", type=str, default=None)
+    parser.add_argument(
+        "--lite-text-dir", type=str, default=None,
+        help=f"Lite+Text results root for fallback (default: {DEFAULT_LITETEXT_DIR})",
+    )
     parser.add_argument("--eval-only", action="store_true", help="Load models from --models-base, skip training.")
     parser.add_argument("--models-base", type=str, default=None, help="Base for saved models (required if --eval-only).")
     parser.add_argument("--save-models", action="store_true")
@@ -482,6 +588,7 @@ def main() -> None:
         Path(args.splits_dir),
         gin_models_base=args.gin_models_base,
         desc_features_dir=args.desc_features_dir,
+        lite_text_dir=args.lite_text_dir,
         benchmark_root=args.benchmark_root,
         save_models=args.save_models,
         output_dir=output_dir,
