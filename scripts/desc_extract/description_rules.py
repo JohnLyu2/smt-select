@@ -100,6 +100,7 @@ DESCRIPTION_RULES: dict[tuple[str, str], object] = {
     ("UFNIA", "Preiner"): _preiner_modify,
     ("ABV", "UltimateAutomizerSvcomp2019"): _ultimate_svcomp2019_modify,
     ("ABV", "UltimateAutomizerSvcomp2023"): _ultimate_svcomp2023_modify,
+    ("ALIA", "UltimateAutomizerSvcomp2023"): _ultimate_svcomp2023_modify,
 }
 
 
