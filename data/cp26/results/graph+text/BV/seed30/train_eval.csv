@@ -131,7 +131,7 @@ BV/2017-Preiner-scholl-smt08/model/model_5_1.smt2,Bitwuzla,1,0.25161278806626797
 BV/2017-Preiner-scholl-smt08/RNDPRE/RNDPRE_3_4.smt2,Z3-alpha,1,0.27165284706279635,0.27165284706279635,,0
 BV/wintersteiger/fmsd13/fixpoint/small-equiv-fixpoint-6.smt2,cvc5,1,0.2259739621076733,0.2259739621076733,,0
 BV/20170501-Heizmann-UltimateAutomizer/jain_2_true-unreach-call_true-no-overflow.i_342.smt2,cvc5,1,0.5603903150185943,0.5603903150185943,,0
-BV/wintersteiger/fmsd13/fixpoint/cache-coherence-2-fixpoint-6.smt2,Bitwuzla,1,0.8902736990344227,0.8708216990344226,0.019452,1
+BV/wintersteiger/fmsd13/fixpoint/cache-coherence-2-fixpoint-6.smt2,Bitwuzla,1,0.8708216990344226,0.8708216990344226,,1
 BV/2018-Preiner-cav18/check_eq_bvurem1_64bit.smt2,cvc5,1,289.45669447793625,289.45669447793625,,0
 BV/2020-Preiner-fmcad20/cons/check_cc_bvuge_s_x_32.smt2,cvc5,1,80.24334498401731,80.24334498401731,,0
 BV/2017-Preiner-keymaera/intersection-example-simple.proof-node475811.smt2,Bitwuzla,1,0.2524175918661058,0.2524175918661058,,0
@@ -225,7 +225,7 @@ BV/2017-Preiner-keymaera/intersection-example-simple.proof-node723526.smt2,Bitwu
 BV/2017-Preiner-scholl-smt08/model/model_6_55.smt2,Bitwuzla,1,0.26215188298374414,0.26215188298374414,,0
 BV/20190429-UltimateAutomizerSvcomp2019/jain_7_true-unreach-call_true-no-overflow_false-termination.i_10.smt2,YicesQS,1,0.2736667268909514,0.2736667268909514,,0
 BV/2017-Preiner-keymaera/intersection-example-simple.proof-node561079.smt2,Bitwuzla,1,0.25452292198315263,0.25452292198315263,,0
-BV/20210330-PEak/extern-loop_sat_subset/hard1.smt2,Z3-alpha,0,2.0978435839155916,0.5243675839155912,1.573476,1
+BV/20210330-PEak/extern-loop_sat_subset/hard1.smt2,Bitwuzla,0,0.5779849388636649,0.5779849388636649,,1
 BV/2017-Preiner-psyco/058.smt2,Bitwuzla,1,0.7448571571148932,0.7448571571148932,,0
 BV/2017-Preiner-keymaera/intersection-example-simple.proof-node369550.smt2,Bitwuzla,1,0.28918053512461483,0.28918053512461483,,0
 BV/20230321-UltimateAutomizerSvcomp2023/soft_float_4-2.c.cil.c_7.smt2,cvc5,1,80.36542613897473,80.36542613897473,,0
@@ -322,7 +322,7 @@ BV/2017-Preiner-scholl-smt08/RNDPRE/RNDPRE_3_51.smt2,YicesQS,1,1.195516729028895
 BV/2020-Preiner-fmcad20/cons/check_cc_urem_x_s_4.smt2,cvc5,1,0.646196624962613,0.646196624962613,,0
 BV/2017-Preiner-keymaera/intersection-example-simple.proof-node351044.smt2,Bitwuzla,1,0.26934623601846397,0.26934623601846397,,0
 BV/2017-Preiner-scholl-smt08/RNDPRE/RNDPRE_3_59.smt2,YicesQS,1,0.5542810319457203,0.5542810319457203,,0
-BV/20210330-PEak/no-extern-loop_sat_subset/medium0.smt2,Z3-alpha,0,1.1472104549163133,0.5021974549163133,0.645013,1
+BV/20210330-PEak/no-extern-loop_sat_subset/medium0.smt2,Bitwuzla,0,0.6046801570337266,0.6046801570337266,,1
 BV/2018-Preiner-cav18/check_bvslt_bvudiv1_64bit.smt2,Bitwuzla,1,0.3142069049645215,0.3142069049645215,,0
 BV/2020-Preiner-fmcad20/inv/check_ic_bvshl_s_x_4.smt2,cvc5,1,0.273735195863992,0.273735195863992,,0
 BV/2017-Preiner-keymaera/intersection-example-simple.proof-node672976.smt2,Bitwuzla,1,0.2613557109143585,0.2613557109143585,,0
