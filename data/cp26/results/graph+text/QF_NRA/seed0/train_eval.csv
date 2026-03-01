@@ -114,7 +114,7 @@ QF_NRA/LassoRanker/CooperatingT2/eric.t2.c_Iteration1_Loop_6-phaseTemplate.smt2,
 QF_NRA/LassoRanker/SV-COMP/PodelskiRybalchenko-2004VMCAI-Ex2_true-termination.c_Iteration1_Lasso_3-pieceTemplate.smt2,Yices2,1,7.331030094379992,7.283337211993057,0.047693,0
 QF_NRA/20220314-Uncu/Polynomial_Proof_Calls/ProveIneq_Mitrinovic_3_57b.smt2,Z3-alpha,1,0.32524936834905716,0.31788380100624636,0.007366,0
 QF_NRA/meti-tarski/Chua/2/VC2/L/Chua-2-VC2-L-chunk-0016.smt2,cvc5,1,0.2600327953647026,0.25363689797814004,0.006396,0
-QF_NRA/LassoRanker/SV-COMP/TelAviv-Amir-Minimum_true-termination.c_Iteration1_Lasso_7-phaseTemplate.smt2,Z3-alpha,1,44.40558509100053,39.16727609100053,5.238309,1
+QF_NRA/LassoRanker/SV-COMP/TelAviv-Amir-Minimum_true-termination.c_Iteration1_Lasso_7-phaseTemplate.smt2,Z3-alpha,1,44.17216797338423,39.16727609100053,5.004892,1
 QF_NRA/20200911-Pine/1599121861773920000.smt2,SMT-RAT,1,0.2880429973834795,0.28026538802077994,0.007778,0
 QF_NRA/20161105-Sturm-MBO/mbo_E5E20.smt2,Yices2,1,0.6493474374534232,0.2803356950171292,0.369012,0
 QF_NRA/meti-tarski/sin/cos/sin-cos-346-b-chunk-0228.smt2,Z3-alpha,1,0.2766917334471033,0.26931728402269073,0.007374,0
@@ -201,7 +201,7 @@ QF_NRA/LassoRanker/SV-COMP/LeeJonesBen-Amram-2001POPL-Ex2_true-termination.c_Ite
 QF_NRA/meti-tarski/atan/problem/2/atan-problem-2-chunk-0108.smt2,Z3-alpha,1,0.2770935204121885,0.27028734498890117,0.006806,0
 QF_NRA/meti-tarski/atan/problem/1/atan-problem-1-chunk-0044.smt2,Z3-alpha,1,0.2778718594005001,0.27089143701596186,0.006980,0
 QF_NRA/20240407-pPDA-Chiari-Pontiggia-Winkler/certificate_hints/mod5_POMC_hints.smt2,Yices2,1,2.591574687360287,2.5665837139822543,0.024991,0
-QF_NRA/2019-ezsmt/reverseFolding/38-reverse_folding-0-0.smt2,Yices2,1,8.659634464997925,2.945470464997925,5.714164,1
+QF_NRA/2019-ezsmt/reverseFolding/38-reverse_folding-0-0.smt2,Z3-alpha,1,70.85524012037294,65.85034823798924,5.004892,1
 QF_NRA/hycomp/ball_count_2d_hill_simple.05.seq_lazy_linear_enc_lemmas_global_12.smt2,Z3-alpha,1,15.362524446357009,15.294757132011,0.067767,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.05.seq_lazy_linear_enc_global_8.smt2,cvc5,1,0.27845393638798455,0.23729114499292336,0.041163,0
 QF_NRA/meti-tarski/sin/problem/8/weak/sin-problem-8-weak-chunk-0073.smt2,Z3-alpha,1,0.287155849330327,0.27985005898517556,0.007306,0
@@ -244,7 +244,7 @@ QF_NRA/hycomp/ball_count_2d_hill_simple.05.seq_lazy_lemmas_global_7.smt2,Yices2,
 QF_NRA/meti-tarski/CMOS/CMOS-opamp-chunk-0082.smt2,SMT-RAT,1,0.2539296963901394,0.24620888798381202,0.007721,0
 QF_NRA/meti-tarski/polypaver/bench-sqrt-3d/polypaver-bench-sqrt-3d-chunk-0512.smt2,Z3-alpha,1,0.2781158193489206,0.2686791690066457,0.009437,0
 QF_NRA/hycomp/ball_count_2d_slope.03.seq_lazy_global_12.smt2,cvc5,0,1200.0,1201.7433531029965,0.097195,0
-QF_NRA/LassoRanker/SV-COMP/CookSeeZuleger-2013TACAS-Fig7b_true-termination.c_Iteration1_Loop_3-nestedTemplate.smt2,Yices2,1,478.6381756240091,471.89559362400905,6.742582,1
+QF_NRA/LassoRanker/SV-COMP/CookSeeZuleger-2013TACAS-Fig7b_true-termination.c_Iteration1_Loop_3-nestedTemplate.smt2,Z3-alpha,0,1200.0,1201.7277646050206,5.004892,1
 QF_NRA/20161105-Sturm-MBO/mbo_E15E17.smt2,Yices2,0,1200.0,1201.2302351830003,0.484221,0
 QF_NRA/meti-tarski/atan/problem/2/weak/atan-problem-2-weak-chunk-0124.smt2,Z3-alpha,1,0.27293800038258964,0.26583821498206817,0.007100,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.05.seq_lazy_linear_enc_lemmas_global_10.smt2,Yices2,1,0.28601132839193055,0.22850302900769748,0.057508,0
@@ -308,7 +308,7 @@ QF_NRA/meti-tarski/sqrt/problem/sqrt-problem-Melquiond3-chunk-0020.smt2,cvc5,1,0
 QF_NRA/meti-tarski/sin/problem/7/weak/sin-problem-7-weak-chunk-0186.smt2,Z3-alpha,1,0.3031139773325664,0.294871432997752,0.008243,0
 QF_NRA/hycomp/ball_count_2d_plain.01.redlog_global_6.smt2,Yices2,1,0.2743432824159642,0.23147552000591531,0.042868,0
 QF_NRA/hycomp/ball_count_1d_plain.03.qfree_global_10.smt2,Yices2,1,0.30421465140042314,0.2586091910197865,0.045605,0
-QF_NRA/LassoRanker/SV-COMP/TelAviv-Amir-Minimum_true-termination.c_Iteration1_Loop_3-pieceTemplate.smt2,Z3-alpha,1,359.10783822401004,353.76615622401005,5.341682,1
+QF_NRA/LassoRanker/SV-COMP/TelAviv-Amir-Minimum_true-termination.c_Iteration1_Loop_3-pieceTemplate.smt2,Z3-alpha,1,358.7710481063937,353.76615622401005,5.004892,1
 QF_NRA/meti-tarski/sin/344/4/sin-344-4-chunk-0024.smt2,Z3-alpha,1,0.27894919143963093,0.27111756600788794,0.007832,0
 QF_NRA/hycomp/ball_count_2d_plain.03.seq_lazy_linear_enc_lemmas_global_7.smt2,Yices2,1,0.263612895384165,0.22241473899339326,0.041198,0
 QF_NRA/20220314-Uncu/Polynomial_Proof_Calls/ProveIneq_ISSAC05_SignPattern_Lemma4c.smt2,Z3-alpha,1,0.6892841114555155,0.6240777220227756,0.065206,0
@@ -339,13 +339,13 @@ QF_NRA/LassoRanker/CooperatingT2/eric2.t2.c_Iteration6_Loop_4-pieceTemplate.smt2
 QF_NRA/meti-tarski/exp/problem/10/2/exp-problem-10-2-chunk-0334.smt2,Z3-alpha,1,0.27647328038673336,0.26867914499598555,0.007794,0
 QF_NRA/meti-tarski/sqrt/problem/12vars3/sqrt-problem-12vars3-chunk-0023.smt2,Yices2,1,0.24178675136735148,0.23529519498697482,0.006492,0
 QF_NRA/meti-tarski/sin/cos/sin-cos-346-b-chunk-0483.smt2,SMT-RAT,1,0.2284224873825111,0.2193244319933001,0.009098,0
-QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_3-pieceTemplate.smt2,Z3-alpha,1,423.20854015497645,417.46805815497646,5.740482,1
+QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_3-pieceTemplate.smt2,Z3-alpha,1,422.47295003736014,417.46805815497646,5.004892,1
 QF_NRA/meti-tarski/polypaver/bench-sqrt-3d/polypaver-bench-sqrt-3d-chunk-0263.smt2,Z3-alpha,1,0.2750663524153312,0.26827262999722734,0.006794,0
 QF_NRA/meti-tarski/atan/problem/1/atan-problem-1-chunk-0056.smt2,Z3-alpha,1,0.2913305203497545,0.28433468998991884,0.006996,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.01.seq_lazy_lemmas_global_4.smt2,Yices2,1,0.2828862523552631,0.25386840698774904,0.029018,0
 QF_NRA/UltimateAutomizer/InVarSynth_2001TACAS-BallPodelskiRajamani.c_Iteration2_0.smt2,SMT-RAT,1,1.4255272153773946,1.385628969001118,0.039898,0
 QF_NRA/meti-tarski/sqrt/1mcosq/8/sqrt-1mcosq-8-chunk-0257.smt2,SMT-RAT,1,0.5429350833824971,0.5339575429970864,0.008978,0
-QF_NRA/2019-ezsmt/reverseFolding/43-reverse_folding-0-0.smt2,Yices2,1,8.728335069005958,2.826107069005957,5.902228,1
+QF_NRA/2019-ezsmt/reverseFolding/43-reverse_folding-0-0.smt2,Z3-alpha,1,135.70057467737442,130.69568279499072,5.004892,1
 QF_NRA/meti-tarski/polypaver/bench-sqrt-3d/polypaver-bench-sqrt-3d-chunk-0448.smt2,Z3-alpha,1,0.3620772394302436,0.35354194600949995,0.008535,0
 QF_NRA/meti-tarski/atan/problem/1/atan-problem-1-chunk-0101.smt2,Z3-alpha,1,0.2787288603672893,0.2709559549984988,0.007773,0
 QF_NRA/20161105-Sturm-MBO/mbo_E2E24.smt2,Yices2,1,0.7399200333698788,0.3182489470054861,0.421671,0
@@ -355,7 +355,7 @@ QF_NRA/zankl/matrix-1-all-01.smt2,SMT-RAT,1,0.24889946641141034,0.23943073701229
 QF_NRA/meti-tarski/exp/problem/10/2/exp-problem-10-2-chunk-0320.smt2,Z3-alpha,1,0.3251959473660351,0.3178083829989191,0.007388,0
 QF_NRA/LassoRanker/SV-COMP/LeeJonesBen-Amram-2001POPL-Ex5_true-termination.c_Iteration2_Lasso_6-nestedTemplate.smt2,Z3-alpha,1,13.754585106415641,13.340300648007542,0.414284,0
 QF_NRA/meti-tarski/atan/vega/3/atan-vega-3-chunk-0365.smt2,Z3-alpha,1,0.28217455639477307,0.2733298850071151,0.008845,0
-QF_NRA/2019-ezsmt/reverseFolding/42-reverse_folding-0-0.smt2,Yices2,1,8.234933240990786,2.449461240990786,5.785472,1
+QF_NRA/2019-ezsmt/reverseFolding/42-reverse_folding-0-0.smt2,Z3-alpha,1,109.5468347063821,104.5419428239984,5.004892,1
 QF_NRA/LassoRanker/CooperatingT2/byron-1.t2.c_Iteration1_Loop_3-pieceTemplate.smt2,cvc5,1,3.6433500063963833,3.584124792017974,0.059225,0
 QF_NRA/meti-tarski/cbrt/3/cbrt-problem-3-chunk-0079.smt2,Z3-alpha,1,0.2791399363728375,0.2707067349983845,0.008433,0
 QF_NRA/zankl/matrix-2-all-16.smt2,SMT-RAT,1,1.3773131484000147,1.334816171991406,0.042497,0
@@ -507,7 +507,7 @@ QF_NRA/20180501-Economics-Mulligan/MulliganEconomicsModel0051c.smt2,Z3-alpha,1,0
 QF_NRA/meti-tarski/atan/vega/3/atan-vega-3-chunk-0515.smt2,Z3-alpha,1,0.2762077133471281,0.2671127229987178,0.009095,0
 QF_NRA/meti-tarski/atan/problem/1/atan-problem-1-chunk-0062.smt2,Z3-alpha,1,0.27218028736623423,0.26535959501052275,0.006821,0
 QF_NRA/meti-tarski/exp/problem/10/3/exp-problem-10-3-chunk-0121.smt2,Z3-alpha,1,0.29334899139447557,0.2865574730094522,0.006792,0
-QF_NRA/2019-ezsmt/reverseFolding/44-reverse_folding-0-0.smt2,Yices2,1,10.744873794995105,4.647294794995105,6.097579,1
+QF_NRA/2019-ezsmt/reverseFolding/44-reverse_folding-0-0.smt2,Z3-alpha,1,236.44598711738453,231.44109523500083,5.004892,1
 QF_NRA/hycomp/ball_count_1d_plain.04.redlog_global_12.smt2,Yices2,1,0.3021773893802562,0.24210574800963514,0.060072,0
 QF_NRA/LassoRanker/SV-COMP/Ben-Amram-2010LMCS-Ex2.3_true-termination.c_Iteration1_Lasso_5-phaseTemplate.smt2,Z3-alpha,1,2.3033357353948194,1.7149248450004961,0.588411,0
 QF_NRA/meti-tarski/polypaver/bench-sqrt-3d/polypaver-bench-sqrt-3d-chunk-0441.smt2,Z3-alpha,1,0.27465771938531147,0.2666615360067226,0.007996,0
@@ -515,11 +515,11 @@ QF_NRA/20220314-Uncu/Rational_Function_Proof_Calls_With_Disjunctive_Denominator_
 QF_NRA/LassoRanker/SV-COMP/NoriSharma-2013FSE-Fig8_true-termination.c_Iteration1_Lasso_7-phaseTemplate.smt2,Z3-alpha,1,134.50982100134806,133.73701580200577,0.772805,0
 QF_NRA/meti-tarski/sqrt/1mcosq/8/sqrt-1mcosq-8-chunk-0448.smt2,SMT-RAT,1,0.7567435303595518,0.7461357879801653,0.010608,0
 QF_NRA/meti-tarski/Nichols-Plot/Inverted-Pendulum/Nichols-Plot-Inverted-Pendulum-Fails-1-6-chunk-0172.smt2,Yices2,1,0.23063381833579807,0.2230861639836803,0.007548,0
-QF_NRA/LassoRanker/SV-COMP/TelAviv-Amir-Minimum_true-termination.c_Iteration1_Lasso_3-pieceTemplate.smt2,Z3-alpha,1,404.938603272984,399.57396927298396,5.364634,1
-QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_3-lexTemplate.smt2,Z3-alpha,1,70.67789249102526,65.33231649102527,5.345576,1
+QF_NRA/LassoRanker/SV-COMP/TelAviv-Amir-Minimum_true-termination.c_Iteration1_Lasso_3-pieceTemplate.smt2,Z3-alpha,1,404.57886115536763,399.57396927298396,5.004892,1
+QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_3-lexTemplate.smt2,Z3-alpha,1,70.33720837340897,65.33231649102527,5.004892,1
 QF_NRA/hycomp/ball_count_2d_hill.05.redlog_global_11.smt2,Z3-alpha,1,0.43443327440271573,0.30792992300121114,0.126503,0
 QF_NRA/meti-tarski/sin/problem/10/sin-problem-10-3-chunk-0021.smt2,Yices2,1,0.22377161640414453,0.21718154501286335,0.006590,0
-QF_NRA/2019-ezsmt/reverseFolding/31-reverse_folding-0-0.smt2,Yices2,1,7.01166247599855,1.5638274759985507,5.447835,1
+QF_NRA/2019-ezsmt/reverseFolding/31-reverse_folding-0-0.smt2,Z3-alpha,1,19.04158312838498,14.036691246001283,5.004892,1
 QF_NRA/zankl/matrix-5-all-8.smt2,Z3-alpha,0,1200.0,1201.7225996569905,0.080054,0
 QF_NRA/hycomp/ball_count_2d_hill.05.seq_lazy_lemmas_global_6.smt2,SMT-RAT,1,1.1485410373957963,1.0963879209884908,0.052153,0
 QF_NRA/20180501-Economics-Mulligan/MulliganEconomicsModel0083a.smt2,Yices2,1,0.22569653042099855,0.21779190000961535,0.007905,0
@@ -556,7 +556,7 @@ QF_NRA/meti-tarski/sin/problem/8/weak/sin-problem-8-weak-chunk-0076.smt2,Z3-alph
 QF_NRA/meti-tarski/atan/vega/3/atan-vega-3-chunk-0399.smt2,Z3-alpha,1,0.27827446738464245,0.2704837689816486,0.007791,0
 QF_NRA/hycomp/ball_count_2d_hill.04.seq_lazy_linear_enc_lemmas_global_8.smt2,SMT-RAT,1,3.0472971924123953,2.9886002260027453,0.058697,0
 QF_NRA/hycomp/ball_count_2d_hill.01.seq_lazy_global_13.smt2,SMT-RAT,1,2.368617067457842,2.2706106410187203,0.098006,0
-QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Loop_3-pieceTemplate.smt2,Z3-alpha,1,280.23419297498816,274.63240197498817,5.601791,1
+QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Loop_3-pieceTemplate.smt2,Z3-alpha,1,279.63729385737184,274.63240197498817,5.004892,1
 QF_NRA/meti-tarski/Chua/1/VC2/U/Chua-1-VC2-U-chunk-0152.smt2,Z3-alpha,1,0.27671935941415327,0.26887613302096725,0.007843,0
 QF_NRA/hycomp/ball_count_2d_plain.03.seq_lazy_linear_enc_global_13.smt2,Z3-alpha,1,0.35337817237685853,0.2932676420023199,0.060111,0
 QF_NRA/meti-tarski/exp/problem/10/2/exp-problem-10-2-chunk-0248.smt2,Z3-alpha,1,0.27433069541674526,0.2662678170017898,0.008063,0
@@ -636,7 +636,7 @@ QF_NRA/meti-tarski/Chua/2/VC1/L/Chua-2-VC1-L-chunk-0072.smt2,Z3-alpha,1,0.283470
 QF_NRA/meti-tarski/Nichols-Plot/Inverted-Pendulum/Nichols-Plot-Inverted-Pendulum-Fails-1-6-chunk-0221.smt2,Yices2,1,0.23272062240956767,0.22466706100385636,0.008054,0
 QF_NRA/meti-tarski/exp/problem/10/3/exp-problem-10-3-chunk-0085.smt2,Z3-alpha,1,0.2721212863931102,0.26509070000611246,0.007031,0
 QF_NRA/2019-ezsmt/bouncingBall/inst_1_1000.smt2,Yices2,1,0.47688025538317347,0.24943919500219636,0.227441,0
-QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_5-phaseTemplate.smt2,Z3-alpha,1,71.90349408600802,66.55491008600802,5.348584,1
+QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_5-phaseTemplate.smt2,Z3-alpha,1,71.55980196839172,66.55491008600802,5.004892,1
 QF_NRA/hycomp/ball_count_2d_hill_simple.01.seq_lazy_linear_enc_lemmas_global_15.smt2,Yices2,1,0.3042744024083619,0.22517202701419592,0.079102,0
 QF_NRA/hycomp/ball_count_2d_plain.10.seq_lazy_lemmas_global_6.smt2,Yices2,1,0.2613878483776604,0.22238179499981925,0.039006,0
 QF_NRA/hycomp/ball_count_1d_plain.05.seq_lazy_global_10.smt2,Yices2,1,0.27482107243357645,0.2287373979925178,0.046084,0
@@ -738,7 +738,7 @@ QF_NRA/20180501-Economics-Mulligan/MulliganEconomicsModel0085c.smt2,Yices2,1,0.2
 QF_NRA/hycomp/ball_count_2d_hill.05.seq_lazy_linear_enc_global_13.smt2,Z3-alpha,1,0.37737586636884557,0.2968431430053897,0.080533,0
 QF_NRA/LassoRanker/Ultimate/Braverman-2006CAV-Ex1-int.bpl_Iteration1_Loop_4-phaseTemplate.smt2,cvc5,1,0.8270722914263275,0.8033379570115358,0.023734,0
 QF_NRA/meti-tarski/exp/problem/10/2/exp-problem-10-2-chunk-0301.smt2,Z3-alpha,1,0.27562432738576503,0.2684604619862512,0.007164,0
-QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Loop_4-lexTemplate.smt2,Z3-alpha,1,95.55538778900865,90.18824278900865,5.367145,1
+QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Loop_4-lexTemplate.smt2,Z3-alpha,1,95.19313467139236,90.18824278900865,5.004892,1
 QF_NRA/hycomp/ball_count_2d_hill_simple.04.seq_lazy_lemmas_global_4.smt2,Yices2,1,0.24902138436535792,0.21909059898462147,0.029931,0
 QF_NRA/meti-tarski/exp/problem/10/3/exp-problem-10-3-chunk-0020.smt2,Z3-alpha,1,0.2743376453823545,0.2677012670028489,0.006636,0
 QF_NRA/LassoRanker/Ultimate/Lobnya-Boolean-Reordered.bpl_Iteration1_Loop_3-pieceTemplate.smt2,Z3-alpha,1,3.1040345574388883,2.7826956390053965,0.321339,0
@@ -1015,7 +1015,7 @@ QF_NRA/LassoRanker/SV-COMP/GulwaniJainKoskinen-2009PLDI-Fig1_true-termination.c_
 QF_NRA/20161105-Sturm-MBO/mbo_E8E20.smt2,Yices2,0,1200.0,1201.2232284680067,0.384510,0
 QF_NRA/hycomp/ball_count_2d_plain.04.seq_lazy_lemmas_global_13.smt2,Z3-alpha,1,0.42427402434494765,0.3485852919984609,0.075689,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.02.seq_lazy_global_15.smt2,Z3-alpha,1,0.34982647239902476,0.28203504098928533,0.067791,0
-QF_NRA/LassoRanker/SV-COMP/KroeningSharyginaTsitovichWintersteiger-2010CAV-Fig1_true-termination.c_Iteration1_Lasso_4-pieceTemplate.smt2,Z3-alpha,0,1200.0,1201.7233416190138,0.000000,1
+QF_NRA/LassoRanker/SV-COMP/KroeningSharyginaTsitovichWintersteiger-2010CAV-Fig1_true-termination.c_Iteration1_Lasso_4-pieceTemplate.smt2,Z3-alpha,0,1200.0,1201.7233416190138,5.004892,1
 QF_NRA/hycomp/ball_count_2d_plain.10.seq_lazy_linear_enc_lemmas_global_15.smt2,Z3-alpha,1,0.3675978493652907,0.2881914890022017,0.079406,0
 QF_NRA/meti-tarski/exp/problem/10/2/exp-problem-10-2-chunk-0371.smt2,Z3-alpha,1,0.30073778933236794,0.29397197999060154,0.006766,0
 QF_NRA/meti-tarski/sin/cos/sin-cos-346-b-chunk-0441.smt2,SMT-RAT,1,0.22709901639117344,0.21842988301068544,0.008669,0
@@ -1078,7 +1078,7 @@ QF_NRA/20170501-Heizmann-UltimateInvariantSynthesis/standard_copy7_ground.i_3_2_
 QF_NRA/20240407-pPDA-Chiari-Pontiggia-Winkler/certificate_hints/call_ret_loop_2_POMC_hints.smt2,Yices2,0,1200.0,1201.2175243980018,0.012350,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.10.seq_lazy_linear_enc_global_12.smt2,Z3-alpha,1,15.332370709390114,15.27729291000287,0.055078,0
 QF_NRA/LassoRanker/Ultimate/TelAviv-AmirMinimum.bpl_Iteration1_Loop_4-pieceTemplate.smt2,Z3-alpha,1,157.86667606341743,155.63639221800258,2.230284,0
-QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Lasso_7-phaseTemplate.smt2,Z3-alpha,1,83.1805869760123,77.80201497601229,5.378572,1
+QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Lasso_7-phaseTemplate.smt2,Z3-alpha,1,82.80690685839599,77.80201497601229,5.004892,1
 QF_NRA/hycomp/ball_count_2d_hill.04.seq_lazy_linear_enc_lemmas_global_7.smt2,SMT-RAT,1,1.3108540623166733,1.2578532899788115,0.053001,0
 QF_NRA/meti-tarski/sin/cos/sin-cos-346-b-chunk-0529.smt2,Z3-alpha,1,0.27199770835667336,0.26524745699134655,0.006750,0
 QF_NRA/meti-tarski/Nichols-Plot/Inverted-Pendulum/Nichols-Plot-Inverted-Pendulum-Fails-1-6-chunk-0257.smt2,Yices2,1,0.23339544343851923,0.22514305100776255,0.008252,0
@@ -1147,7 +1147,7 @@ QF_NRA/meti-tarski/atan/vega/3/weak/atan-vega-3-weak-chunk-0561.smt2,Z3-alpha,1,
 QF_NRA/20200911-Pine/1599122161444977000.smt2,SMT-RAT,1,0.2611989853563388,0.25302857998758554,0.008170,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.04.redlog_global_14.smt2,Yices2,1,0.41334802336731413,0.3389958819898311,0.074352,0
 QF_NRA/hycomp/ball_count_1d_plain.05.seq_lazy_linear_enc_global_13.smt2,Z3-alpha,1,0.4546128023890448,0.3945753650041297,0.060037,0
-QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Lasso_4-phaseTemplate.smt2,Z3-alpha,1,44.78929344099822,39.548838440998225,5.240455,1
+QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Lasso_4-phaseTemplate.smt2,Z3-alpha,1,44.55373032338192,39.548838440998225,5.004892,1
 QF_NRA/hycomp/ball_count_2d_hill_simple.01.qfree_global_14.smt2,Yices2,1,0.29095273339279415,0.22806859901174903,0.062884,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.03.seq_lazy_linear_enc_global_11.smt2,Z3-alpha,1,0.3314952253955086,0.2780955759808421,0.053400,0
 QF_NRA/meti-tarski/sin/problem/7/weak/sin-problem-7-weak-chunk-0183.smt2,Z3-alpha,1,1.8771402044172534,1.868926654016832,0.008214,0
@@ -1171,7 +1171,7 @@ QF_NRA/hycomp/ball_count_2d_hill_simple.05.seq_lazy_linear_enc_lemmas_global_6.s
 QF_NRA/hycomp/ball_count_2d_plain.10.seq_lazy_linear_enc_global_8.smt2,cvc5,1,0.27834440540262917,0.23898282702430151,0.039362,0
 QF_NRA/hycomp/etcs_braking_2.01.seq_lazy_global_15.smt2,Z3-alpha,1,15.52701381232563,15.371845011977712,0.155169,0
 QF_NRA/meti-tarski/CMOS/CMOS-opamp-chunk-0252.smt2,SMT-RAT,1,0.22917459633989676,0.2211647279909812,0.008010,0
-QF_NRA/LassoRanker/CooperatingT2/brp_withassume.t2.c_Iteration8_Loop_3-pieceTemplate.smt2,cvc5,1,206.6261068360013,201.3595508360013,5.266556,1
+QF_NRA/LassoRanker/CooperatingT2/brp_withassume.t2.c_Iteration8_Loop_3-pieceTemplate.smt2,Z3-alpha,0,1200.0,1201.7198759489984,5.004892,1
 QF_NRA/20200911-Pine/1599122159846134000.smt2,SMT-RAT,1,0.23258992738063863,0.22441348098800518,0.008176,0
 QF_NRA/LassoRanker/CooperatingT2/broydn.c.i.broydn.pl.t2.fixed.t2.c_Iteration1_Loop_4-pieceTemplate.smt2,cvc5,1,3.7631783834027264,3.433765444002347,0.329413,0
 QF_NRA/UltimateAutomizer/InVarSynth_GoannaDoubleFreeWithoutPointers.bpl_Iteration1_1.smt2,Z3-alpha,1,0.5571079694151082,0.4864663000043947,0.070642,0
@@ -1291,7 +1291,7 @@ QF_NRA/meti-tarski/exp/problem/10/2/exp-problem-10-2-chunk-0293.smt2,Z3-alpha,1,
 QF_NRA/meti-tarski/atan/vega/3/atan-vega-3-chunk-0118.smt2,Z3-alpha,1,0.2740245153787215,0.2671106680063531,0.006914,0
 QF_NRA/20200911-Pine/1599121905539672000.smt2,SMT-RAT,1,1.0309242784229242,1.0229274980083574,0.007997,0
 QF_NRA/hycomp/ball_count_2d_hill.01.redlog_global_13.smt2,Z3-alpha,1,0.5510126313843899,0.40421084899571724,0.146802,0
-QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Lasso_6-phaseTemplate.smt2,Z3-alpha,1,56.77479195999243,51.44354795999243,5.331244,1
+QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Lasso_6-phaseTemplate.smt2,Z3-alpha,1,56.448439842376125,51.44354795999243,5.004892,1
 QF_NRA/20220314-Uncu/Rational_Function_Proof_Calls_With_Disjunctive_Denominator_Simplifications/DDC_ProveIneq_ISSAC05_FibonacciPoly_b.smt2,Yices2,1,0.24188855141491114,0.23468409600900486,0.007204,0
 QF_NRA/LassoRanker/CooperatingT2/eric.t2.c_Iteration1_Loop_5-phaseTemplate.smt2,Z3-alpha,1,1.1106390774026182,0.8955050469958223,0.215134,0
 QF_NRA/meti-tarski/sqrt/1mcosq/8/sqrt-1mcosq-8-chunk-0177.smt2,SMT-RAT,1,0.269356066385251,0.262051697995048,0.007304,0
@@ -1419,7 +1419,7 @@ QF_NRA/meti-tarski/atan/vega/3/atan-vega-3-chunk-0310.smt2,Z3-alpha,1,0.27836109
 QF_NRA/meti-tarski/polypaver/bench-sqrt-3d/polypaver-bench-sqrt-3d-chunk-0205.smt2,Z3-alpha,1,0.28293996536612,0.2756808109988924,0.007259,0
 QF_NRA/meti-tarski/sqrt/1mcosq/7/sqrt-1mcosq-7-chunk-0177.smt2,SMT-RAT,1,0.2904428133866419,0.2796427819994278,0.010800,0
 QF_NRA/LassoRanker/Ultimate/2013POPL-BenAmGen-Ex3.20.bpl_Iteration1_Lasso_3-pieceTemplate.smt2,cvc5,1,0.8629908454264184,0.8071512950118631,0.055840,0
-QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_7-nestedTemplate.smt2,Z3-alpha,1,166.14600474000446,160.68443674000446,5.461568,1
+QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_7-nestedTemplate.smt2,Z3-alpha,1,165.68932862238816,160.68443674000446,5.004892,1
 QF_NRA/hycomp/ball_count_2d_plain.05.qfree_global_10.smt2,Yices2,1,0.3002385894020223,0.24699689701083116,0.053242,0
 QF_NRA/20170501-Heizmann-UltimateInvariantSynthesis/standard_copyInitSum3_ground.i_3_2_2.bpl_3.smt2,SMT-RAT,1,2.538218821423095,2.515060189005453,0.023159,0
 QF_NRA/meti-tarski/sin/problem/7/sin-problem-7-chunk-0207.smt2,SMT-RAT,1,0.22901159835836335,0.22029931499855593,0.008712,0
@@ -1622,7 +1622,7 @@ QF_NRA/hycomp/ball_count_2d_hill_simple.03.seq_lazy_linear_enc_lemmas_global_14.
 QF_NRA/20200911-Pine/1599121903380659000.smt2,SMT-RAT,1,0.8383234274175153,0.8295288119988982,0.008795,0
 QF_NRA/LassoRanker/CooperatingT2/fun4.t2.c_Iteration1_Loop_4-pieceTemplate.smt2,cvc5,1,47.14391743536779,46.8740023499995,0.269915,0
 QF_NRA/hycomp/ball_count_2d_hill.05.seq_lazy_linear_enc_lemmas_global_15.smt2,SMT-RAT,1,40.527337130387046,40.42405935798888,0.103278,0
-QF_NRA/2019-ezsmt/reverseFolding/04-reverse_folding-0-0.smt2,Z3-alpha,0,1200.0,1201.7211841899843,0.000000,1
+QF_NRA/2019-ezsmt/reverseFolding/04-reverse_folding-0-0.smt2,Z3-alpha,0,1200.0,1201.7211841899843,5.004892,1
 QF_NRA/meti-tarski/Chua/1/IL/U/Chua-1-IL-U-chunk-0084.smt2,Z3-alpha,1,0.34704855537946755,0.33741362401633523,0.009635,0
 QF_NRA/meti-tarski/atan/problem/2/weakT/atan-problem-2-weakT-chunk-0010.smt2,Z3-alpha,1,0.27230401237701485,0.265931759000523,0.006372,0
 QF_NRA/hycomp/etcs_braking_2.01.qfree_global_6.smt2,Yices2,1,0.30918658239041874,0.24102297899662517,0.068164,0
@@ -1645,7 +1645,7 @@ QF_NRA/meti-tarski/sin/cos/sin-cos-346-b-chunk-0180.smt2,Z3-alpha,1,0.2746318683
 QF_NRA/meti-tarski/atan/vega/3/weak/atan-vega-3-weak-chunk-0547.smt2,Z3-alpha,1,0.27365509440513747,0.2668245930108242,0.006831,0
 QF_NRA/meti-tarski/atan/vega/3/atan-vega-3-chunk-0218.smt2,Z3-alpha,1,0.27348268537988374,0.2657486329844687,0.007734,0
 QF_NRA/hycomp/ball_count_2d_slope.01.seq_lazy_lemmas_global_4.smt2,Z3-alpha,1,0.606655746344211,0.5496040529978927,0.057052,0
-QF_NRA/2019-ezsmt/reverseFolding/40-reverse_folding-0-0.smt2,Yices2,1,8.768831118991642,2.8462021189916413,5.922629,1
+QF_NRA/2019-ezsmt/reverseFolding/40-reverse_folding-0-0.smt2,Z3-alpha,1,95.60246720138329,90.59757531899959,5.004892,1
 QF_NRA/hycomp/ball_count_2d_plain.10.seq_lazy_lemmas_global_12.smt2,Z3-alpha,1,15.363549350406709,15.294731271016644,0.068818,0
 QF_NRA/LassoRanker/Ultimate/MultiPhase1.bpl_Iteration1_Lasso_4-pieceTemplate.smt2,cvc5,1,198.8137955414082,198.6959542610275,0.117841,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.05.redlog_global_10.smt2,Yices2,1,0.2986500863867947,0.2430117670155596,0.055638,0
@@ -1699,7 +1699,7 @@ QF_NRA/LassoRanker/CooperatingT2/heidy7-simple.t2.c_Iteration2_Lasso_3-pieceTemp
 QF_NRA/20211101-Geogebra/IsoTriangle-Bottema1_1b.smt2,Z3-alpha,1,0.2721076974072163,0.2655605840263888,0.006547,0
 QF_NRA/hycomp/ball_count_2d_plain.05.redlog_global_7.smt2,Yices2,1,0.27861731536776246,0.22884418698959053,0.049773,0
 QF_NRA/20161105-Sturm-MBO/mbo_E4E14.smt2,Yices2,0,1200.0,1201.2509984079807,0.490248,0
-QF_NRA/2019-ezsmt/reverseFolding/45-reverse_folding-0-0.smt2,Yices2,1,13.542889865999008,7.3578068659990095,6.185083,1
+QF_NRA/2019-ezsmt/reverseFolding/45-reverse_folding-0-0.smt2,Z3-alpha,1,278.9536695973898,273.94877771500614,5.004892,1
 QF_NRA/meti-tarski/sin/344/3/sin-344-3-chunk-0046.smt2,Z3-alpha,1,0.27342771234779106,0.2659181199851446,0.007510,0
 QF_NRA/hycomp/ball_count_2d_hill.01.seq_lazy_linear_enc_lemmas_global_10.smt2,SMT-RAT,1,1.899587235437673,1.8291261660051532,0.070461,0
 QF_NRA/20200911-Pine/1599121905853387000.smt2,SMT-RAT,1,0.27247414338725107,0.26456976699410006,0.007904,0
@@ -1732,7 +1732,7 @@ QF_NRA/hycomp/ball_count_2d_hill.02.redlog_global_6.smt2,Z3-alpha,0,1200.0,1201.
 QF_NRA/LassoRanker/CooperatingT2/sas2.t2.c_Iteration6_Lasso_2-pieceTemplate.smt2,Z3-alpha,1,36.511404424376984,35.845273705985164,0.666131,0
 QF_NRA/meti-tarski/atan/vega/3/atan-vega-3-chunk-0372.smt2,Z3-alpha,1,0.2780392743830704,0.26907994798966683,0.008959,0
 QF_NRA/hycomp/ball_count_2d_plain.04.seq_lazy_linear_enc_lemmas_global_14.smt2,Z3-alpha,0,1200.0,1201.7143668990175,0.075784,0
-QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_4-nestedTemplate.smt2,Z3-alpha,1,52.45723847101065,47.16910747101065,5.288131,1
+QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_4-nestedTemplate.smt2,Z3-alpha,1,52.17399935339434,47.16910747101065,5.004892,1
 QF_NRA/LassoRanker/Ultimate/simple-scaled200.bpl_Iteration1_Lasso_3-pieceTemplate.smt2,Z3-alpha,1,42.03128105340382,38.1607797750039,3.870501,0
 QF_NRA/meti-tarski/sin/problem/7/sin-problem-7-chunk-0308.smt2,SMT-RAT,1,2.288332891354537,2.2787722689972725,0.009561,0
 QF_NRA/meti-tarski/exp/problem/10/2/exp-problem-10-2-chunk-0335.smt2,Z3-alpha,1,0.27759044037756,0.26980657398235053,0.007784,0
@@ -1761,7 +1761,7 @@ QF_NRA/hycomp/ball_count_2d_hill_simple.02.redlog_global_6.smt2,Yices2,1,0.57453
 QF_NRA/hycomp/ball_count_1d_plain.05.seq_lazy_linear_enc_lemmas_global_12.smt2,Yices2,1,0.2953148413749547,0.23522787101683207,0.060087,0
 QF_NRA/LassoRanker/Ultimate/Braverman-2006CAV-Ex1-int.bpl_Iteration1_Lasso_5-phaseTemplate.smt2,cvc5,1,18.131036084402318,18.10357815801399,0.027458,0
 QF_NRA/LassoRanker/CooperatingT2/firewire.t2.c_Iteration3_Loop_3-pieceTemplate.smt2,Z3-alpha,1,5.352590110409972,4.704634035995696,0.647956,0
-QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_7-phaseTemplate.smt2,Z3-alpha,1,183.67777553602554,178.20860153602553,5.469174,1
+QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_7-phaseTemplate.smt2,Z3-alpha,1,183.21349341840923,178.20860153602553,5.004892,1
 QF_NRA/meti-tarski/polypaver/bench-sqrt-3d/polypaver-bench-sqrt-3d-chunk-0443.smt2,Z3-alpha,1,0.276122699341238,0.2680487610050477,0.008074,0
 QF_NRA/LassoRanker/CooperatingT2/hongyi1.t2.c_Iteration1_Loop_3-pieceTemplate.smt2,Z3-alpha,0,1200.0,1201.7209695819765,4.960455,0
 QF_NRA/LassoRanker/Ultimate/CookSeeZuleger-2013TACAS-Fig7b.bpl_Iteration1_Loop_4-pieceTemplate.smt2,Z3-alpha,1,14.121308634343757,13.471282099984819,0.650027,0
@@ -1827,12 +1827,12 @@ QF_NRA/20161105-Sturm-MBO/mbo_E2E16.smt2,Yices2,0,1200.0,1201.2220468070009,0.57
 QF_NRA/hycomp/ball_count_2d_slope.05.seq_lazy_global_8.smt2,SMT-RAT,1,12.870481024404024,12.797950626001693,0.072530,0
 QF_NRA/meti-tarski/atan/vega/3/atan-vega-3-chunk-0222.smt2,Z3-alpha,1,0.27431006941568525,0.2667891359888017,0.007521,0
 QF_NRA/hycomp/simple_ballistics_reach.01.seq_lazy_lemmas_global_15.smt2,cvc5,0,1200.0,1201.7198762439948,0.169814,0
-QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_2-pieceTemplate.smt2,Z3-alpha,1,118.57511698997892,113.17715598997893,5.397961,1
+QF_NRA/LassoRanker/SV-COMP/aviad_true-termination.c_Iteration1_Loop_2-pieceTemplate.smt2,Z3-alpha,1,118.18204787236263,113.17715598997893,5.004892,1
 QF_NRA/20211101-Geogebra/Triangle-Area_Perimeter_a.smt2,Z3-alpha,1,0.28946873239564197,0.28231451101601124,0.007154,0
 QF_NRA/meti-tarski/CMOS/CMOS-opamp-chunk-0131.smt2,SMT-RAT,1,0.29453257435906166,0.2861242789949756,0.008408,0
 QF_NRA/meti-tarski/sin/cos/sin-cos-346-b-chunk-0494.smt2,Z3-alpha,1,0.35234109038227657,0.3455197660077829,0.006821,0
 QF_NRA/meti-tarski/sqrt/1mcosq/8/sqrt-1mcosq-8-chunk-0283.smt2,SMT-RAT,1,0.28010423335452983,0.27064336798503064,0.009461,0
-QF_NRA/2019-ezsmt/reverseFolding/37-reverse_folding-0-0.smt2,Yices2,1,8.884799248990284,3.2321822489902843,5.652617,1
+QF_NRA/2019-ezsmt/reverseFolding/37-reverse_folding-0-0.smt2,Z3-alpha,1,51.23695651540273,46.232064633019036,5.004892,1
 QF_NRA/20200911-Pine/1599121977409531000.smt2,SMT-RAT,1,0.25974778533653775,0.2517907599976752,0.007957,0
 QF_NRA/meti-tarski/polypaver/bench-sqrt-3d/polypaver-bench-sqrt-3d-chunk-0464.smt2,Z3-alpha,1,0.27698558239588933,0.26872829999774694,0.008257,0
 QF_NRA/hycomp/ball_count_1d_plain.05.redlog_global_7.smt2,Yices2,1,0.2619751483385586,0.2224618129839655,0.039513,0
@@ -1939,7 +1939,7 @@ QF_NRA/hycomp/ball_count_2d_slope.04.seq_lazy_lemmas_global_11.smt2,cvc5,1,0.448
 QF_NRA/LassoRanker/Ultimate/DecreasingInvariant.bpl_Iteration1_Loop_4-pieceTemplate.smt2,cvc5,1,19.116109216348,19.025635661004344,0.090474,0
 QF_NRA/meti-tarski/Nichols-Plot/Inverted-Pendulum/Nichols-Plot-Inverted-Pendulum-Fails-1-6-chunk-0078.smt2,SMT-RAT,1,0.2442007353771147,0.23656828299863264,0.007632,0
 QF_NRA/hycomp/ball_count_2d_plain.10.seq_lazy_linear_enc_lemmas_global_14.smt2,Z3-alpha,1,15.37775345739882,15.303139417985221,0.074614,0
-QF_NRA/LassoRanker/CooperatingT2/brp_withassume.t2.c_Iteration1_Loop_4-pieceTemplate.smt2,cvc5,1,444.851420135997,439.51008613599697,5.341334,1
+QF_NRA/LassoRanker/CooperatingT2/brp_withassume.t2.c_Iteration1_Loop_4-pieceTemplate.smt2,Z3-alpha,0,1200.0,1201.7181654100132,5.004892,1
 QF_NRA/hycomp/simple_ballistics_reach.01.seq_lazy_linear_enc_lemmas_global_6.smt2,cvc5,1,0.3370346173711256,0.2760453250084538,0.060989,0
 QF_NRA/hycomp/etcs_braking_2.01.qfree_global_13.smt2,Yices2,1,1.0344124823701237,0.8974511839915067,0.136961,0
 QF_NRA/meti-tarski/sin/problem/8/sin-problem-8-chunk-0057.smt2,Z3-alpha,1,0.2724218954050117,0.26567814699956216,0.006744,0
@@ -1982,7 +1982,7 @@ QF_NRA/hycomp/ball_count_2d_plain.03.seq_lazy_global_11.smt2,cvc5,1,0.3019446844
 QF_NRA/hycomp/ball_count_2d_hill.10.seq_lazy_linear_enc_global_10.smt2,Z3-alpha,1,15.348712400411921,15.286390016990481,0.062322,0
 QF_NRA/20220314-Uncu/Rational_Function_Proof_Calls_With_Basic_Denominator_Simplifications/BDC_ProveIneq_ISSAC05_LevinLHS.smt2,Z3-alpha,1,0.2728793994125114,0.2662109880184289,0.006668,0
 QF_NRA/LassoRanker/SV-COMP/Masse_true-termination.c_Iteration1_Lasso_2-pieceTemplate.smt2,cvc5,1,5.747227127396934,5.379940885002725,0.367286,0
-QF_NRA/2019-ezsmt/reverseFolding/35-reverse_folding-0-0.smt2,Yices2,1,7.586434489012927,1.9620324890129268,5.624402,1
+QF_NRA/2019-ezsmt/reverseFolding/35-reverse_folding-0-0.smt2,Z3-alpha,1,43.923004940380075,38.91811305799638,5.004892,1
 QF_NRA/LassoRanker/Ultimate/SanDiego.bpl_Iteration1_Loop_4-pieceTemplate.smt2,cvc5,1,0.5979523973606662,0.5058447060000617,0.092108,0
 QF_NRA/LassoRanker/SV-COMP/Ben-Amram-2010LMCS-Ex2.3_true-termination.c_Iteration1_Lasso_4-lexTemplate.smt2,Z3-alpha,1,2.818413800351289,2.052413097990211,0.766001,0
 QF_NRA/meti-tarski/sqrt/1mcosq/7/sqrt-1mcosq-7-chunk-0164.smt2,SMT-RAT,1,0.2501479353764695,0.2407629329827614,0.009385,0
@@ -2028,7 +2028,7 @@ QF_NRA/meti-tarski/sin/problem/7/weak/sin-problem-7-weak-chunk-0160.smt2,Z3-alph
 QF_NRA/zankl/matrix-2-all-20.smt2,SMT-RAT,1,0.6942072863990576,0.6731811120116618,0.021026,0
 QF_NRA/meti-tarski/atan/problem/2/weak/atan-problem-2-weak-chunk-0043.smt2,Z3-alpha,1,0.27447987338617863,0.26761440600967035,0.006865,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.02.qfree_global_13.smt2,Yices2,1,0.518305233383751,0.22098755798651837,0.297318,0
-QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Lasso_5-nestedTemplate.smt2,Z3-alpha,1,42.804347596001016,37.519166596001014,5.285181,1
+QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Lasso_5-nestedTemplate.smt2,Z3-alpha,1,42.52405847838471,37.519166596001014,5.004892,1
 QF_NRA/LassoRanker/CooperatingT2/bubblesort_inner_loop.t2.c_Iteration1_Loop_3-pieceTemplate.smt2,cvc5,1,1.5674551783837047,1.3627127750078216,0.204742,0
 QF_NRA/LassoRanker/Ultimate/Gulwani.bpl_Iteration1_Lasso_4-pieceTemplate.smt2,Z3-alpha,0,1200.0,1201.7164222690044,1.876947,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.03.seq_lazy_lemmas_global_10.smt2,Yices2,1,0.4230502883679834,0.36310810199938715,0.059942,0
@@ -2058,7 +2058,7 @@ QF_NRA/20161105-Sturm-MBO/mbo_E5E25.smt2,Yices2,1,0.6819992854094268,0.272724812
 QF_NRA/hycomp/ball_count_2d_hill_simple.10.seq_lazy_lemmas_global_12.smt2,Yices2,1,0.29545414237744594,0.22684525299700908,0.068609,0
 QF_NRA/hycomp/ball_count_2d_hill.05.seq_lazy_linear_enc_global_11.smt2,Z3-alpha,1,0.38021064741277555,0.3105925260169897,0.069618,0
 QF_NRA/meti-tarski/Chua/2/IL/U/Chua-2-IL-U-chunk-0098.smt2,Z3-alpha,1,0.30695435040487395,0.2934632709948346,0.013491,0
-QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Loop_4-phaseTemplate.smt2,Z3-alpha,1,20.16466919600127,14.926135196001269,5.238534,1
+QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Loop_4-phaseTemplate.smt2,Z3-alpha,1,19.931027078384965,14.926135196001269,5.004892,1
 QF_NRA/20170501-Heizmann-UltimateInvariantSynthesis/ddlm2013.i_3_6_2.bpl_3.smt2,SMT-RAT,1,6.790424118366525,6.757085433986504,0.033339,0
 QF_NRA/meti-tarski/atan/vega/3/weak/atan-vega-3-weak-chunk-0452.smt2,Z3-alpha,1,0.29836648440194735,0.2907960180018563,0.007570,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.10.seq_lazy_linear_enc_lemmas_global_12.smt2,Yices2,1,0.3010748203911022,0.2364543369913008,0.064620,0
@@ -2219,7 +2219,7 @@ QF_NRA/20200911-Pine/1599122161615591000.smt2,SMT-RAT,1,0.2308003753956542,0.223
 QF_NRA/UltimateAutomizer/InVarSynth_ImpulseTest.bpl_Iteration2_0.smt2,SMT-RAT,1,0.8976110083700293,0.8802546710066963,0.017356,0
 QF_NRA/hycomp/ball_count_2d_plain.05.seq_lazy_lemmas_global_4.smt2,Yices2,1,0.25079102540129283,0.22065707101137377,0.030134,0
 QF_NRA/meti-tarski/exp/problem/10/2/exp-problem-10-2-chunk-0308.smt2,Z3-alpha,1,0.2978235424039555,0.2906817379989661,0.007142,0
-QF_NRA/LassoRanker/SV-COMP/TelAviv-Amir-Minimum_true-termination.c_Iteration1_Lasso_4-pieceTemplate.smt2,Z3-alpha,0,1200.0,1201.718918368977,0.000000,1
+QF_NRA/LassoRanker/SV-COMP/TelAviv-Amir-Minimum_true-termination.c_Iteration1_Lasso_4-pieceTemplate.smt2,Z3-alpha,0,1200.0,1201.718918368977,5.004892,1
 QF_NRA/meti-tarski/Chua/2/IL/L/Chua-2-IL-L-chunk-0016.smt2,cvc5,1,0.228169854405303,0.22178771201288328,0.006382,0
 QF_NRA/hycomp/ball_count_2d_hill.10.seq_lazy_linear_enc_lemmas_global_9.smt2,SMT-RAT,1,3.0177502213869842,2.95304773299722,0.064702,0
 QF_NRA/meti-tarski/CMOS/CMOS-opamp-chunk-0284.smt2,SMT-RAT,1,0.22581604535897679,0.2181381479895208,0.007678,0
@@ -2264,14 +2264,14 @@ QF_NRA/meti-tarski/atan/vega/3/weak/atan-vega-3-weak-chunk-0464.smt2,Z3-alpha,1,
 QF_NRA/meti-tarski/atan/problem/1/weak/atan-problem-1-weak-chunk-0026.smt2,Yices2,1,0.22410202541012733,0.21769700100412592,0.006405,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.02.qfree_global_12.smt2,Yices2,1,0.6402864613579256,0.5852691740146838,0.055017,0
 QF_NRA/20180501-Economics-Mulligan/MulliganEconomicsModel0086e.smt2,Yices2,1,0.25801519842442544,0.24111711099976674,0.016898,0
-QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Lasso_7-nestedTemplate.smt2,Z3-alpha,1,67.28448330999535,61.917328309995355,5.367155,1
+QF_NRA/LassoRanker/Ultimate/Collatz.bpl_Iteration1_Lasso_7-nestedTemplate.smt2,Z3-alpha,1,66.92222019237906,61.917328309995355,5.004892,1
 QF_NRA/zankl/matrix-2-all-15.smt2,SMT-RAT,1,0.5823579674129975,0.5537378980079666,0.028620,0
 QF_NRA/hycomp/ball_count_2d_hill_simple.10.redlog_global_6.smt2,Yices2,1,0.259489695391119,0.2229184290044941,0.036571,0
 QF_NRA/hycomp/ball_count_2d_plain.05.seq_lazy_linear_enc_lemmas_global_14.smt2,Z3-alpha,1,15.421476996411537,15.34502531599719,0.076452,0
 QF_NRA/20200911-Pine/1599122165825193000.smt2,SMT-RAT,1,0.2507743813863159,0.24311421098536812,0.007660,0
 QF_NRA/meti-tarski/exp/problem/10/2/exp-problem-10-2-chunk-0092.smt2,Z3-alpha,1,0.2727544814066165,0.2657490929996129,0.007005,0
 QF_NRA/2019-ezsmt/reverseFolding/20-reverse_folding-0-0.smt2,Yices2,1,3.6338847243701706,0.68062485702103,2.953260,0
-QF_NRA/LassoRanker/SV-COMP/CookSeeZuleger-2013TACAS-Fig7b_true-termination.c_Iteration1_Loop_2-nestedTemplate.smt2,Yices2,1,159.19041956100887,152.86968056100886,6.320739,1
+QF_NRA/LassoRanker/SV-COMP/CookSeeZuleger-2013TACAS-Fig7b_true-termination.c_Iteration1_Loop_2-nestedTemplate.smt2,Z3-alpha,1,986.4626202283786,981.4577283459948,5.004892,1
 QF_NRA/meti-tarski/Chua/1/IL/L/Chua-1-IL-L-chunk-0123.smt2,Z3-alpha,1,0.27504866939360695,0.2682691939990036,0.006779,0
 QF_NRA/meti-tarski/Chua/2/IL/L/Chua-2-IL-L-chunk-0052.smt2,Z3-alpha,1,0.31389954240384,0.30638765601906925,0.007512,0
 QF_NRA/zankl/matrix-1-all-44.smt2,SMT-RAT,1,1.4424186403581076,1.429443347005872,0.012975,0
