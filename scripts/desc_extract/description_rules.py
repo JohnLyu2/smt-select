@@ -41,91 +41,76 @@ def _preiner_prefix(smtlib_path: str) -> str | None:
 # verification task.
 _ULTIMATE_SVCOMP2019_PREFIXES: dict[str, str] = {
     "alternating_list_true-unreach-call_true-valid-memsafety.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " and memory safety in a program that builds a list with alternating"
-        " data values and checks its structure.",
+        "The original SV-COMP benchmark checks unreachability and memory safety"
+        " in an alternating list program.",
     "cs_szymanski_true-unreach-call.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " in Szymanski's mutual exclusion algorithm.",
+        "The original SV-COMP benchmark checks unreachability in Szymanski's"
+        " mutual exclusion algorithm.",
     "cs_time_var_mutex_true-unreach-call.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " in a time-variable mutual exclusion algorithm.",
+        "The original SV-COMP benchmark checks unreachability in a mutual"
+        " exclusion algorithm.",
     "dancing_true-unreach-call_false-valid-memtrack.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " in a dancing links program that removes and re-inserts a node"
-        " in a doubly-linked list, where memory tracking is violated.",
+        "The original SV-COMP benchmark checks unreachability and memory tracking"
+        " in a dancing links program.",
     "dll-circular_false-unreach-call_false-valid-memcleanup.i":
-        "This SV-COMP benchmark checks a circular doubly-linked list"
-        " program where the error state is reachable and memory cleanup"
-        " is violated.",
+        "The original SV-COMP benchmark checks unreachability and memory cleanup"
+        " in a circular doubly-linked list program.",
     "dll_of_dll_false-unreach-call_false-valid-memcleanup.i":
-        "This SV-COMP benchmark checks a doubly-linked list of"
-        " doubly-linked lists program where the error state is reachable"
-        " and memory cleanup is violated.",
+        "The original SV-COMP benchmark checks unreachability and memory cleanup"
+        " in a doubly-linked list of doubly-linked lists program.",
     "dll_of_dll_true-unreach-call_true-valid-memsafety.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " and memory safety in a doubly-linked list of doubly-linked"
-        " lists program.",
+        "The original SV-COMP benchmark checks unreachability and memory safety"
+        " in a doubly-linked list of doubly-linked lists program.",
     "ex3_forlist_true-termination.c_true-unreach-call.i":
-        "This SV-COMP benchmark checks termination and unreachability"
-        " of an error state in a for-loop list traversal program.",
+        "The original SV-COMP benchmark checks termination and unreachability"
+        " in a pointer state-tracking program.",
     "list-ext_flag_false-unreach-call_false-valid-deref.i":
-        "This SV-COMP benchmark checks a list program with an external"
-        " flag where the error state is reachable and an invalid"
-        " dereference exists.",
+        "The original SV-COMP benchmark checks unreachability and memory safety"
+        " in an extended list program where each node stores its own flag.",
     "list_flag_true-unreach-call_false-valid-memtrack.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " in a program that builds a list whose data values depend on a"
-        " flag and checks its structure, where memory tracking is violated.",
+        "The original SV-COMP benchmark checks unreachability and memory tracking"
+        " in a flag-controlled list program.",
     "list_search_false-unreach-call_false-valid-memcleanup.i":
-        "This SV-COMP benchmark checks a linked-list insert-and-search"
-        " program where the error state is reachable and memory cleanup"
-        " is violated.",
+        "The original SV-COMP benchmark checks unreachability and memory cleanup"
+        " in a linked-list search program.",
     "list_search_true-unreach-call_false-valid-memcleanup.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " in a linked-list insert-and-search program, where memory cleanup"
-        " is violated.",
+        "The original SV-COMP benchmark checks unreachability and memory cleanup"
+        " in a linked-list search program.",
     "list_true-unreach-call_false-valid-memtrack.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " in a program that builds an integer list with a repeating"
-        " pattern and checks its structure, where memory tracking"
-        " is violated.",
+        "The original SV-COMP benchmark checks unreachability and memory tracking"
+        " in an integer list program.",
     "s3_clnt.blast.01_false-unreach-call.i.cil.c":
-        "This SV-COMP benchmark checks an SSL v3 client state-machine"
-        " program (BLAST variant 01) where the error state is reachable.",
+        "The original SV-COMP benchmark checks unreachability in an SSL v3"
+        " client state-machine program (BLAST variant 01).",
     "s3_clnt.blast.04_false-unreach-call.i.cil.c":
-        "This SV-COMP benchmark checks an SSL v3 client state-machine"
-        " program (BLAST variant 04) where the error state is reachable.",
+        "The original SV-COMP benchmark checks unreachability in an SSL v3"
+        " client state-machine program (BLAST variant 04).",
     "sep10_true-unreach-call.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " in a pointer separation program (variant sep10).",
+        "The original SV-COMP benchmark checks unreachability in a"
+        " reducer commutativity program (array size 10).",
     "sep60_true-unreach-call.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " in a pointer separation program (variant sep60).",
+        "The original SV-COMP benchmark checks unreachability in a"
+        " reducer commutativity program (array size 60).",
     "simple_true-unreach-call_false-valid-memtrack.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " in a program that builds a simple integer list and traverses it"
-        " to check its structure, where memory tracking is violated.",
+        "The original SV-COMP benchmark checks unreachability and memory tracking"
+        " in a simple list program.",
     "sll-rb-sentinel_false-unreach-call_false-valid-memcleanup.i":
-        "This SV-COMP benchmark checks a singly-linked list with sentinel"
-        " nodes where the error state is reachable and memory cleanup is"
-        " violated.",
+        "The original SV-COMP benchmark checks unreachability and memory cleanup"
+        " in a singly-linked list program with red-black colored nodes"
+        " and a sentinel node.",
     "sll-sorted_false-unreach-call_false-valid-memcleanup.i":
-        "This SV-COMP benchmark checks a sorted singly-linked list"
-        " program where the error state is reachable and memory cleanup"
-        " is violated.",
+        "The original SV-COMP benchmark checks unreachability and memory cleanup"
+        " in a sorted singly-linked list program.",
     "sll_to_dll_rev_false-unreach-call_false-valid-memcleanup.i":
-        "This SV-COMP benchmark checks a program that converts a"
-        " singly-linked list to a doubly-linked list and reverses it,"
-        " where the error state is reachable and memory cleanup"
-        " is violated.",
+        "The original SV-COMP benchmark checks unreachability and memory cleanup"
+        " in a program that builds a singly-linked list, converts it to a"
+        " doubly-linked list, and reverses it.",
     "splice_true-unreach-call_false-valid-memtrack.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " in a program that splits a list into two sublists by position"
-        " and checks each, where memory tracking is violated.",
+        "The original SV-COMP benchmark checks unreachability and memory tracking"
+        " in a list-splitting program.",
     "standard_running_true-unreach-call.i":
-        "This SV-COMP benchmark checks unreachability of an error state"
-        " in a standard running example program.",
+        "The original SV-COMP benchmark checks unreachability in a standard"
+        " running example program.",
 }
 
 
