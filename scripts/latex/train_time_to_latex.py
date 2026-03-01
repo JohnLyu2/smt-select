@@ -2,7 +2,7 @@
 """
 Convert doc/result_summary/train_time.csv into a LaTeX table (doc/cp26/train_time.tex).
 
-Reads the CSV with columns logic, gin_pwc, synt (train time in seconds per source).
+Reads the CSV with columns logic, graph, lite (train time in seconds per source).
 Writes a tabular .tex with escaped logic names and training time in minutes.
 """
 
@@ -53,7 +53,7 @@ def main() -> None:
         reader = csv.DictReader(f)
         rows = list(reader)
 
-    columns = ["logic", "synt", "gin_pwc"]
+    columns = ["logic", "lite", "graph"]
     headers = ["", "SMT-Select-Lite", "SMT-Select-Graph"]
 
     lines = [
@@ -68,8 +68,8 @@ def main() -> None:
     for row in rows:
         cells = [
             latex_escape(row.get("logic", "")),
-            format_time_min(row.get("synt", "")),
-            format_time_min(row.get("gin_pwc", "")),
+            format_time_min(row.get("lite", "")),
+            format_time_min(row.get("graph", "")),
         ]
         lines.append(" & ".join(cells) + " \\\\")
 

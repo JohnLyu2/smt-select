@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
 Collect training time from train logs in two locations:
-- GIN-PWC: data/cp26/results/gnn/gin_pwc/<logic>/train_log/seed*.log
-- Syntactic: data/cp26/results/synt/<logic>/train_log/seed*.log
+- Graph: data/cp26/results/graph/<logic>/train_log/seed*.log
+- Lite: data/cp26/results/lite/<logic>/train_log/seed*.log
 
 For each logic, parses each seed log: first and last timestamp determine duration in seconds.
-Adds total feature extraction time from data/features/syntactic/<logic>/extraction_times.csv to both gin_pwc and synt (capped at 5s per instance).
-Writes one CSV: doc/result_summary/train_time.csv with columns logic, gin_pwc, synt.
+Adds total feature extraction time from data/features/syntactic/<logic>/extraction_times.csv to both graph and lite (capped at 5s per instance).
+Writes one CSV: doc/result_summary/train_time.csv with columns logic, graph, lite.
 """
 
 import csv
@@ -17,8 +17,8 @@ from pathlib import Path
 # Script is under scripts/collect_results/
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-GIN_PWC_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "gnn" / "gin_pwc"
-SYNT_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "synt"
+GRAPH_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "graph"
+LITE_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "lite"
 FEATURES_SYNTACTIC_ROOT = PROJECT_ROOT / "data" / "features" / "syntactic"
 OUTPUT_PATH = PROJECT_ROOT / "doc" / "result_summary" / "train_time.csv"
 
@@ -107,43 +107,42 @@ def total_extraction_time_sec(logic: str) -> float:
 
 
 def main() -> None:
-    gin_pwc_times: dict[str, float | str] = {}
-    synt_times: dict[str, float | str] = {}
+    graph_times: dict[str, float | str] = {}
+    lite_times: dict[str, float | str] = {}
 
-    if GIN_PWC_ROOT.is_dir():
-        gin_pwc_times = collect_from_root(GIN_PWC_ROOT)
-        # Add feature extraction time to each gin_pwc training time
-        for logic in gin_pwc_times:
-            val = gin_pwc_times[logic]
+    if LITE_ROOT.is_dir():
+        lite_times = collect_from_root(LITE_ROOT)
+        for logic in lite_times:
+            val = lite_times[logic]
             if val != "":
                 extraction_sec = total_extraction_time_sec(logic)
-                gin_pwc_times[logic] = round(float(val) + extraction_sec, 1)
+                lite_times[logic] = round(float(val) + extraction_sec, 1)
     else:
-        print(f"Skipping GIN-PWC: directory not found: {GIN_PWC_ROOT}")
+        print(f"Skipping Lite: directory not found: {LITE_ROOT}")
 
-    if SYNT_ROOT.is_dir():
-        synt_times = collect_from_root(SYNT_ROOT)
-        # Add feature extraction time to each synt training time
-        for logic in synt_times:
-            val = synt_times[logic]
+    if GRAPH_ROOT.is_dir():
+        graph_times = collect_from_root(GRAPH_ROOT)
+        for logic in graph_times:
+            val = graph_times[logic]
             if val != "":
-                extraction_sec = total_extraction_time_sec(logic)
-                synt_times[logic] = round(float(val) + extraction_sec, 1)
+                lite_val = lite_times.get(logic, "")
+                lite_total = float(lite_val) if lite_val != "" else 0.0
+                graph_times[logic] = round(float(val) + lite_total, 1)
     else:
-        print(f"Skipping synt: directory not found: {SYNT_ROOT}")
+        print(f"Skipping Graph: directory not found: {GRAPH_ROOT}")
 
-    all_logics = sorted(set(gin_pwc_times) | set(synt_times))
+    all_logics = sorted(set(graph_times) | set(lite_times))
     if all_logics:
         rows = [
             {
                 "logic": logic,
-                "gin_pwc": gin_pwc_times.get(logic, ""),
-                "synt": synt_times.get(logic, ""),
+                "graph": graph_times.get(logic, ""),
+                "lite": lite_times.get(logic, ""),
             }
             for logic in all_logics
         ]
         OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-        fieldnames = ["logic", "gin_pwc", "synt"]
+        fieldnames = ["logic", "graph", "lite"]
         with open(OUTPUT_PATH, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
