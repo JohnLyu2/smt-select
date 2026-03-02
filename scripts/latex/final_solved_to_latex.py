@@ -13,22 +13,23 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 RESULT_DIRS = [
     PROJECT_ROOT / "data" / "cp26" / "results" / "lite",
-    PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text",
+    PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text" / "all-mpnet-base-v2",
     PROJECT_ROOT / "data" / "cp26" / "results" / "graph",
     PROJECT_ROOT / "data" / "cp26" / "results" / "machsmt" / "ehm",
     PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text",
     PROJECT_ROOT / "data" / "cp26" / "results" / "sibyl" / "evaluation",
+    PROJECT_ROOT / "data" / "cp26" / "results" / "text" / "all-mpnet-base-v2",
 ]
-LABELS = ["synt", "synt_mpnet", "gin_pwc", "mach_ehm", "fusion_pwc", "sibyl"]
+LABELS = ["synt", "synt_mpnet", "gin_pwc", "mach_ehm", "fusion_pwc", "sibyl", "text_mpnet"]
 
 TEX_PATH = PROJECT_ROOT / "doc" / "cp26" / "final_solved.tex"
 
-DISPLAY_ORDER = ["sbs", "vbs", "mach_ehm", "sibyl", "synt", "gin_pwc", "synt_mpnet", "fusion_pwc"]
+DISPLAY_ORDER = ["vbs", "mach_ehm", "sibyl", "synt", "gin_pwc", "text_mpnet", "synt_mpnet", "fusion_pwc"]
 VARIANT_MAP = {
-    "sbs": "",
     "vbs": "",
     "synt": "Lite",
     "gin_pwc": "Graph",
+    "text_mpnet": "Text",
     "synt_mpnet": "Lite+Text",
     "fusion_pwc": "Graph+Text",
     "sibyl": "",
@@ -86,6 +87,13 @@ def format_solved(val: float | None) -> str:
     return f"{val:.1f}"
 
 
+def format_diff(val: float | None, sbs: float | None) -> str:
+    if val is None or sbs is None:
+        return "---"
+    diff = val - sbs
+    return f"{diff:+.1f}"
+
+
 def main() -> None:
     result_dirs = [d.resolve() for d in RESULT_DIRS]
     for d in result_dirs:
@@ -117,34 +125,35 @@ def main() -> None:
                 break
 
     # Determine which labels have data
-    method_columns = [c for c in DISPLAY_ORDER if c not in ("sbs", "vbs") and any((l, c) in solved for l in logics)]
-    has_sbs_vbs = bool(sbs_vbs)
-    value_columns = (["sbs", "vbs"] if has_sbs_vbs else []) + method_columns
+    method_columns = [c for c in DISPLAY_ORDER if c not in ("vbs",) and any((l, c) in solved for l in logics)]
+    has_vbs = bool(sbs_vbs)
+    value_columns = (["vbs"] if has_vbs else []) + method_columns
 
     has_sibyl = "sibyl" in method_columns
-    n_baseline = 2 if has_sbs_vbs else 0
+    n_ref = 1 if has_vbs else 0
     n_without = 4 if has_sibyl else 3
-    n_with = 2
+    n_with = len(method_columns) - n_without
     columns_to_bold = [c for c in value_columns if c != "vbs"]
 
     ncols = 1 + len(value_columns)
-    col_spec = "l" + "c" * len(value_columns)
+    col_spec = "@{}l" + "c" * len(value_columns) + "@{}"
 
     lines = [
         "\\begin{table}[t]",
         "\\centering",
+        "\\resizebox{\\columnwidth}{!}{%",
         f"\\begin{{tabular}}{{{col_spec}}}",
         "\\toprule",
     ]
 
     # Header rows
-    if n_baseline == 2:
+    if n_ref == 1:
         lines.append(
-            f" & \\multicolumn{{2}}{{c}}{{\\textbf{{Reference}}}} & \\multicolumn{{{n_without}}}{{c}}{{\\textbf{{Without Description}}}} & \\multicolumn{{{n_with}}}{{c}}{{\\textbf{{With Description}}}} \\\\"
+            f" & \\multicolumn{{1}}{{c}}{{\\textbf{{Ref.}}}} & \\multicolumn{{{n_without}}}{{c}}{{\\textbf{{Without Description}}}} & \\multicolumn{{{n_with}}}{{c}}{{\\textbf{{With Description}}}} \\\\"
         )
-        lines.append("\\cmidrule(lr){2-3}")
-        lines.append(f"\\cmidrule(lr){{4-{3 + n_without}}}")
-        lines.append(f"\\cmidrule(lr){{{4 + n_without}-{ncols}}}")
+        lines.append("\\cmidrule(lr){2-2}")
+        lines.append(f"\\cmidrule(lr){{3-{2 + n_without}}}")
+        lines.append(f"\\cmidrule(lr){{{3 + n_without}-{ncols}}}")
     else:
         lines.append(
             f" & \\multicolumn{{{n_without}}}{{c}}{{\\textbf{{Without Description}}}} & \\multicolumn{{{n_with}}}{{c}}{{\\textbf{{With Description}}}} \\\\"
@@ -152,21 +161,21 @@ def main() -> None:
         lines.append(f"\\cmidrule(lr){{2-{1 + n_without}}}")
         lines.append(f"\\cmidrule(lr){{{2 + n_without}-{ncols}}}")
 
-    if n_baseline == 2 and has_sibyl:
+    if n_ref == 1 and has_sibyl:
         lines.append(
-            " & \\multirow{2}{*}{SBS} & \\multirow{2}{*}{VBS} & "
+            " & \\multirow{2}{*}{VBS} & "
             "\\multirow{2}{*}{MachSMT} & \\multirow{2}{*}{Sibyl} & "
-            f"\\multicolumn{{2}}{{c}}{{SMT-Select}} & \\multicolumn{{{n_with}}}{{c}}{{SMT-Select}} \\\\"
-        )
-        lines.append("\\cmidrule(lr){6-7}")
-        lines.append(f"\\cmidrule(lr){{8-{ncols}}}")
-    elif n_baseline == 2:
-        lines.append(
-            " & \\multirow{2}{*}{SBS} & \\multirow{2}{*}{VBS} & \\multirow{2}{*}{MachSMT} & "
             f"\\multicolumn{{2}}{{c}}{{SMT-Select}} & \\multicolumn{{{n_with}}}{{c}}{{SMT-Select}} \\\\"
         )
         lines.append("\\cmidrule(lr){5-6}")
         lines.append(f"\\cmidrule(lr){{7-{ncols}}}")
+    elif n_ref == 1:
+        lines.append(
+            " & \\multirow{2}{*}{VBS} & \\multirow{2}{*}{MachSMT} & "
+            f"\\multicolumn{{2}}{{c}}{{SMT-Select}} & \\multicolumn{{{n_with}}}{{c}}{{SMT-Select}} \\\\"
+        )
+        lines.append("\\cmidrule(lr){4-5}")
+        lines.append(f"\\cmidrule(lr){{6-{ncols}}}")
     elif has_sibyl:
         lines.append(
             " & \\multirow{2}{*}{MachSMT} & \\multirow{2}{*}{Sibyl} & "
@@ -186,32 +195,25 @@ def main() -> None:
     lines.append(" & ".join(row3_cells) + " \\\\")
     lines.append("\\midrule")
 
-    # Data rows
+    # Data rows — values shown as difference from SBS
     for logic in logics:
-        row_vals: dict[str, float] = {}
+        sbs_val = sbs_vbs[logic][0] if logic in sbs_vbs else None
+
+        row_diffs: dict[str, float] = {}
         for key in columns_to_bold:
-            if key in ("sbs", "vbs"):
-                continue
-            if (logic, key) in solved:
-                row_vals[key] = solved[(logic, key)]
-            elif key == "sbs" and logic in sbs_vbs:
-                row_vals[key] = sbs_vbs[logic][0]
-        if logic in sbs_vbs:
-            row_vals["sbs"] = sbs_vbs[logic][0]
-        max_val = max(row_vals.values()) if row_vals else None
-        best_keys = {k for k, v in row_vals.items() if v == max_val} if max_val is not None else set()
+            val = solved.get((logic, key))
+            if val is not None and sbs_val is not None:
+                row_diffs[key] = val - sbs_val
+        max_diff = max(row_diffs.values()) if row_diffs else None
+        best_keys = {k for k, v in row_diffs.items() if v == max_diff} if max_diff is not None else set()
 
         cells = [latex_escape(logic)]
         for key in value_columns:
-            if key == "sbs" and logic in sbs_vbs:
-                val = sbs_vbs[logic][0]
-            elif key == "vbs" and logic in sbs_vbs:
-                val = sbs_vbs[logic][1]
-            elif key in ("sbs", "vbs"):
-                val = None
+            if key == "vbs":
+                cell = format_diff(sbs_vbs[logic][1] if logic in sbs_vbs else None, sbs_val)
             else:
                 val = solved.get((logic, key))
-            cell = format_solved(val)
+                cell = format_diff(val, sbs_val)
             if key != "vbs" and key in best_keys:
                 cell = "\\textbf{" + cell + "}"
             cells.append(cell)
@@ -219,8 +221,8 @@ def main() -> None:
 
     lines.extend([
         "\\bottomrule",
-        "\\end{tabular}",
-        "\\caption{Number of instances solved on the held-out test set. Results are averaged over five random train--test splits.}",
+        "\\end{tabular}}",
+        "\\caption{Difference in instances solved vs.\\ competition winner (SBS) on the held-out test set. Results are averaged over five random train--test splits.}",
         "\\label{tab:final_solved}",
         "\\end{table}",
     ])

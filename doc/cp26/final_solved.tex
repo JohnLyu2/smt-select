@@ -1,27 +1,28 @@
 \begin{table}[t]
 \centering
-\begin{tabular}{lcccccccc}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lcccccccc@{}}
 \toprule
- & \multicolumn{2}{c}{\textbf{Reference}} & \multicolumn{4}{c}{\textbf{Without Description}} & \multicolumn{2}{c}{\textbf{With Description}} \\
-\cmidrule(lr){2-3}
-\cmidrule(lr){4-7}
-\cmidrule(lr){8-9}
- & \multirow{2}{*}{SBS} & \multirow{2}{*}{VBS} & \multirow{2}{*}{MachSMT} & \multirow{2}{*}{Sibyl} & \multicolumn{2}{c}{SMT-Select} & \multicolumn{2}{c}{SMT-Select} \\
-\cmidrule(lr){6-7}
-\cmidrule(lr){8-9}
- &  &  &  &  & Lite & Graph & Lite+Text & Graph+Text \\
+ & \multicolumn{1}{c}{\textbf{Ref.}} & \multicolumn{4}{c}{\textbf{Without Description}} & \multicolumn{3}{c}{\textbf{With Description}} \\
+\cmidrule(lr){2-2}
+\cmidrule(lr){3-6}
+\cmidrule(lr){7-9}
+ & \multirow{2}{*}{VBS} & \multirow{2}{*}{MachSMT} & \multirow{2}{*}{Sibyl} & \multicolumn{2}{c}{SMT-Select} & \multicolumn{3}{c}{SMT-Select} \\
+\cmidrule(lr){5-6}
+\cmidrule(lr){7-9}
+ &  &  &  & Lite & Graph & Text & Lite+Text & Graph+Text \\
 \midrule
-ABV & 211.8 & 246.6 & 214.0 & 218.2 & 236.8 & 238.4 & 235.0 & \textbf{239.4} \\
-ALIA & 76.0 & 96.6 & 80.4 & 83.4 & 86.4 & 87.4 & 87.0 & \textbf{89.8} \\
-BV & 236.6 & 250.2 & 237.4 & 236.0 & 241.8 & 241.6 & 243.0 & \textbf{243.4} \\
-QF\_BV & 2623.2 & 2639.0 & 2623.4 & 2625.4 & 2628.2 & 2630.4 & \textbf{2632.8} & 2632.0 \\
-QF\_IDL & 258.6 & 273.2 & 259.6 & 256.4 & 269.4 & 270.0 & 270.2 & \textbf{271.4} \\
-QF\_LIA & 1131.0 & 1183.4 & 1172.6 & 1169.0 & 1178.2 & \textbf{1179.0} & 1178.2 & 1178.0 \\
-QF\_NRA & 703.2 & 735.8 & 709.8 & 703.0 & 718.8 & 721.0 & 721.2 & \textbf{721.4} \\
-QF\_SLIA & 5813.4 & 5925.8 & 5901.0 & --- & 5916.2 & 5919.4 & \textbf{5920.6} & 5919.4 \\
-UFNIA & 923.0 & 939.4 & 900.2 & --- & 924.8 & 927.4 & 927.4 & \textbf{928.8} \\
+ABV & +34.8 & +2.2 & +6.4 & +25.0 & +26.6 & +22.0 & +23.2 & \textbf{+27.6} \\
+ALIA & +20.6 & +4.4 & +7.4 & +10.4 & +11.4 & +9.0 & +11.0 & \textbf{+13.8} \\
+BV & +13.6 & +0.8 & -0.6 & +5.2 & +5.0 & +3.4 & +6.4 & \textbf{+6.8} \\
+QF\_BV & +15.8 & +0.2 & +2.2 & +5.0 & +7.2 & \textbf{+9.8} & +9.6 & +8.8 \\
+QF\_IDL & +14.6 & +1.0 & -2.2 & +10.8 & +11.4 & +7.4 & +11.6 & \textbf{+12.8} \\
+QF\_LIA & +52.4 & +41.6 & +38.0 & +47.2 & +48.0 & \textbf{+48.2} & +47.2 & +47.0 \\
+QF\_NRA & +32.6 & +6.6 & -0.2 & +15.6 & +17.8 & +16.0 & +18.0 & \textbf{+18.2} \\
+QF\_SLIA & +112.4 & +87.6 & --- & +102.8 & +106.0 & +106.4 & \textbf{+107.2} & +106.0 \\
+UFNIA & +16.4 & -22.8 & --- & +1.8 & +4.4 & -0.6 & +4.4 & \textbf{+5.8} \\
 \bottomrule
-\end{tabular}
-\caption{Number of instances solved on the held-out test set. Results are averaged over five random train--test splits.}
+\end{tabular}}
+\caption{Difference in instances solved vs.\ competition winner (SBS) on the held-out test set. Results are averaged over five random train--test splits.}
 \label{tab:final_solved}
 \end{table}

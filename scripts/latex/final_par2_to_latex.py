@@ -13,20 +13,22 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 RESULT_DIRS = [
     PROJECT_ROOT / "data" / "cp26" / "results" / "lite",
-    PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text",
+    PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text" / "all-mpnet-base-v2",
     PROJECT_ROOT / "data" / "cp26" / "results" / "graph",
     PROJECT_ROOT / "data" / "cp26" / "results" / "machsmt" / "ehm",
     PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text",
     PROJECT_ROOT / "data" / "cp26" / "results" / "sibyl" / "evaluation",
+    PROJECT_ROOT / "data" / "cp26" / "results" / "text" / "all-mpnet-base-v2",
 ]
-LABELS = ["synt", "synt_mpnet", "gin_pwc", "mach_ehm", "fusion_pwc", "sibyl"]
+LABELS = ["synt", "synt_mpnet", "gin_pwc", "mach_ehm", "fusion_pwc", "sibyl", "text_mpnet"]
 
 TEX_PATH = PROJECT_ROOT / "doc" / "cp26" / "final_par2.tex"
 
-DISPLAY_ORDER = ["mach_ehm", "sibyl", "synt", "gin_pwc", "synt_mpnet", "fusion_pwc"]
+DISPLAY_ORDER = ["mach_ehm", "sibyl", "synt", "gin_pwc", "text_mpnet", "synt_mpnet", "fusion_pwc"]
 VARIANT_MAP = {
     "synt": "Lite",
     "gin_pwc": "Graph",
+    "text_mpnet": "Text",
     "synt_mpnet": "Lite+Text",
     "fusion_pwc": "Graph+Text",
     "sibyl": "",
@@ -71,10 +73,7 @@ def get_test_gap_par2(summary_path: Path) -> tuple[float | None, float | None]:
 def format_cell(mean: float | None, std: float | None) -> str:
     if mean is None:
         return "---"
-    mean_str = f"{mean * 100:.1f}"
-    if std is not None:
-        return f"{mean_str} $\\pm$ {std * 100:.1f}"
-    return mean_str
+    return f"{mean * 100:.1f}"
 
 
 def main() -> None:
@@ -103,12 +102,12 @@ def main() -> None:
     n_without = 4 if has_sibyl else 3
     n_with = len(value_columns) - n_without
     ncols = 1 + len(value_columns)
-    col_spec = "l" + "c" * len(value_columns)
+    col_spec = "@{}l" + "c" * len(value_columns) + "@{}"
 
     lines = [
         "\\begin{table}[t]",
         "\\centering",
-        f"\\begin{{tabular}}{{{col_spec}}}",
+        f"\\begin{{tabular*}}{{\\columnwidth}}{{@{{\\extracolsep{{\\fill}}}}{col_spec}}}",
         "\\toprule",
         f" & \\multicolumn{{{n_without}}}{{c}}{{\\textbf{{Without Description}}}} & \\multicolumn{{{n_with}}}{{c}}{{\\textbf{{With Description}}}} \\\\",
         f"\\cmidrule(lr){{2-{1 + n_without}}}",
@@ -152,18 +151,14 @@ def main() -> None:
             mean, std = data.get((logic, label), (None, None))
             cell = format_cell(mean, std)
             if label in best_keys:
-                if " $\\pm$ " in cell:
-                    mean_part, _, std_part = cell.partition(" $\\pm$ ")
-                    cell = "\\textbf{" + mean_part + "} $\\pm$ " + std_part
-                else:
-                    cell = "\\textbf{" + cell + "}"
+                cell = "\\textbf{" + cell + "}"
             cells.append(cell)
         lines.append(" & ".join(cells) + " \\\\")
 
     lines.extend([
         "\\bottomrule",
-        "\\end{tabular}",
-        "\\caption{Experimental results on the held-out test set, measured by the PAR-2 SBS--VBS gap closed (\\%). Results are averaged over five random train--test splits and reported as mean $\\pm$ standard deviation.}",
+        "\\end{tabular*}",
+        "\\caption{Experimental results on the held-out test set, measured by the PAR-2 SBS--VBS gap closed (\\%). Results are averaged over five random train--test splits.}",
         "\\label{tab:final_par2}",
         "\\end{table}",
     ])
