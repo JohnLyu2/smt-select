@@ -220,104 +220,103 @@ def evaluate_multi_splits(
             model_save_dir = Path(tempfile.mkdtemp())
 
         log_handler: logging.FileHandler | None = None
-        if output_dir:
-            train_log_dir = output_dir / "train_log"
-            train_log_dir.mkdir(parents=True, exist_ok=True)
-            log_file = train_log_dir / f"seed{seed_val}.log"
-            log_handler = logging.FileHandler(log_file, mode="w", encoding="utf-8")
-            log_handler.setLevel(logging.DEBUG)
-            log_handler.setFormatter(
-                logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-            )
-            logging.getLogger().addHandler(log_handler)
-
-        logging.info("Training started for seed %d", seed_val)
         try:
-            # Write failed paths to temp file for train_pwc (exclude from training, fallback ranking)
+            if output_dir:
+                train_log_dir = output_dir / "train_log"
+                train_log_dir.mkdir(parents=True, exist_ok=True)
+                log_file = train_log_dir / f"seed{seed_val}.log"
+                log_handler = logging.FileHandler(log_file, mode="w", encoding="utf-8")
+                log_handler.setLevel(logging.DEBUG)
+                log_handler.setFormatter(
+                    logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+                )
+                logging.getLogger().addHandler(log_handler)
+
+            logging.info("Training started for seed %d", seed_val)
             timeout_file: Path | None = None
             if failed_paths_list:
                 timeout_file = Path(
                     tempfile.mkstemp(suffix=".txt", prefix="timeout_paths_")[1]
                 )
                 timeout_file.write_text("\n".join(failed_paths_list), encoding="utf-8")
-            train_pwc(
+            try:
+                train_pwc(
+                    train_data,
+                    save_dir=str(model_save_dir),
+                    xg_flag=xg_flag,
+                    feature_csv_path=feature_csv_path,
+                    svm_c=svm_c,
+                    random_seed=random_seed,
+                    timeout_instance_paths=str(timeout_file) if timeout_file else None,
+                    extraction_time_by_path=extraction_time_by_path,
+                    feature_timeout=None,
+                )
+            finally:
+                if timeout_file and timeout_file.is_file():
+                    timeout_file.unlink(missing_ok=True)
+
+            as_model = PwcSelector.load(str(model_save_dir / "model.joblib"))
+            if as_model.feature_csv_path is None:
+                as_model.feature_csv_path = feature_csv_path
+            as_model.failed_paths_from_csv = failed_paths_from_csv or set()
+            as_model.extraction_time_by_path = extraction_time_by_path
+            as_model.sbs_solver_id = train_data.get_best_solver_id()
+
+            train_output_csv = None
+            test_output_csv = None
+            if output_dir:
+                seed_out_dir = output_dir / f"seed{seed_val}"
+                seed_out_dir.mkdir(parents=True, exist_ok=True)
+                train_output_csv = str(seed_out_dir / "train_eval.csv")
+                test_output_csv = str(seed_out_dir / "test_eval.csv")
+
+            train_result = as_evaluate(
+                as_model,
                 train_data,
-                save_dir=str(model_save_dir),
-                xg_flag=xg_flag,
-                feature_csv_path=feature_csv_path,
-                svm_c=svm_c,
-                random_seed=random_seed,
-                timeout_instance_paths=str(timeout_file) if timeout_file else None,
-                extraction_time_by_path=extraction_time_by_path,
-                feature_timeout=None,
+                write_csv_path=train_output_csv,
+                extra_overhead_by_path=extraction_time_by_path,
             )
-            if timeout_file and timeout_file.is_file():
-                timeout_file.unlink(missing_ok=True)
+            train_metrics = compute_metrics(train_result, train_data)
+
+            test_result = as_evaluate(
+                as_model,
+                test_data,
+                write_csv_path=test_output_csv,
+                extra_overhead_by_path=extraction_time_by_path,
+            )
+            test_metrics = compute_metrics(test_result, test_data)
+
+            seed_results.append({
+                "seed": seed_val,
+                "train_size": len(train_data),
+                "test_size": len(test_data),
+                "train_metrics": train_metrics,
+                "test_metrics": test_metrics,
+            })
+
+            n_train, n_test = len(train_data), len(test_data)
+            train_gap_pct = (
+                (train_metrics["gap_cls_par2"] * 100)
+                if train_metrics.get("gap_cls_par2") is not None
+                else 0.0
+            )
+            test_gap_pct = (
+                (test_metrics["gap_cls_par2"] * 100)
+                if test_metrics.get("gap_cls_par2") is not None
+                else 0.0
+            )
+            logging.info(
+                f"  Train: solved {train_metrics['solved']}/{n_train}, gap closed (PAR-2): {train_gap_pct:.2f}%"
+            )
+            logging.info(
+                f"  Test:  solved {test_metrics['solved']}/{n_test}, gap closed (PAR-2): {test_gap_pct:.2f}%"
+            )
         finally:
             if log_handler is not None:
                 logging.getLogger().removeHandler(log_handler)
                 log_handler.close()
-
-        as_model = PwcSelector.load(str(model_save_dir / "model.joblib"))
-        if as_model.feature_csv_path is None:
-            as_model.feature_csv_path = feature_csv_path
-        # Use CSV label failed=1 for SBS at eval (failed_paths_from_csv), not extraction_time comparison
-        as_model.failed_paths_from_csv = failed_paths_from_csv or set()
-        as_model.extraction_time_by_path = extraction_time_by_path
-        as_model.sbs_solver_id = train_data.get_best_solver_id()
-
-        train_output_csv = None
-        test_output_csv = None
-        if output_dir:
-            seed_out_dir = output_dir / f"seed{seed_val}"
-            seed_out_dir.mkdir(parents=True, exist_ok=True)
-            train_output_csv = str(seed_out_dir / "train_eval.csv")
-            test_output_csv = str(seed_out_dir / "test_eval.csv")
-
-        train_result = as_evaluate(
-            as_model,
-            train_data,
-            write_csv_path=train_output_csv,
-            extra_overhead_by_path=extraction_time_by_path,
-        )
-        train_metrics = compute_metrics(train_result, train_data)
-
-        test_result = as_evaluate(
-            as_model,
-            test_data,
-            write_csv_path=test_output_csv,
-            extra_overhead_by_path=extraction_time_by_path,
-        )
-        test_metrics = compute_metrics(test_result, test_data)
-
-        seed_results.append({
-            "seed": seed_val,
-            "train_size": len(train_data),
-            "test_size": len(test_data),
-            "train_metrics": train_metrics,
-            "test_metrics": test_metrics,
-        })
-
-        n_train, n_test = len(train_data), len(test_data)
-        train_gap_pct = (
-            (train_metrics["gap_cls_par2"] * 100)
-            if train_metrics.get("gap_cls_par2") is not None
-            else 0.0
-        )
-        test_gap_pct = (
-            (test_metrics["gap_cls_par2"] * 100)
-            if test_metrics.get("gap_cls_par2") is not None
-            else 0.0
-        )
-        logging.info(
-            f"  Train: solved {train_metrics['solved']}/{n_train}, gap closed (PAR-2): {train_gap_pct:.2f}%"
-        )
-        logging.info(
-            f"  Test:  solved {test_metrics['solved']}/{n_test}, gap closed (PAR-2): {test_gap_pct:.2f}%"
-        )
-
-        if not save_models:
-            shutil.rmtree(model_save_dir, ignore_errors=True)
+            if not save_models:
+                shutil.rmtree(model_save_dir, ignore_errors=True)
 
     test_metrics_list = [r["test_metrics"] for r in seed_results]
     train_metrics_list = [r["train_metrics"] for r in seed_results]
@@ -399,7 +398,7 @@ def main():
         nargs="+",
         required=True,
         metavar="DIR",
-        help="Two or more base dirs (e.g. synt + desc); each must contain <logic>/features.csv and extraction_times.csv.",
+        help="One or more base dirs (e.g. synt + desc); each must contain <logic>/features.csv and extraction_times.csv.",
     )
     parser.add_argument(
         "--timeout",
@@ -503,11 +502,9 @@ def main():
             feature_csv = division_dir / "features.csv"
             extraction_times_csv = division_dir / "extraction_times.csv"
             if not feature_csv.is_file():
-                logging.warning("Skipping %s: missing %s", division, feature_csv)
-                break
+                raise FileNotFoundError(f"Missing feature CSV for {division}: {feature_csv}")
             if not extraction_times_csv.is_file():
-                logging.warning("Skipping %s: missing %s", division, extraction_times_csv)
-                break
+                raise FileNotFoundError(f"Missing extraction_times CSV for {division}: {extraction_times_csv}")
             feature_csv_paths.append(str(feature_csv))
             times = load_extraction_times_csv(extraction_times_csv)
             for p, t in times.items():
@@ -517,25 +514,22 @@ def main():
             failed_paths_set.update(
                 load_failed_paths_from_extraction_times_csv(extraction_times_csv)
             )
-        else:
-            feature_csv_path = feature_csv_paths[0] if len(feature_csv_paths) == 1 else feature_csv_paths
-            output_dir = (base_output_dir / division).resolve() if base_output_dir else None
-            if output_dir:
-                output_dir.mkdir(parents=True, exist_ok=True)
-            evaluate_multi_splits(
-                splits_dir,
-                feature_csv_path,
-                extraction_time_by_path,
-                failed_paths_from_csv=failed_paths_set,
-                xg_flag=args.xg,
-                save_models=args.save_models,
-                output_dir=output_dir,
-                timeout=args.timeout,
-                svm_c=args.svm_c,
-                random_seed=args.random_seed,
-            )
-            continue
-        # warning was logged; skip this division
+        feature_csv_path = feature_csv_paths[0] if len(feature_csv_paths) == 1 else feature_csv_paths
+        output_dir = (base_output_dir / division).resolve() if base_output_dir else None
+        if output_dir:
+            output_dir.mkdir(parents=True, exist_ok=True)
+        evaluate_multi_splits(
+            splits_dir,
+            feature_csv_path,
+            extraction_time_by_path,
+            failed_paths_from_csv=failed_paths_set,
+            xg_flag=args.xg,
+            save_models=args.save_models,
+            output_dir=output_dir,
+            timeout=args.timeout,
+            svm_c=args.svm_c,
+            random_seed=args.random_seed,
+        )
 
 
 if __name__ == "__main__":
