@@ -1,24 +1,24 @@
 \begin{table}[t]
 \centering
-\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}@{}lccccccc@{}}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}@{}lcccccc@{}}
 \toprule
- & \multicolumn{4}{c}{\textbf{Without Description}} & \multicolumn{3}{c}{\textbf{With Description}} \\
+ & \multicolumn{4}{c}{\textbf{Without Description}} & \multicolumn{2}{c}{\textbf{With Description}} \\
 \cmidrule(lr){2-5}
-\cmidrule(lr){6-8}
- & \multirow{2}{*}{MachSMT} & \multirow{2}{*}{Sibyl} & \multicolumn{2}{c}{SMT-Select} & \multicolumn{3}{c}{SMT-Select} \\
+\cmidrule(lr){6-7}
+ & \multirow{2}{*}{MachSMT} & \multirow{2}{*}{Sibyl} & \multicolumn{2}{c}{SMT-Select} & \multicolumn{2}{c}{SMT-Select} \\
 \cmidrule(lr){4-5}
-\cmidrule(lr){6-8}
- &  &  & Lite & Graph & Text & Lite+Text & Graph+Text \\
+\cmidrule(lr){6-7}
+ &  &  & Lite & Graph & Text & Lite+Text \\
 \midrule
-ABV & 7.8 & 18.0 & 71.4 & 76.6 & 62.8 & 67.2 & \textbf{79.4} \\
-ALIA & 27.7 & 33.3 & 55.3 & 55.1 & 42.9 & 56.4 & \textbf{67.7} \\
-BV & 17.1 & 12.0 & 38.2 & 42.4 & 32.3 & 49.2 & \textbf{53.9} \\
-QF\_BV & 7.3 & -29.5 & 33.4 & 46.1 & 55.9 & \textbf{56.8} & 54.2 \\
-QF\_IDL & 6.1 & -30.5 & 64.5 & 69.7 & 44.9 & 71.7 & \textbf{81.8} \\
-QF\_LIA & 84.7 & 76.7 & 89.0 & \textbf{92.6} & 91.9 & 91.2 & 91.6 \\
-QF\_NRA & 17.3 & -3.5 & 44.6 & 50.6 & 44.9 & 50.7 & \textbf{55.2} \\
-QF\_SLIA & 77.0 & --- & 90.7 & 92.8 & 87.3 & \textbf{93.5} & \textbf{93.5} \\
-UFNIA & -129.2 & --- & 14.8 & 24.5 & -4.0 & 23.9 & \textbf{31.8} \\
+ABV & 7.8 & 18.0 & 71.4 & \textbf{76.6} & 62.8 & 67.2 \\
+ALIA & 27.7 & 33.3 & 55.3 & 55.1 & 42.9 & \textbf{56.4} \\
+BV & 17.1 & 12.0 & 38.2 & 42.4 & 32.3 & \textbf{49.2} \\
+QF\_BV & 7.3 & -29.5 & 33.4 & 46.1 & 55.9 & \textbf{56.8} \\
+QF\_IDL & 6.1 & -30.5 & 64.5 & 69.7 & 44.9 & \textbf{71.7} \\
+QF\_LIA & 84.7 & 76.7 & 89.0 & \textbf{92.6} & 91.9 & 91.2 \\
+QF\_NRA & 17.3 & -3.5 & 44.6 & \textbf{50.6} & 44.9 & \textbf{50.7} \\
+QF\_SLIA & 77.0 & --- & 90.7 & 92.8 & 87.3 & \textbf{93.5} \\
+UFNIA & -129.2 & --- & 14.8 & \textbf{24.5} & -4.0 & 23.9 \\
 \bottomrule
 \end{tabular*}
 \caption{Experimental results on the held-out test set, measured by the PAR-2 SBS--VBS gap closed (\%). Results are averaged over five random train--test splits.}

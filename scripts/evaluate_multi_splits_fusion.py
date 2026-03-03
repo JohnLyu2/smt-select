@@ -585,15 +585,22 @@ def main() -> None:
     parser.add_argument("--val-split-seed", type=int, default=42)
     parser.add_argument("--min-epochs", type=int, default=100)
     parser.add_argument("--seeds", type=int, nargs="*", default=None, metavar="N")
+    parser.add_argument("--qwen", action="store_true", help="Use Qwen3-Embedding-0.6B text embeddings and corresponding lite+text results.")
     parser.add_argument("--log-level", type=str, default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
     args = parser.parse_args()
 
     if args.logic:
         args.splits_dir = str(DEFAULT_SPLITS_BASE / args.logic)
-        args.output_dir = str(Path("data/cp26/results/fusion_pwc") / args.logic)
-        args.save_models = True
-        if args.models_base is None:
-            args.models_base = Path("models")
+        if args.qwen:
+            model_name = "Qwen3-Embedding-0.6B"
+            args.desc_features_dir = str(Path("data/features/desc") / model_name)
+            args.lite_text_dir = str(Path("data/cp26/results/lite+text") / model_name)
+            args.output_dir = str(Path("data/cp26/results/fusion_pwc") / model_name / args.logic)
+        else:
+            args.output_dir = str(Path("data/cp26/results/fusion_pwc") / args.logic)
+            args.save_models = True
+            if args.models_base is None:
+                args.models_base = Path("models")
     if args.eval_only and args.models_base is None:
         parser.error("--models-base is required when --eval-only (or use --logic)")
     if args.eval_only and args.models_base:

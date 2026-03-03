@@ -15,16 +15,18 @@ TEXT_RESULTS_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "text"
 LITE_TEXT_RESULTS_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text"
 TEX_PATH = PROJECT_ROOT / "doc" / "cp26" / "desc.tex"
 
-MODEL_ORDER = ["all-mpnet-base-v2", "embeddinggemma-300m", "Qwen3-Embedding-0.6B"]
+MODEL_ORDER = ["all-mpnet-base-v2", "Qwen3-Embedding-0.6B"]
 MODEL_DISPLAY = {
     "all-mpnet-base-v2": "mpnet",
-    "embeddinggemma-300m": "gemma",
     "Qwen3-Embedding-0.6B": "Qwen3",
 }
+
+GRAPH_TEXT_RESULTS_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text"
 
 GROUPS = [
     ("SMT-Select-Text", TEXT_RESULTS_ROOT),
     ("SMT-Select-Lite+Text", LITE_TEXT_RESULTS_ROOT),
+    ("SMT-Select-Graph+Text", GRAPH_TEXT_RESULTS_ROOT),
 ]
 
 

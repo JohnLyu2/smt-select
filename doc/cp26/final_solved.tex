@@ -1,26 +1,26 @@
 \begin{table}[t]
 \centering
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{@{}lcccccccc@{}}
+\begin{tabular}{@{}lccccccc@{}}
 \toprule
- & \multicolumn{1}{c}{\textbf{Ref.}} & \multicolumn{4}{c}{\textbf{Without Description}} & \multicolumn{3}{c}{\textbf{With Description}} \\
+ & \multicolumn{1}{c}{\textbf{Ref.}} & \multicolumn{4}{c}{\textbf{Without Description}} & \multicolumn{2}{c}{\textbf{With Description}} \\
 \cmidrule(lr){2-2}
 \cmidrule(lr){3-6}
-\cmidrule(lr){7-9}
- & \multirow{2}{*}{VBS} & \multirow{2}{*}{MachSMT} & \multirow{2}{*}{Sibyl} & \multicolumn{2}{c}{SMT-Select} & \multicolumn{3}{c}{SMT-Select} \\
+\cmidrule(lr){7-8}
+ & \multirow{2}{*}{VBS} & \multirow{2}{*}{MachSMT} & \multirow{2}{*}{Sibyl} & \multicolumn{2}{c}{SMT-Select} & \multicolumn{2}{c}{SMT-Select} \\
 \cmidrule(lr){5-6}
-\cmidrule(lr){7-9}
- &  &  &  & Lite & Graph & Text & Lite+Text & Graph+Text \\
+\cmidrule(lr){7-8}
+ &  &  &  & Lite & Graph & Text & Lite+Text \\
 \midrule
-ABV & +34.8 & +2.2 & +6.4 & +25.0 & +26.6 & +22.0 & +23.2 & \textbf{+27.6} \\
-ALIA & +20.6 & +4.4 & +7.4 & +10.4 & +11.4 & +9.0 & +11.0 & \textbf{+13.8} \\
-BV & +13.6 & +0.8 & -0.6 & +5.2 & +5.0 & +3.4 & +6.4 & \textbf{+6.8} \\
-QF\_BV & +15.8 & +0.2 & +2.2 & +5.0 & +7.2 & \textbf{+9.8} & +9.6 & +8.8 \\
-QF\_IDL & +14.6 & +1.0 & -2.2 & +10.8 & +11.4 & +7.4 & +11.6 & \textbf{+12.8} \\
-QF\_LIA & +52.4 & +41.6 & +38.0 & +47.2 & +48.0 & \textbf{+48.2} & +47.2 & +47.0 \\
-QF\_NRA & +32.6 & +6.6 & -0.2 & +15.6 & +17.8 & +16.0 & +18.0 & \textbf{+18.2} \\
-QF\_SLIA & +112.4 & +87.6 & --- & +102.8 & +106.0 & +106.4 & \textbf{+107.2} & +106.0 \\
-UFNIA & +16.4 & -22.8 & --- & +1.8 & +4.4 & -0.6 & +4.4 & \textbf{+5.8} \\
+ABV & +34.8 & +2.2 & +6.4 & +25.0 & \textbf{+26.6} & +22.0 & +23.2 \\
+ALIA & +20.6 & +4.4 & +7.4 & +10.4 & \textbf{+11.4} & +9.0 & +11.0 \\
+BV & +13.6 & +0.8 & -0.6 & +5.2 & +5.0 & +3.4 & \textbf{+6.4} \\
+QF\_BV & +15.8 & +0.2 & +2.2 & +5.0 & +7.2 & \textbf{+9.8} & +9.6 \\
+QF\_IDL & +14.6 & +1.0 & -2.2 & +10.8 & +11.4 & +7.4 & \textbf{+11.6} \\
+QF\_LIA & +52.4 & +41.6 & +38.0 & +47.2 & +48.0 & \textbf{+48.2} & +47.2 \\
+QF\_NRA & +32.6 & +6.6 & -0.2 & +15.6 & +17.8 & +16.0 & \textbf{+18.0} \\
+QF\_SLIA & +112.4 & +87.6 & --- & +102.8 & +106.0 & +106.4 & \textbf{+107.2} \\
+UFNIA & +16.4 & -22.8 & --- & +1.8 & \textbf{+4.4} & -0.6 & \textbf{+4.4} \\
 \bottomrule
 \end{tabular}}
 \caption{Difference in instances solved vs.\ competition winner (SBS) on the held-out test set. Results are averaged over five random train--test splits.}
