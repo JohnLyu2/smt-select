@@ -42,6 +42,7 @@ from src.performance import (
 DEFAULT_GIN_FEATURES_BASE = Path("data/features/gin_pwc")
 DEFAULT_DESC_FEATURES_DIR = Path("data/features/desc/all-mpnet-base-v2")
 DEFAULT_LITETEXT_DIR = Path("data/cp26/results/lite+text")
+DEFAULT_SPLITS_BASE = Path("data/cp26/performance_splits/smtcomp24")
 
 CSV_HEADER = ["benchmark", "selected", "solved", "runtime", "solver_runtime", "overhead", "feature_fail"]
 
@@ -312,6 +313,10 @@ def evaluate_multi_splits_fusion(
 
         gin_by_rel = load_embedding_csv(gin_csv)
         text_by_rel = load_embedding_csv(desc_csv)
+        if text_by_rel:
+            d_text = next(iter(text_by_rel.values())).shape[0]
+        else:
+            raise ValueError(f"No text embeddings loaded from {desc_csv}")
         paths_full = list(train_data.keys()) + list(test_data.keys())
         emb_by_path = build_emb_by_path(
             gin_by_rel,
@@ -388,7 +393,7 @@ def evaluate_multi_splits_fusion(
                     train_data_for_training,
                     str(model_save_dir),
                     d_gin=64,
-                    d_text=768,
+                    d_text=d_text,
                     d_text_small=d_text_small,
                     hidden_fused=hidden_fused,
                     num_epochs=num_epochs,
@@ -535,7 +540,7 @@ def main() -> None:
         "--splits-dir",
         type=str,
         default=None,
-        help="Directory with seed subdirs (train.json, test.json). Required unless --logic.",
+        help="Directory with seed subdirs (train.json, test.json). If omitted with --logic, auto-set. If both omitted, all logics are discovered.",
     )
     parser.add_argument("--benchmark-root", type=str, default=DEFAULT_BENCHMARK_ROOT)
     parser.add_argument(
@@ -584,7 +589,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.logic:
-        args.splits_dir = str(Path("data/cp26/performance_splits/smtcomp24") / args.logic)
+        args.splits_dir = str(DEFAULT_SPLITS_BASE / args.logic)
         args.output_dir = str(Path("data/cp26/results/fusion_pwc") / args.logic)
         args.save_models = True
         if args.models_base is None:
@@ -595,42 +600,98 @@ def main() -> None:
         args.models_base = Path(args.models_base)
         if not args.models_base.is_dir():
             parser.error(f"--models-base must be an existing directory: {args.models_base}")
-    if not args.splits_dir:
-        parser.error("Either --splits-dir or --logic is required")
 
     logging.basicConfig(
         level=getattr(logging, args.log_level),
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
-    output_dir = Path(args.output_dir) if args.output_dir else None
-    if output_dir:
-        output_dir.mkdir(parents=True, exist_ok=True)
 
-    evaluate_multi_splits_fusion(
-        Path(args.splits_dir),
-        gin_features_base=args.gin_features_base,
-        desc_features_dir=args.desc_features_dir,
-        lite_text_dir=args.lite_text_dir,
-        benchmark_root=args.benchmark_root,
-        save_models=args.save_models,
-        output_dir=output_dir,
-        models_base=Path(args.models_base) if args.models_base else None,
-        eval_only=args.eval_only,
-        timeout=args.timeout,
-        d_text_small=args.d_text_small,
-        hidden_fused=args.hidden_fused,
-        num_epochs=args.epochs,
-        batch_size=args.batch,
-        lr=args.lr,
-        dropout=0.1,
-        val_ratio=args.val_ratio,
-        patience=args.patience,
-        val_split_seed=args.val_split_seed,
-        min_epochs=args.min_epochs,
-        skip_easy_unsolvable=args.skip_easy_unsolvable,
-        skip_trivial_under=args.skip_trivial_under,
-        seeds=args.seeds,
+    if args.splits_dir:
+        output_dir = Path(args.output_dir) if args.output_dir else None
+        if output_dir:
+            output_dir.mkdir(parents=True, exist_ok=True)
+        evaluate_multi_splits_fusion(
+            Path(args.splits_dir),
+            gin_features_base=args.gin_features_base,
+            desc_features_dir=args.desc_features_dir,
+            lite_text_dir=args.lite_text_dir,
+            benchmark_root=args.benchmark_root,
+            save_models=args.save_models,
+            output_dir=output_dir,
+            models_base=Path(args.models_base) if args.models_base else None,
+            eval_only=args.eval_only,
+            timeout=args.timeout,
+            d_text_small=args.d_text_small,
+            hidden_fused=args.hidden_fused,
+            num_epochs=args.epochs,
+            batch_size=args.batch,
+            lr=args.lr,
+            dropout=0.1,
+            val_ratio=args.val_ratio,
+            patience=args.patience,
+            val_split_seed=args.val_split_seed,
+            min_epochs=args.min_epochs,
+            skip_easy_unsolvable=args.skip_easy_unsolvable,
+            skip_trivial_under=args.skip_trivial_under,
+            seeds=args.seeds,
+        )
+        return
+
+    if not args.output_dir:
+        parser.error("--output-dir is required when running all logics (no --logic or --splits-dir)")
+
+    gin_base = Path(args.gin_features_base or DEFAULT_GIN_FEATURES_BASE)
+    desc_dir = Path(args.desc_features_dir or DEFAULT_DESC_FEATURES_DIR)
+    lt_dir = Path(args.lite_text_dir or DEFAULT_LITETEXT_DIR)
+    splits_base = DEFAULT_SPLITS_BASE
+    base_output_dir = Path(args.output_dir)
+
+    candidates = sorted(
+        sub.name for sub in desc_dir.iterdir()
+        if sub.is_dir() and (sub / "features.csv").is_file()
     )
+    logics = [
+        name for name in candidates
+        if (splits_base / name).is_dir()
+        and (lt_dir / name).is_dir()
+        and (gin_base / name).is_dir()
+    ]
+    if not logics:
+        parser.error(
+            f"No logics found with desc features in {desc_dir}, "
+            f"splits in {splits_base}, lite+text in {lt_dir}, and GIN in {gin_base}"
+        )
+    logging.info("Running all %d logics: %s", len(logics), logics)
+
+    for logic in logics:
+        logging.info("\n%s Running %s %s", "=" * 20, logic, "=" * 20)
+        output_dir = (base_output_dir / logic).resolve()
+        output_dir.mkdir(parents=True, exist_ok=True)
+        evaluate_multi_splits_fusion(
+            splits_base / logic,
+            gin_features_base=args.gin_features_base,
+            desc_features_dir=args.desc_features_dir,
+            lite_text_dir=args.lite_text_dir,
+            benchmark_root=args.benchmark_root,
+            save_models=args.save_models,
+            output_dir=output_dir,
+            models_base=Path(args.models_base) if args.models_base else None,
+            eval_only=args.eval_only,
+            timeout=args.timeout,
+            d_text_small=args.d_text_small,
+            hidden_fused=args.hidden_fused,
+            num_epochs=args.epochs,
+            batch_size=args.batch,
+            lr=args.lr,
+            dropout=0.1,
+            val_ratio=args.val_ratio,
+            patience=args.patience,
+            val_split_seed=args.val_split_seed,
+            min_epochs=args.min_epochs,
+            skip_easy_unsolvable=args.skip_easy_unsolvable,
+            skip_trivial_under=args.skip_trivial_under,
+            seeds=args.seeds,
+        )
 
 
 if __name__ == "__main__":
