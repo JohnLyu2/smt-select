@@ -195,6 +195,9 @@ def train_setfit_model(
     num_epochs: int = 1,
     batch_size: int = 16,
     multi_label: bool = False,
+    use_amp: bool = False,
+    sampling_strategy: str = "oversampling",
+    num_iterations: int | None = None,
 ) -> SetFitModel:
     if "texts" not in train_data or "labels" not in train_data:
         raise ValueError("Expected train_data to include 'texts' and 'labels' keys.")
@@ -220,7 +223,10 @@ def train_setfit_model(
     device = "cuda" if torch.cuda.is_available() else "cpu"
     logging.info("Using device: %s", device)
     logging.info("Base model: %s", model_name)
-    logging.info("Training specs: epochs=%s, batch_size=%s, multi_label=%s", num_epochs, batch_size, multi_label)
+    logging.info(
+        "Training specs: epochs=%s, batch_size=%s, multi_label=%s, use_amp=%s, sampling=%s, num_iterations=%s",
+        num_epochs, batch_size, multi_label, use_amp, sampling_strategy, num_iterations,
+    )
     
     multi_target_strategy = "one-vs-rest" if multi_label else None
     
@@ -240,17 +246,18 @@ def train_setfit_model(
         except Exception:
             pass
 
+    ta_kwargs: dict = {
+        "batch_size": batch_size,
+        "num_epochs": num_epochs,
+        "use_amp": use_amp,
+        "sampling_strategy": sampling_strategy,
+    }
+    if num_iterations is not None:
+        ta_kwargs["num_iterations"] = num_iterations
     try:
-        training_args = TrainingArguments(
-            batch_size=batch_size,
-            num_epochs=num_epochs,
-            device=device,
-        )
+        training_args = TrainingArguments(**ta_kwargs, device=device)
     except TypeError:
-        training_args = TrainingArguments(
-            batch_size=batch_size,
-            num_epochs=num_epochs,
-        )
+        training_args = TrainingArguments(**ta_kwargs)
     trainer = Trainer(
         model=model,
         args=training_args,

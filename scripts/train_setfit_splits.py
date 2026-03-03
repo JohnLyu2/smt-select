@@ -84,6 +84,19 @@ def main() -> int:
     parser.add_argument("--num-epochs", type=int, default=1, help="Training epochs (default: 1).")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size (default: 16).")
     parser.add_argument("--timeout", type=float, default=1200.0, help="Timeout in seconds (default: 1200).")
+    parser.add_argument("--no-amp", action="store_true", help="Disable Automatic Mixed Precision (enabled by default).")
+    parser.add_argument(
+        "--sampling-strategy",
+        default="undersampling",
+        choices=["oversampling", "undersampling", "unique"],
+        help="Contrastive pair sampling strategy (default: undersampling).",
+    )
+    parser.add_argument(
+        "--num-iterations",
+        type=int,
+        default=20,
+        help="Number of pair-generation iterations; set -1 to use --sampling-strategy instead (default: 20).",
+    )
     args = parser.parse_args()
 
     if args.logic is not None:
@@ -165,6 +178,9 @@ def _train_logic(
             num_epochs=args.num_epochs,
             batch_size=args.batch_size,
             multi_label=False,
+            use_amp=not args.no_amp,
+            sampling_strategy=args.sampling_strategy,
+            num_iterations=args.num_iterations if args.num_iterations >= 0 else None,
         )
 
         solver2id = {name: idx for idx, name in solver_id_dict.items()}
@@ -180,6 +196,9 @@ def _train_logic(
             "num_epochs": args.num_epochs,
             "batch_size": args.batch_size,
             "timeout": args.timeout,
+            "use_amp": not args.no_amp,
+            "sampling_strategy": args.sampling_strategy,
+            "num_iterations": args.num_iterations if args.num_iterations >= 0 else None,
         }
         with open(model_dir / "train_config.json", "w", encoding="utf-8") as f:
             json.dump(train_config, f, indent=2)
