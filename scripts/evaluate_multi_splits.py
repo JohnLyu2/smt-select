@@ -86,6 +86,9 @@ def evaluate_multi_splits(
     extraction_time_by_path: dict[str, float],
     *,
     failed_paths_from_csv: set[str] | None = None,
+    feature_csv_path_and_times_per_seed: dict[
+        int, tuple[str | list[str], dict[str, float]]
+    ] | None = None,
     xg_flag: bool = False,
     save_models: bool = False,
     output_dir: Path | None = None,
@@ -102,9 +105,10 @@ def evaluate_multi_splits(
 
     Args:
         splits_dir: Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/ABV)
-        feature_csv_path: Path or list of paths to feature CSV(s)
-        extraction_time_by_path: Map normalized instance path -> extraction time (sec) for overhead
+        feature_csv_path: Path or list of paths to feature CSV(s); ignored if feature_csv_path_and_times_per_seed is set
+        extraction_time_by_path: Map normalized instance path -> extraction time (sec); ignored if feature_csv_path_and_times_per_seed is set
         failed_paths_from_csv: Set of normalized paths with failed=1 in extraction_times CSV; used for SBS at eval
+        feature_csv_path_and_times_per_seed: If set, use (feature_csv_path, extraction_time_by_path) per seed for per-seed feature dirs
         xg_flag: Use XGBoost if True else SVM
         save_models: Save model per split (requires output_dir)
         output_dir: Where to write summary.json and optional per-split outputs
@@ -126,9 +130,18 @@ def evaluate_multi_splits(
             f"No seed dirs (seedN with train.json and test.json) found in {splits_dir}"
         )
 
-    # Validate feature coverage using first seed's train+test. Instances in
-    # failed_paths_from_csv (failed=1 in extraction_times) are excluded from
-    # training and get SBS at eval, so we do not require them in any feature CSV.
+    use_per_seed = feature_csv_path_and_times_per_seed is not None
+    if use_per_seed:
+        missing_seeds = [
+            s for s, _ in seed_entries
+            if s not in feature_csv_path_and_times_per_seed
+        ]
+        if missing_seeds:
+            raise ValueError(
+                f"feature_csv_path_and_times_per_seed missing seed(s): {missing_seeds}"
+            )
+
+    # Instance set from first split (same division => same instances across seeds)
     first_seed_dir = seed_entries[0][1]
     train_data_0 = parse_performance_json(
         str(first_seed_dir / "train.json"), timeout
@@ -138,49 +151,48 @@ def evaluate_multi_splits(
     failed_set = failed_paths_from_csv or set()
     instances_requiring_features = all_instance_paths - failed_set
 
-    if isinstance(feature_csv_path, list):
-        logging.info(
-            f"Validating feature coverage for {len(instances_requiring_features)} instances "
-            f"(every path must appear in all {len(feature_csv_path)} feature CSV(s)); "
-            f"{len(failed_set)} failed paths excluded from check",
+    def _validate_feature_and_times(
+        fp: str | list[str],
+        et: dict[str, float],
+        seed_label: str = "",
+    ) -> None:
+        prefix = f"[seed {seed_label}] " if seed_label else ""
+        if isinstance(fp, list):
+            logging.info(
+                f"{prefix}Validating feature coverage for {len(instances_requiring_features)} instances "
+                f"(every path in all {len(fp)} CSV(s)); {len(failed_set)} failed excluded",
+            )
+        else:
+            logging.info(
+                f"{prefix}Validating feature coverage for {len(instances_requiring_features)} instances "
+                f"({len(failed_set)} failed excluded)",
+            )
+        missing_instances, instance_missing_in_csvs = validate_feature_coverage(
+            instances_requiring_features, fp
         )
-    else:
-        logging.info(
-            f"Validating feature coverage for {len(instances_requiring_features)} instances "
-            f"({len(failed_set)} failed paths excluded from check)",
-        )
-    missing_instances, instance_missing_in_csvs = validate_feature_coverage(
-        instances_requiring_features, feature_csv_path
-    )
-    if missing_instances:
-        error_msg = (
-            f"ERROR: {len(missing_instances)} instance(s) missing in ALL feature CSV(s).\n"
-            f"  Missing (first 10): {list(missing_instances)[:10]}"
-        )
-        logging.error(error_msg)
-        raise ValueError(error_msg)
-    if isinstance(feature_csv_path, list) and instance_missing_in_csvs:
-        sample = list(instance_missing_in_csvs.items())[:3]
-        details = "; ".join(f"{p!r} missing in {len(csvs)} CSV(s)" for p, csvs in sample)
-        error_msg = (
-            f"ERROR: {len(instance_missing_in_csvs)} instance(s) missing in at least one feature CSV. "
-            f"Every path (except failed=1 in extraction_times) must have features in all {len(feature_csv_path)} source(s). Example: {details}"
-        )
-        logging.error(error_msg)
-        raise ValueError(error_msg)
+        if missing_instances:
+            raise ValueError(
+                f"{prefix}ERROR: {len(missing_instances)} instance(s) missing in ALL feature CSV(s). "
+                f"Missing (first 10): {list(missing_instances)[:10]}"
+            )
+        if isinstance(fp, list) and instance_missing_in_csvs:
+            sample = list(instance_missing_in_csvs.items())[:3]
+            details = "; ".join(f"{p!r} missing in {len(csvs)} CSV(s)" for p, csvs in sample)
+            raise ValueError(
+                f"{prefix}ERROR: {len(instance_missing_in_csvs)} instance(s) missing in at least one feature CSV. Example: {details}"
+            )
+        missing_from_et = {
+            p for p in instances_requiring_features
+            if normalize_path(p) not in et
+        }
+        if missing_from_et:
+            raise ValueError(
+                f"{prefix}ERROR: {len(missing_from_et)} instance(s) missing from extraction_times. "
+                f"Missing (first 10): {list(missing_from_et)[:10]}"
+            )
 
-    missing_from_extraction_times = {
-        p for p in instances_requiring_features
-        if normalize_path(p) not in extraction_time_by_path
-    }
-    if missing_from_extraction_times:
-        error_msg = (
-            f"ERROR: {len(missing_from_extraction_times)} instance(s) missing from all extraction_times.csv. "
-            f"Every path that has features must appear in extraction_times.csv from every feature dir. "
-            f"Missing (first 10): {list(missing_from_extraction_times)[:10]}"
-        )
-        logging.error(error_msg)
-        raise ValueError(error_msg)
+    if not use_per_seed:
+        _validate_feature_and_times(feature_csv_path, extraction_time_by_path)
 
     n_seeds = len(seed_entries)
     logging.info(
@@ -201,6 +213,18 @@ def evaluate_multi_splits(
         logging.info(f"\n{'=' * 60}")
         logging.info(f"Seed {seed_val} ({seed_dir.name})")
         logging.info(f"{'=' * 60}")
+
+        if use_per_seed:
+            feature_csv_path_this = feature_csv_path_and_times_per_seed[seed_val][0]
+            extraction_time_by_path_this = feature_csv_path_and_times_per_seed[seed_val][1]
+            _validate_feature_and_times(
+                feature_csv_path_this,
+                extraction_time_by_path_this,
+                str(seed_val),
+            )
+        else:
+            feature_csv_path_this = feature_csv_path
+            extraction_time_by_path_this = extraction_time_by_path
 
         train_path = seed_dir / "train.json"
         test_path = seed_dir / "test.json"
@@ -244,11 +268,11 @@ def evaluate_multi_splits(
                     train_data,
                     save_dir=str(model_save_dir),
                     xg_flag=xg_flag,
-                    feature_csv_path=feature_csv_path,
+                    feature_csv_path=feature_csv_path_this,
                     svm_c=svm_c,
                     random_seed=random_seed,
                     timeout_instance_paths=str(timeout_file) if timeout_file else None,
-                    extraction_time_by_path=extraction_time_by_path,
+                    extraction_time_by_path=extraction_time_by_path_this,
                     feature_timeout=None,
                 )
             finally:
@@ -256,10 +280,10 @@ def evaluate_multi_splits(
                     timeout_file.unlink(missing_ok=True)
 
             as_model = PwcSelector.load(str(model_save_dir / "model.joblib"))
-            if as_model.feature_csv_path is None:
-                as_model.feature_csv_path = feature_csv_path
+            # Ensure evaluation uses this seed's features (and times) for train/test
+            as_model.feature_csv_path = feature_csv_path_this
+            as_model.extraction_time_by_path = extraction_time_by_path_this
             as_model.failed_paths_from_csv = failed_paths_from_csv or set()
-            as_model.extraction_time_by_path = extraction_time_by_path
             as_model.sbs_solver_id = train_data.get_best_solver_id()
 
             train_output_csv = None
@@ -274,7 +298,7 @@ def evaluate_multi_splits(
                 as_model,
                 train_data,
                 write_csv_path=train_output_csv,
-                extra_overhead_by_path=extraction_time_by_path,
+                extra_overhead_by_path=extraction_time_by_path_this,
             )
             train_metrics = compute_metrics(train_result, train_data)
 
@@ -282,7 +306,7 @@ def evaluate_multi_splits(
                 as_model,
                 test_data,
                 write_csv_path=test_output_csv,
-                extra_overhead_by_path=extraction_time_by_path,
+                extra_overhead_by_path=extraction_time_by_path_this,
             )
             test_metrics = compute_metrics(test_result, test_data)
 
@@ -347,6 +371,7 @@ def evaluate_multi_splits(
         "model_type": "XGBoost" if xg_flag else "SVM",
         "splits_dir": str(splits_dir),
         "feature_csv_path": feature_csv_path,
+        "feature_csv_path_per_seed": use_per_seed,
         "seeds": seed_results,
         "aggregated": aggregated,
     }
@@ -398,7 +423,7 @@ def main():
         nargs="+",
         required=True,
         metavar="DIR",
-        help="One or more base dirs (e.g. synt + desc); each must contain <logic>/features.csv and extraction_times.csv.",
+        help="One or more base dirs. Each must have either <logic>/features.csv (flat) or <logic>/seed<N>/features.csv for each split seed (per-seed).",
     )
     parser.add_argument(
         "--timeout",
@@ -457,23 +482,33 @@ def main():
     splits_base = (project_root / SPLITS_BASE).resolve()
 
     def discover_logics_from_feature_dir() -> list[str]:
-        """Logics that have features in every feature dir and have splits in SPLITS_BASE."""
+        """Logics that have features in every feature dir (flat or per-seed) and have splits in SPLITS_BASE."""
         first_base = features_dirs[0]
         candidates = [
             sub.name for sub in first_base.iterdir()
             if sub.is_dir()
-            and (sub / "features.csv").is_file()
-            and (sub / "extraction_times.csv").is_file()
         ]
-        logics = [
-            name for name in sorted(candidates)
-            if (splits_base / name).is_dir()
-            and all(
-                (base / name / "features.csv").is_file()
-                and (base / name / "extraction_times.csv").is_file()
-                for base in features_dirs
-            )
-        ]
+        logics = []
+        for name in sorted(candidates):
+            splits_dir = splits_base / name
+            if not splits_dir.is_dir():
+                continue
+            seed_entries = discover_seed_dirs(splits_dir)
+            if not seed_entries:
+                continue
+            def base_has_division(base: Path) -> bool:
+                div_dir = base / name
+                flat = (div_dir / "features.csv").is_file() and (div_dir / "extraction_times.csv").is_file()
+                if flat:
+                    return True
+                per_seed = all(
+                    (div_dir / f"seed{val}" / "features.csv").is_file()
+                    and (div_dir / f"seed{val}" / "extraction_times.csv").is_file()
+                    for val, _ in seed_entries
+                )
+                return per_seed
+            if all(base_has_division(base) for base in features_dirs):
+                logics.append(name)
         return logics
 
     if args.logic is not None:
@@ -493,28 +528,78 @@ def main():
 
     for division in divisions_to_run:
         splits_dir = splits_base / division
+        seed_entries = discover_seed_dirs(splits_dir)
 
-        feature_csv_paths = []
-        extraction_time_by_path = {}
-        failed_paths_set = set()
+        # Detect flat vs per-seed per base
+        base_layouts: list[tuple[Path, bool]] = []  # (base, is_per_seed)
         for base in features_dirs:
-            division_dir = base / division
-            feature_csv = division_dir / "features.csv"
-            extraction_times_csv = division_dir / "extraction_times.csv"
-            if not feature_csv.is_file():
-                raise FileNotFoundError(f"Missing feature CSV for {division}: {feature_csv}")
-            if not extraction_times_csv.is_file():
-                raise FileNotFoundError(f"Missing extraction_times CSV for {division}: {extraction_times_csv}")
-            feature_csv_paths.append(str(feature_csv))
-            times = load_extraction_times_csv(extraction_times_csv)
-            for p, t in times.items():
-                extraction_time_by_path[p] = extraction_time_by_path.get(p, 0.0) + min(
-                    t, FEATURE_TIMEOUT
-                )
-            failed_paths_set.update(
-                load_failed_paths_from_extraction_times_csv(extraction_times_csv)
+            div_dir = base / division
+            flat_ok = (div_dir / "features.csv").is_file() and (div_dir / "extraction_times.csv").is_file()
+            per_seed_ok = all(
+                (div_dir / f"seed{val}" / "features.csv").is_file()
+                and (div_dir / f"seed{val}" / "extraction_times.csv").is_file()
+                for val, _ in seed_entries
             )
-        feature_csv_path = feature_csv_paths[0] if len(feature_csv_paths) == 1 else feature_csv_paths
+            if flat_ok:
+                base_layouts.append((base, False))
+            elif per_seed_ok:
+                base_layouts.append((base, True))
+            else:
+                if not flat_ok:
+                    raise FileNotFoundError(
+                        f"Missing features for {division}: need either {div_dir}/features.csv or "
+                        f"{div_dir}/seed<N>/features.csv for each split seed"
+                    )
+                raise FileNotFoundError(
+                    f"Missing per-seed features for {division}: {div_dir}/seed<N>/ for all seeds"
+                )
+
+        use_per_seed = any(per_seed for _, per_seed in base_layouts)
+        failed_paths_set: set[str] = set()
+
+        if use_per_seed:
+            feature_csv_path_and_times_per_seed = {}
+            for seed_val, _ in seed_entries:
+                paths_this: list[str] = []
+                et_this: dict[str, float] = {}
+                for base, is_per_seed in base_layouts:
+                    div_dir = base / division
+                    if is_per_seed:
+                        fc = div_dir / f"seed{seed_val}" / "features.csv"
+                        tc = div_dir / f"seed{seed_val}" / "extraction_times.csv"
+                    else:
+                        fc = div_dir / "features.csv"
+                        tc = div_dir / "extraction_times.csv"
+                    paths_this.append(str(fc))
+                    for p, t in load_extraction_times_csv(tc).items():
+                        et_this[p] = et_this.get(p, 0.0) + min(t, FEATURE_TIMEOUT)
+                    failed_paths_set.update(
+                        load_failed_paths_from_extraction_times_csv(tc)
+                    )
+                feature_csv_path_and_times_per_seed[seed_val] = (
+                    paths_this[0] if len(paths_this) == 1 else paths_this,
+                    et_this,
+                )
+            feature_csv_path = feature_csv_path_and_times_per_seed[seed_entries[0][0]][0]
+            extraction_time_by_path = feature_csv_path_and_times_per_seed[seed_entries[0][0]][1]
+        else:
+            feature_csv_path_and_times_per_seed = None
+            feature_csv_paths = []
+            extraction_time_by_path = {}
+            for base, _ in base_layouts:
+                div_dir = base / division
+                feature_csv = div_dir / "features.csv"
+                extraction_times_csv = div_dir / "extraction_times.csv"
+                feature_csv_paths.append(str(feature_csv))
+                for p, t in load_extraction_times_csv(extraction_times_csv).items():
+                    extraction_time_by_path[p] = extraction_time_by_path.get(p, 0.0) + min(
+                        t, FEATURE_TIMEOUT
+                    )
+                failed_paths_set.update(
+                    load_failed_paths_from_extraction_times_csv(extraction_times_csv)
+                )
+            feature_csv_path = feature_csv_paths[0] if len(feature_csv_paths) == 1 else feature_csv_paths
+
         output_dir = (base_output_dir / division).resolve() if base_output_dir else None
         if output_dir:
             output_dir.mkdir(parents=True, exist_ok=True)
@@ -523,6 +608,7 @@ def main():
             feature_csv_path,
             extraction_time_by_path,
             failed_paths_from_csv=failed_paths_set,
+            feature_csv_path_and_times_per_seed=feature_csv_path_and_times_per_seed,
             xg_flag=args.xg,
             save_models=args.save_models,
             output_dir=output_dir,

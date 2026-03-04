@@ -240,16 +240,6 @@ def evaluate_multi_splits_fusion(
         )
 
     desc_division_dir = desc_dir / division
-    desc_csv = desc_division_dir / "features.csv"
-    if not desc_csv.is_file():
-        raise ValueError(f"Description features CSV not found: {desc_csv}")
-    desc_extraction_csv = desc_division_dir / "extraction_times.csv"
-    if not desc_extraction_csv.is_file():
-        raise FileNotFoundError(f"Description extraction times not found: {desc_extraction_csv}")
-    # Map desc extraction times (logic-relative paths) to full paths under benchmark root
-    desc_extraction_rel = load_extraction_times_csv(desc_extraction_csv)
-    desc_overhead_by_full = {str(root / p): t for p, t in desc_extraction_rel.items()}
-
     seed_entries = discover_seed_dirs(splits_dir)
     if not seed_entries:
         raise ValueError(
@@ -261,12 +251,38 @@ def evaluate_multi_splits_fusion(
         if not seed_entries:
             raise ValueError(f"No matching seed dirs for seeds {sorted(seed_set)} in {splits_dir}")
 
+    # Detect flat vs per-seed desc layout
+    desc_flat_ok = (desc_division_dir / "features.csv").is_file() and (
+        desc_division_dir / "extraction_times.csv"
+    ).is_file()
+    desc_per_seed_ok = all(
+        (desc_division_dir / f"seed{seed_val}" / "features.csv").is_file()
+        and (desc_division_dir / f"seed{seed_val}" / "extraction_times.csv").is_file()
+        for seed_val, _ in seed_entries
+    )
+    if desc_flat_ok:
+        desc_per_seed = False
+        desc_csv_flat = desc_division_dir / "features.csv"
+        desc_extraction_csv_flat = desc_division_dir / "extraction_times.csv"
+        desc_extraction_rel_flat = load_extraction_times_csv(desc_extraction_csv_flat)
+        desc_overhead_by_full_flat = {str(root / p): t for p, t in desc_extraction_rel_flat.items()}
+    elif desc_per_seed_ok:
+        desc_per_seed = True
+        desc_csv_flat = None
+        desc_overhead_by_full_flat = None
+    else:
+        raise ValueError(
+            f"Description features for {division}: need either {desc_division_dir}/features.csv "
+            f"or {desc_division_dir}/seed<N>/features.csv (and extraction_times.csv) for each split seed"
+        )
+
     n_seeds = len(seed_entries)
     logging.info(
-        "Starting Fusion-PWC evaluation over %d splits for division %s%s",
+        "Starting Fusion-PWC evaluation over %d splits for division %s%s (desc %s)",
         n_seeds,
         division,
         " (eval-only)" if eval_only else "",
+        "per-seed" if desc_per_seed else "flat",
     )
 
     seed_results: list[dict] = []
@@ -311,12 +327,23 @@ def evaluate_multi_splits_fusion(
         if not extraction_times_csv.is_file():
             raise FileNotFoundError(f"GIN extraction times not found: {extraction_times_csv}")
 
+        if desc_per_seed:
+            desc_csv_this = desc_division_dir / f"seed{seed_val}" / "features.csv"
+            desc_extraction_csv_this = desc_division_dir / f"seed{seed_val}" / "extraction_times.csv"
+            desc_overhead_by_full_this = {
+                str(root / p): t
+                for p, t in load_extraction_times_csv(desc_extraction_csv_this).items()
+            }
+        else:
+            desc_csv_this = desc_csv_flat
+            desc_overhead_by_full_this = desc_overhead_by_full_flat
+
         gin_by_rel = load_embedding_csv(gin_csv)
-        text_by_rel = load_embedding_csv(desc_csv)
+        text_by_rel = load_embedding_csv(desc_csv_this)
         if text_by_rel:
             d_text = next(iter(text_by_rel.values())).shape[0]
         else:
-            raise ValueError(f"No text embeddings loaded from {desc_csv}")
+            raise ValueError(f"No text embeddings loaded from {desc_csv_this}")
         paths_full = list(train_data.keys()) + list(test_data.keys())
         emb_by_path = build_emb_by_path(
             gin_by_rel,
@@ -344,7 +371,7 @@ def evaluate_multi_splits_fusion(
         gin_extraction_rel = load_extraction_times_csv(extraction_times_csv)
         gin_overhead_by_full = {str(root / p): t for p, t in gin_extraction_rel.items()}
         overhead_by_path = {
-            p: gin_overhead_by_full.get(p, 0.0) + desc_overhead_by_full.get(p, 0.0)
+            p: gin_overhead_by_full.get(p, 0.0) + desc_overhead_by_full_this.get(p, 0.0)
             for p in paths_full
         }
 
@@ -562,9 +589,14 @@ def main() -> None:
     )
     parser.add_argument("--eval-only", action="store_true", help="Load models from --models-base, skip training.")
     parser.add_argument(
+        "--filter",
+        action="store_true",
+        help="Apply easy-unsolvable filter to training (alias for --skip-easy-unsolvable).",
+    )
+    parser.add_argument(
         "--skip-easy-unsolvable",
         action="store_true",
-        help="Exclude train instances where no solver solves or all solve in <= N seconds; saves train time",
+        help="(Deprecated; use --filter) Exclude train instances where no solver solves or all solve in <= N seconds; saves train time",
     )
     parser.add_argument(
         "--skip-trivial-under",
@@ -589,16 +621,22 @@ def main() -> None:
     parser.add_argument("--log-level", type=str, default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
     args = parser.parse_args()
 
+    # --filter is the preferred name; keep --skip-easy-unsolvable for backwards compatibility
+    if getattr(args, "filter", False):
+        args.skip_easy_unsolvable = True
+
     if args.logic:
         args.splits_dir = str(DEFAULT_SPLITS_BASE / args.logic)
         if args.qwen:
             model_name = "Qwen3-Embedding-0.6B"
             args.desc_features_dir = str(Path("data/features/desc") / model_name)
             args.lite_text_dir = str(Path("data/cp26/results/lite+text") / model_name)
-            args.output_dir = str(Path("data/cp26/results/fusion_pwc") / model_name / args.logic)
+            if args.output_dir is None:
+                args.output_dir = str(Path("data/cp26/results/fusion_pwc") / model_name / args.logic)
         else:
-            args.output_dir = str(Path("data/cp26/results/fusion_pwc") / args.logic)
-            args.save_models = True
+            if args.output_dir is None:
+                args.output_dir = str(Path("data/cp26/results/fusion_pwc") / args.logic)
+                args.save_models = True
             if args.models_base is None:
                 args.models_base = Path("models")
     if args.eval_only and args.models_base is None:
@@ -653,19 +691,41 @@ def main() -> None:
     splits_base = DEFAULT_SPLITS_BASE
     base_output_dir = Path(args.output_dir)
 
+    def desc_has_division(name: str) -> bool:
+        div_dir = desc_dir / name
+        if not div_dir.is_dir():
+            return False
+        flat = (div_dir / "features.csv").is_file() and (
+            div_dir / "extraction_times.csv"
+        ).is_file()
+        if flat:
+            return True
+        splits_dir = splits_base / name
+        if not splits_dir.is_dir():
+            return False
+        seed_entries = discover_seed_dirs(splits_dir)
+        if not seed_entries:
+            return False
+        return all(
+            (div_dir / f"seed{seed_val}" / "features.csv").is_file()
+            and (div_dir / f"seed{seed_val}" / "extraction_times.csv").is_file()
+            for seed_val, _ in seed_entries
+        )
+
     candidates = sorted(
         sub.name for sub in desc_dir.iterdir()
-        if sub.is_dir() and (sub / "features.csv").is_file()
+        if sub.is_dir()
     )
     logics = [
         name for name in candidates
         if (splits_base / name).is_dir()
         and (lt_dir / name).is_dir()
         and (gin_base / name).is_dir()
+        and desc_has_division(name)
     ]
     if not logics:
         parser.error(
-            f"No logics found with desc features in {desc_dir}, "
+            f"No logics found with desc features (flat or per-seed) in {desc_dir}, "
             f"splits in {splits_base}, lite+text in {lt_dir}, and GIN in {gin_base}"
         )
     logging.info("Running all %d logics: %s", len(logics), logics)
