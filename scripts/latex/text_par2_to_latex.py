@@ -15,9 +15,10 @@ TEXT_RESULTS_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "text"
 LITE_TEXT_RESULTS_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text"
 TEX_PATH = PROJECT_ROOT / "doc" / "cp26" / "desc.tex"
 
-MODEL_ORDER = ["all-mpnet-base-v2", "Qwen3-Embedding-0.6B"]
+MODEL_ORDER = ["all-mpnet-base-v2", "Qwen3-Embedding-0.6B", "setfit"]
 MODEL_DISPLAY = {
     "all-mpnet-base-v2": "mpnet",
+    "setfit": "finetune",
     "Qwen3-Embedding-0.6B": "Qwen3",
 }
 
@@ -106,6 +107,7 @@ def main() -> None:
     lines = [
         "\\begin{table}[t]",
         "\\centering",
+        "\\resizebox{\\columnwidth}{!}{%",
         f"\\begin{{tabular}}{{{col_spec}}}",
         "\\toprule",
     ]
@@ -155,7 +157,8 @@ def main() -> None:
     lines.extend([
         "\\bottomrule",
         "\\end{tabular}",
-        "\\caption{PAR-2 SBS--VBS gap closed (\\%) for description-based models, averaged over five splits.}",
+        "}",
+        "\\caption{Performance comparison of different description encoders within SMT-Select-Text, SMT-Select-Lite+Text, and SMT-Select-Graph+Text, measured by the PAR-2 SBS--VBS gap closed (\\%) on the held-out test set. Results are averaged over five random train--test splits, and the best-performing encoder for each variant is shown in bold.}",
         "\\label{tab:desc}",
         "\\end{table}",
     ])

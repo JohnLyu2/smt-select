@@ -16,7 +16,7 @@ RESULT_DIRS = [
     PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text" / "all-mpnet-base-v2",
     PROJECT_ROOT / "data" / "cp26" / "results" / "graph",
     PROJECT_ROOT / "data" / "cp26" / "results" / "machsmt" / "ehm",
-    PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text",
+    PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text" / "all-mpnet-base-v2",
     PROJECT_ROOT / "data" / "cp26" / "results" / "sibyl" / "evaluation",
     PROJECT_ROOT / "data" / "cp26" / "results" / "text" / "all-mpnet-base-v2",
 ]
@@ -73,7 +73,7 @@ def get_test_gap_par2(summary_path: Path) -> tuple[float | None, float | None]:
 def format_cell(mean: float | None, std: float | None) -> str:
     if mean is None:
         return "---"
-    return f"{mean * 100:.1f}"
+    return f"{mean * 100:.2f}"
 
 
 def main() -> None:

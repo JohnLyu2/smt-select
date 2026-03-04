@@ -1,24 +1,24 @@
 \begin{table}[t]
 \centering
-\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}@{}lcccccc@{}}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}@{}lccccccc@{}}
 \toprule
- & \multicolumn{4}{c}{\textbf{Without Description}} & \multicolumn{2}{c}{\textbf{With Description}} \\
+ & \multicolumn{4}{c}{\textbf{Without Description}} & \multicolumn{3}{c}{\textbf{With Description}} \\
 \cmidrule(lr){2-5}
-\cmidrule(lr){6-7}
- & \multirow{2}{*}{MachSMT} & \multirow{2}{*}{Sibyl} & \multicolumn{2}{c}{SMT-Select} & \multicolumn{2}{c}{SMT-Select} \\
+\cmidrule(lr){6-8}
+ & \multirow{2}{*}{MachSMT} & \multirow{2}{*}{Sibyl} & \multicolumn{2}{c}{SMT-Select} & \multicolumn{3}{c}{SMT-Select} \\
 \cmidrule(lr){4-5}
-\cmidrule(lr){6-7}
- &  &  & Lite & Graph & Text & Lite+Text \\
+\cmidrule(lr){6-8}
+ &  &  & Lite & Graph & Text & Lite+Text & Graph+Text \\
 \midrule
-ABV & 7.8 & 18.0 & 71.4 & \textbf{76.6} & 62.8 & 67.2 \\
-ALIA & 27.7 & 33.3 & 55.3 & 55.1 & 42.9 & \textbf{56.4} \\
-BV & 17.1 & 12.0 & 38.2 & 42.4 & 32.3 & \textbf{49.2} \\
-QF\_BV & 7.3 & -29.5 & 33.4 & 46.1 & 55.9 & \textbf{56.8} \\
-QF\_IDL & 6.1 & -30.5 & 64.5 & 69.7 & 44.9 & \textbf{71.7} \\
-QF\_LIA & 84.7 & 76.7 & 89.0 & \textbf{92.6} & 91.9 & 91.2 \\
-QF\_NRA & 17.3 & -3.5 & 44.6 & \textbf{50.6} & 44.9 & \textbf{50.7} \\
-QF\_SLIA & 77.0 & --- & 90.7 & 92.8 & 87.3 & \textbf{93.5} \\
-UFNIA & -129.2 & --- & 14.8 & \textbf{24.5} & -4.0 & 23.9 \\
+ABV & 7.83 & 17.97 & 71.45 & 76.56 & 62.83 & 67.15 & \textbf{79.44} \\
+ALIA & 27.73 & 33.34 & 55.30 & 55.07 & 42.85 & 56.42 & \textbf{67.65} \\
+BV & 17.11 & 12.00 & 38.22 & 42.43 & 32.31 & 49.20 & \textbf{53.92} \\
+QF\_BV & 7.35 & -29.45 & 33.44 & 46.06 & 55.92 & \textbf{56.80} & 54.23 \\
+QF\_IDL & 6.06 & -30.47 & 64.53 & 69.66 & 44.92 & 71.69 & \textbf{81.82} \\
+QF\_LIA & 84.70 & 76.66 & 89.01 & \textbf{92.56} & 91.95 & 91.19 & 91.65 \\
+QF\_NRA & 17.25 & -3.50 & 44.61 & 50.61 & 44.94 & 50.72 & \textbf{55.17} \\
+QF\_SLIA & 76.96 & --- & 90.70 & 92.82 & 87.34 & \textbf{93.50} & \textbf{93.50} \\
+UFNIA & -129.22 & --- & 14.79 & 24.48 & -3.95 & 23.95 & \textbf{31.84} \\
 \bottomrule
 \end{tabular*}
 \caption{Experimental results on the held-out test set, measured by the PAR-2 SBS--VBS gap closed (\%). Results are averaged over five random train--test splits.}
