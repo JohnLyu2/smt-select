@@ -18,7 +18,6 @@ from .feature import (
     extract_feature_from_csvs_concat,
 )
 from .solver_selector import SolverSelector
-from .pwc_wl import sorted_fallback_solvers
 from .utils import normalize_path
 
 PERF_DIFF_THRESHOLD = 1e-1  # Threshold for considering performance differences
@@ -30,12 +29,6 @@ def _load_path_list(value: str | Path | None) -> list[str]:
         return []
     with open(value, encoding="utf-8") as f:
         return [p.strip() for p in f if p.strip()]
-
-
-def _wl_level_csv_paths(wl_dir: str | Path, wl_iter: int) -> list[str]:
-    """Paths to level_0.csv through level_{wl_iter}.csv under wl_dir (as in wl_feature output)."""
-    base = Path(wl_dir)
-    return [str(base / f"level_{i}.csv") for i in range(wl_iter + 1)]
 
 
 def create_pairwise_samples(
@@ -228,9 +221,6 @@ class PwcSelector(SolverSelector):
             return (fallback, overhead, True)
 
 
-WL_FAILED_PATHS_FILENAME = "failed_paths.txt"
-
-
 def train_pwc(
     multi_perf_data,
     save_dir,
@@ -260,9 +250,12 @@ def train_pwc(
                 n_skipped,
                 feature_timeout,
             )
-    paths = _load_path_list(timeout_instance_paths)
     solver_size = multi_perf_data.num_solvers()
-    fallback_solver_ids = sorted_fallback_solvers(multi_perf_data, paths)
+    # Use the single best solver (SBS) on the training data as the default fallback.
+    # This solver is used when feature extraction fails or an instance is in the
+    # failed/timeout list.
+    sbs_solver_id = multi_perf_data.get_best_solver_id()
+    fallback_solver_ids = [sbs_solver_id]
 
     model_matrix = np.empty((solver_size, solver_size), dtype=object)
     model_matrix[:] = None
@@ -303,41 +296,6 @@ def train_pwc(
         failed_instance_paths=timeout_instance_paths,
     )
     pwc_model.save(save_dir)
-
-
-def train_wl_pwc(
-    multi_perf_data,
-    save_dir: str | Path,
-    wl_dir: str | Path,
-    wl_iter: int,
-    feature_csv_path: str | Path | None = None,
-    xg_flag: bool = False,
-    svm_c: float = 1.0,
-    random_seed: int = 42,
-) -> None:
-    """
-    Train PWC using WL feature CSVs under wl_dir (level_0.csv .. level_{wl_iter}.csv),
-    optionally concatenated with an extra feature CSV. Uses failed-paths file
-    wl_dir/failed_paths.txt. Saves a PwcSelector to save_dir.
-    """
-    wl_dir = Path(wl_dir)
-    wl_paths = _wl_level_csv_paths(wl_dir, wl_iter)
-    if feature_csv_path is not None:
-        feature_csv_paths = wl_paths + [str(feature_csv_path)]
-    else:
-        feature_csv_paths = wl_paths
-    fp_file = wl_dir / WL_FAILED_PATHS_FILENAME
-    timeout_instance_paths = str(fp_file) if fp_file.exists() else None
-
-    train_pwc(
-        multi_perf_data,
-        save_dir,
-        xg_flag=xg_flag,
-        feature_csv_path=feature_csv_paths,
-        svm_c=svm_c,
-        random_seed=random_seed,
-        timeout_instance_paths=timeout_instance_paths,
-    )
 
 
 def main():

@@ -249,8 +249,14 @@ def evaluate_multi_splits(
                 train_log_dir = output_dir / "train_log"
                 train_log_dir.mkdir(parents=True, exist_ok=True)
                 log_file = train_log_dir / f"seed{seed_val}.log"
+
+                def _skip_train_test_in_file(record: logging.LogRecord) -> bool:
+                    msg = record.getMessage()
+                    return not (msg.startswith("  Train:") or msg.startswith("  Test:"))
+
                 log_handler = logging.FileHandler(log_file, mode="w", encoding="utf-8")
                 log_handler.setLevel(logging.DEBUG)
+                log_handler.addFilter(_skip_train_test_in_file)
                 log_handler.setFormatter(
                     logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
                 )

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import time
 from pathlib import Path
 
 import joblib
@@ -17,29 +18,12 @@ from .defaults import DEFAULT_BENCHMARK_ROOT
 from .performance import parse_performance_json, MultiSolverDataset
 from .performance import PERF_DIFF_THRESHOLD
 from .solver_selector import SolverSelector
-from .wl_feature import build_smt_graph_timeout, _suppress_z3_destructor_noise
-
-
-def generate_graph_dict(
-    instance_paths: list[str], timeout_sec: int
-) -> tuple[dict[str, Graph], list[str]]:
-    """Build graphs for each instance. Returns (path -> graph, list of paths that failed: timeout/recursion/error)."""
-    graph_dict: dict[str, Graph] = {}
-    failed_list: list[str] = []
-    for p in instance_paths:
-        g = build_smt_graph_timeout(p, timeout_sec)
-        if g is not None:
-            graph_dict[p] = g
-        else:
-            failed_list.append(p)
-            _suppress_z3_destructor_noise()
-    logging.info(
-        "Graphs: %d built, %d failed (of %d instances)",
-        len(graph_dict),
-        len(failed_list),
-        len(instance_paths),
-    )
-    return graph_dict, failed_list
+from .graph_rep import (
+    build_smt_graph_dict_timeout,
+    generate_graph_dicts_parallel,
+    smt_graph_to_grakel,
+    _suppress_z3_destructor_noise,
+)
 
 
 def generate_labels_for_config_pair(
@@ -68,36 +52,6 @@ def generate_labels_for_config_pair(
             labels.append(label)
             costs.append(cost)
     return indices, np.array(labels), np.array(costs)
-
-
-def sorted_fallback_solvers(
-    multi_perf_data: MultiSolverDataset,
-    failed_paths: list[str],
-) -> list[int]:
-    """
-    Rank solvers by average PAR-2 over the given paths (for instances that failed
-    graph build). Returns solver ids from best to worst, used as fallback order.
-    """
-    if not failed_paths:
-        paths = list(multi_perf_data.keys())
-    else:
-        paths = failed_paths
-    n_solvers = multi_perf_data.num_solvers()
-    if n_solvers == 0:
-        return []
-    scores: list[tuple[int, float]] = []
-    for sid in range(n_solvers):
-        total = 0.0
-        count = 0
-        for p in paths:
-            par2 = multi_perf_data.get_par2(p, sid)
-            if par2 is not None:
-                total += par2
-                count += 1
-        avg = total / count if count > 0 else float("inf")
-        scores.append((sid, avg))
-    scores.sort(key=lambda x: x[1])
-    return [sid for sid, _ in scores]
 
 
 class PwcWlSelector(SolverSelector):
@@ -161,14 +115,31 @@ class PwcWlSelector(SolverSelector):
 
     def algorithm_select(self, instance_path: str | Path) -> int:
         """Return solver id for the given instance (path to .smt2 file)."""
+        selected, _, _ = self.algorithm_select_with_info(instance_path)
+        return selected
+
+    def algorithm_select_with_info(
+        self, instance_path: str | Path
+    ) -> tuple[int, float, bool]:
+        """
+        Return (solver_id, overhead_sec, feature_fail).
+
+        overhead_sec measures time for graph construction + kernel/SVM inference.
+        feature_fail is True when graph construction fails (WL features unavailable);
+        in that case, the selector falls back to the train SBS solver.
+        """
         path = Path(instance_path)
-        graph = build_smt_graph_timeout(path, self.graph_timeout)
-        if graph is None:
+        t0 = time.perf_counter()
+        graph_dict = build_smt_graph_dict_timeout(path, self.graph_timeout)
+        if graph_dict is None:
             _suppress_z3_destructor_noise()
-            return self.fallback_solver_ids[0]
+            overhead = time.perf_counter() - t0
+            return (self.fallback_solver_ids[0], overhead, True)
+        graph = smt_graph_to_grakel(graph_dict)
         rank = self._get_rank_lst(graph)
         _suppress_z3_destructor_noise()
-        return rank[0]
+        overhead = time.perf_counter() - t0
+        return (rank[0], overhead, False)
 
 
 def train_pwc_wl(
@@ -176,18 +147,28 @@ def train_pwc_wl(
     wl_iter: int,
     save_dir: str | Path,
     graph_timeout: int = 5,
+    jobs: int = 1,
 ) -> None:
-    """Train pairwise WL-based SVM models and save PwcWlSelector."""
+    """Train pairwise WL-based SVM models and save PwcWlSelector.
+
+    Graphs are built using generate_graph_dicts_parallel from graph_rep, so
+    when jobs > 1 graph construction is parallelized; jobs <= 1 falls back to
+    a sequential path.
+    """
     Path(save_dir).mkdir(parents=True, exist_ok=True)
     solver_size = multi_perf_data.num_solvers()
     instance_paths = list(multi_perf_data.keys())
-    graph_dict, failed_list = generate_graph_dict(instance_paths, graph_timeout)
-    if not graph_dict:
+    # Build underlying SMT graphs (dict representation) in parallel, then convert
+    # to GraKel Graph objects for WL kernel training.
+    graph_dict_raw, failed_list = generate_graph_dicts_parallel(
+        instance_paths, graph_timeout, jobs
+    )
+    if not graph_dict_raw:
         raise ValueError(
             "No graphs could be built (all failed: timeout/recursion/error?). Increase --graph-timeout or check instances."
         )
-    train_paths = list(graph_dict.keys())
-    train_graphs = [graph_dict[p] for p in train_paths]
+    train_paths = list(graph_dict_raw.keys())
+    train_graphs = [smt_graph_to_grakel(graph_dict_raw[p]) for p in train_paths]
 
     wl_kernel = WeisfeilerLehman(n_iter=wl_iter, normalize=True)
     k_mat = wl_kernel.fit_transform(train_graphs)
@@ -216,7 +197,10 @@ def train_pwc_wl(
                 svm_ij.fit(sub, label_arr, sample_weight=cost_arr)
             svm_matrix[i][j] = svm_ij
 
-    fallback_solver_ids = sorted_fallback_solvers(multi_perf_data, failed_list)
+    # Use the single best solver (SBS) on the training data as the default
+    # fallback when graph construction fails for an instance.
+    sbs_solver_id = multi_perf_data.get_best_solver_id()
+    fallback_solver_ids = [sbs_solver_id]
     solver_id_dict = multi_perf_data.get_solver_id_dict()
 
     model = PwcWlSelector(
@@ -260,6 +244,12 @@ def main() -> None:
         help="Graph build timeout in seconds (default: 5)",
     )
     parser.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="Number of parallel workers for graph building; 1 = sequential (default: 1)",
+    )
+    parser.add_argument(
         "--timeout",
         type=float,
         default=1200.0,
@@ -301,6 +291,7 @@ def main() -> None:
         args.wl_iter,
         args.save_dir,
         args.graph_timeout,
+        jobs=args.jobs,
     )
 
 
