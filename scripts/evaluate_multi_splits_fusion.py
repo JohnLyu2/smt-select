@@ -41,7 +41,7 @@ from src.performance import (
 
 DEFAULT_GIN_FEATURES_BASE = Path("data/features/gin_pwc")
 DEFAULT_DESC_FEATURES_DIR = Path("data/features/desc/all-mpnet-base-v2")
-DEFAULT_LITETEXT_DIR = Path("data/cp26/results/lite+text")
+DEFAULT_LITETEXT_DIR = Path("data/cp26/results/lite+text/all-mpnet-base-v2")
 DEFAULT_SPLITS_BASE = Path("data/cp26/performance_splits/smtcomp24")
 
 CSV_HEADER = ["benchmark", "selected", "solved", "runtime", "solver_runtime", "overhead", "feature_fail"]

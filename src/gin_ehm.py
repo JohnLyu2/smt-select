@@ -36,7 +36,6 @@ from .graph_rep import (
     _suppress_z3_destructor_noise,
 )
 from .performance import MultiSolverDataset
-from .pwc_wl import sorted_fallback_solvers
 from .solver_selector import SolverSelector
 
 # Index for node types not in the vocabulary (e.g. at inference time).
@@ -519,7 +518,7 @@ def train_gin_regression(
         model.load_state_dict(torch.load(best_state_path, map_location=device, weights_only=True))
         best_state_path.unlink(missing_ok=True)
 
-    fallback_solver_ids = sorted_fallback_solvers(multi_perf_data, failed_list)
+    fallback_solver_ids = [multi_perf_data.get_best_solver_id()]
     config = {
         "num_node_types": num_node_types,
         "num_heads": K,

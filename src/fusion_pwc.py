@@ -20,7 +20,6 @@ from .gin_pwc import (
     _weighted_bce_loss,
 )
 from .performance import MultiSolverDataset, PERF_DIFF_THRESHOLD
-from .pwc_wl import sorted_fallback_solvers
 from .solver_selector import SolverSelector
 
 GIN_L2_EPS = 1e-8
@@ -500,7 +499,7 @@ def train_fusion_pwc(
         )
         best_state_path.unlink(missing_ok=True)
 
-    fallback_solver_ids = sorted_fallback_solvers(multi_perf_data, failed_list)
+    fallback_solver_ids = [multi_perf_data.get_best_solver_id()]
     config = {
         "d_gin": d_gin,
         "d_text": d_text,
