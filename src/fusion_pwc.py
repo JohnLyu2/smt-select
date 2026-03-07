@@ -107,6 +107,7 @@ class FusionPWC(nn.Module):
         self.d_text = d_text
         self.d_text_small = d_text_small
         self.hidden_fused = hidden_fused
+        self._num_solvers = num_solvers
         self._num_pairs = (num_solvers * (num_solvers - 1)) // 2
 
         self.text_proj = nn.Sequential(
@@ -182,7 +183,7 @@ class FusionPWCSelector(SolverSelector):
         self.random_seed = random_seed
         self.model.to(self.device)
         self.model.eval()
-        self._num_solvers = len(fallback_solver_ids)
+        self._num_solvers = model._num_solvers
         self._pair_order = all_pairs(self._num_solvers)
 
     def _get_rank_lst(self, logits: torch.Tensor) -> list[int]:
