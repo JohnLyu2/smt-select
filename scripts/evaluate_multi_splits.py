@@ -89,7 +89,6 @@ def evaluate_multi_splits(
     feature_csv_path_and_times_per_seed: dict[
         int, tuple[str | list[str], dict[str, float]]
     ] | None = None,
-    xg_flag: bool = False,
     save_models: bool = False,
     output_dir: Path | None = None,
     timeout: float = 1200.0,
@@ -109,7 +108,6 @@ def evaluate_multi_splits(
         extraction_time_by_path: Map normalized instance path -> extraction time (sec); ignored if feature_csv_path_and_times_per_seed is set
         failed_paths_from_csv: Set of normalized paths with failed=1 in extraction_times CSV; used for SBS at eval
         feature_csv_path_and_times_per_seed: If set, use (feature_csv_path, extraction_time_by_path) per seed for per-seed feature dirs
-        xg_flag: Use XGBoost if True else SVM
         save_models: Save model per split (requires output_dir)
         output_dir: Where to write summary.json and optional per-split outputs
         timeout: Timeout in seconds
@@ -273,7 +271,6 @@ def evaluate_multi_splits(
                 train_pwc(
                     train_data,
                     save_dir=str(model_save_dir),
-                    xg_flag=xg_flag,
                     feature_csv_path=feature_csv_path_this,
                     svm_c=svm_c,
                     random_seed=random_seed,
@@ -374,7 +371,7 @@ def evaluate_multi_splits(
         "division": division,
         "n_seeds": n_seeds,
         "seed_values": [s for s, _ in seed_entries],
-        "model_type": "XGBoost" if xg_flag else "SVM",
+        "model_type": "SVM",
         "splits_dir": str(splits_dir),
         "feature_csv_path": feature_csv_path,
         "feature_csv_path_per_seed": use_per_seed,
@@ -436,11 +433,6 @@ def main():
         type=float,
         default=1200.0,
         help="Timeout in seconds (default: 1200)",
-    )
-    parser.add_argument(
-        "--xg",
-        action="store_true",
-        help="Use XGBoost instead of SVM",
     )
     parser.add_argument(
         "--output-dir",
@@ -615,7 +607,6 @@ def main():
             extraction_time_by_path,
             failed_paths_from_csv=failed_paths_set,
             feature_csv_path_and_times_per_seed=feature_csv_path_and_times_per_seed,
-            xg_flag=args.xg,
             save_models=args.save_models,
             output_dir=output_dir,
             timeout=args.timeout,

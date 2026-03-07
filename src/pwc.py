@@ -6,7 +6,6 @@ import joblib
 import argparse
 import logging
 
-import xgboost as xgb
 from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_X_y
@@ -78,16 +77,6 @@ def create_pairwise_samples(
     return inputs_array, labels_array, costs_array
 
 
-class PairwiseXGBoost(xgb.XGBClassifier):
-    def __init__(self, random_state=42, **kwargs):
-        super().__init__(n_jobs=8, random_state=random_state, **kwargs)
-
-    def fit(self, x, y, weights):
-        x, y = check_X_y(x, y)
-        super().fit(x, y, sample_weight=weights)
-        return self
-
-
 class PairwiseSVM(SVC):
     def __init__(self, c_value: float = 1.0, **kwargs):
         self.c_value = c_value
@@ -113,13 +102,12 @@ class PwcSelector(SolverSelector):
     def __init__(
         self,
         model_matrix,
-        xg_flag,
         feature_csv_path,
         random_seed: int = 42,
         fallback_solver_ids: list[int] | None = None,
         failed_instance_paths: str | Path | None = None,
     ):
-        self.model_type = "XG" if xg_flag else "SVM"
+        self.model_type = "SVM"
         self.model_matrix = model_matrix
         self.solver_size = model_matrix.shape[0]
         self.feature_csv_path = feature_csv_path
@@ -176,7 +164,7 @@ class PwcSelector(SolverSelector):
     def algorithm_select_with_info(self, instance_path):
         """
         Return (solver_id, overhead_sec, feature_fail).
-        overhead_sec is the time for feature lookup + model inference (SVM/XGBoost).
+        overhead_sec is the time for feature lookup + model inference (SVM).
         feature_fail is True if feature extraction failed (instance not in CSV or in failed set without fallback).
         When failed_paths_from_csv and sbs_solver_id are set, instances in that set return (sbs_solver_id, 0.0, True)
         (use SBS, no overhead). The CSV label failed=1 is used for this decision, not extraction_time comparison.
@@ -224,7 +212,6 @@ class PwcSelector(SolverSelector):
 def train_pwc(
     multi_perf_data,
     save_dir,
-    xg_flag=False,
     feature_csv_path=None,
     svm_c: float = 1.0,
     random_seed: int = 42,
@@ -283,13 +270,10 @@ def train_pwc(
                 model.fit(inputs_array, labels_array)
             else:
                 model = PairwiseSVM(c_value=svm_c)
-                if xg_flag:
-                    model = PairwiseXGBoost()
                 model.fit(inputs_array, labels_array, costs_array)
             model_matrix[i, j] = model
     pwc_model = PwcSelector(
         model_matrix,
-        xg_flag,
         feature_csv_path,
         random_seed=random_seed,
         fallback_solver_ids=fallback_solver_ids,
@@ -300,7 +284,6 @@ def train_pwc(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--xg", action="store_true", help="Flag to use XGBoost")
     parser.add_argument(
         "--save-dir",
         type=str,
@@ -346,7 +329,6 @@ def main():
         level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
     )
 
-    xg_flag = args.xg
     save_dir = args.save_dir
     timeout = args.timeout
     train_dataset = parse_performance_json(args.perf_json, timeout)
@@ -366,7 +348,6 @@ def main():
     train_pwc(
         train_dataset,
         save_dir,
-        xg_flag,
         args.feature_csv,
         svm_c=args.svm_c,
         random_seed=args.random_seed,
