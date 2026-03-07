@@ -25,7 +25,7 @@ def create_setfit_data(
     """
     Create SetFit training data from performance data and description JSON.
 
-    Performance data must be JSON (e.g. data/cp26/raw_data/smtcomp24_performance/LOGIC.json).
+    Performance data must be JSON (e.g. data/raw_data/smtcomp24_performance/LOGIC.json).
     Solver order (for multi_label and for saving) is taken from the performance data.
     Returns solver_id_dict (id -> solver name) so callers can save solver2id for evaluation.
 
@@ -282,7 +282,7 @@ def main() -> None:
     parser.add_argument(
         "--train-perf-json",
         required=True,
-        help="Path to training performance JSON (e.g. data/cp26/raw_data/smtcomp24_performance/LOGIC.json).",
+        help="Path to training performance JSON (e.g. data/raw_data/smtcomp24_performance/LOGIC.json).",
     )
     parser.add_argument("--desc-json", required=True, help="Path to descriptions JSON.")
     parser.add_argument(

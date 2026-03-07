@@ -42,7 +42,7 @@ from src.performance import (
 
 DEFAULT_GIN_MODELS_BASE = Path("models")
 DEFAULT_DESC_FEATURES_DIR = Path("data/features/desc/all-mpnet-base-v2")
-DEFAULT_LITETEXT_DIR = Path("data/cp26/results/lite+text")
+DEFAULT_LITETEXT_DIR = Path("data/results/lite+text")
 
 CSV_HEADER = ["benchmark", "selected", "solved", "runtime", "solver_runtime", "overhead", "feature_fail"]
 
@@ -562,8 +562,8 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.logic:
-        args.splits_dir = str(Path("data/cp26/performance_splits/smtcomp24") / args.logic)
-        args.output_dir = str(Path("data/cp26/results/fusion_e2e_pwc") / args.logic)
+        args.splits_dir = str(Path("data/train_test_splits") / args.logic)
+        args.output_dir = str(Path("data/results/graph+text") / args.logic)
         args.save_models = True
         if args.models_base is None:
             args.models_base = Path("models")

@@ -5,7 +5,7 @@ Build doc/logic_filter/smtcomp24_logic_info.csv from meta_info and performance d
 For each logic:
 - num_benchmarks, num_families: from data/meta_info_24/<logic>.json if present,
   else num_benchmarks from performance instance count and num_families=0.
-- num_solvers, sbs, vbs: from data/cp26/raw_data/smtcomp24_performance/<logic>.json.
+- num_solvers, sbs, vbs: from data/raw_data/smtcomp24_performance/<logic>.json.
 - description_rate: fraction of benchmarks with a description. ave_size: average SMT2 file size in KB.
 
 Output: logic,num_benchmarks,num_families,num_solvers,sbs,vbs,description_rate,ave_size
@@ -62,8 +62,8 @@ def main() -> None:
     parser.add_argument(
         "--perf-dir",
         type=Path,
-        default=PROJECT_ROOT / "data" / "cp26" / "raw_data" / "smtcomp24_performance",
-        help="Directory containing <logic>.json performance files (default: data/cp26/raw_data/smtcomp24_performance)",
+default=PROJECT_ROOT / "data" / "raw_data" / "smtcomp24_performance",
+            help="Directory containing <logic>.json performance files (default: data/raw_data/smtcomp24_performance)",
     )
     parser.add_argument(
         "-o",

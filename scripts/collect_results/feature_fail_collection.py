@@ -2,7 +2,7 @@
 """
 Collect graph build/fail counts from GIN-PWC train logs.
 
-Reads logs from data/cp26/results/gnn/gin_pwc/<logic>/train_log/seed*.log,
+Reads logs from data/results/graph/gin_pwc/<logic>/train_log/seed*.log,
 parses lines like: "Graphs: 1865 built, 0 failed (of 1865 instances)",
 and writes doc/result_summary/feature_fail.csv with one row per logic: logic, avg_fail_rate (average fail rate over seeds).
 """
@@ -14,7 +14,7 @@ from pathlib import Path
 # Script is under scripts/collect_results/
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-GIN_PWC_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "gnn" / "gin_pwc"
+GIN_PWC_ROOT = PROJECT_ROOT / "data" / "results" / "graph" / "gin_pwc"
 OUTPUT_PATH = PROJECT_ROOT / "doc" / "result_summary" / "feature_fail.csv"
 
 # "2026-02-22 23:03:30,273 - INFO - Graphs: 1865 built, 0 failed (of 1865 instances)"

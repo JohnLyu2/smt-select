@@ -2,8 +2,8 @@
 """
 Generate a LaTeX table of PAR-2 gap closed (%) for text-only and lite+text models.
 
-Reads summary.json from data/cp26/results/text/<model>/<logic>/summary.json
-and data/cp26/results/lite+text/<model>/<logic>/summary.json,
+Reads summary.json from data/results/text/<model>/<logic>/summary.json
+and data/results/lite+text/<model>/<logic>/summary.json,
 extracts test gap_cls_par2_mean, and writes doc/cp26/desc.tex.
 """
 
@@ -11,8 +11,8 @@ import json
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-TEXT_RESULTS_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "text"
-LITE_TEXT_RESULTS_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text"
+TEXT_RESULTS_ROOT = PROJECT_ROOT / "data" / "results" / "text"
+LITE_TEXT_RESULTS_ROOT = PROJECT_ROOT / "data" / "results" / "lite+text"
 TEX_PATH = PROJECT_ROOT / "doc" / "cp26" / "desc.tex"
 
 MODEL_ORDER = ["all-mpnet-base-v2", "Qwen3-Embedding-0.6B", "setfit"]
@@ -22,7 +22,7 @@ MODEL_DISPLAY = {
     "Qwen3-Embedding-0.6B": "Qwen3",
 }
 
-GRAPH_TEXT_RESULTS_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text"
+GRAPH_TEXT_RESULTS_ROOT = PROJECT_ROOT / "data" / "results" / "graph+text"
 
 GROUPS = [
     ("SMT-Select-Text", TEXT_RESULTS_ROOT),

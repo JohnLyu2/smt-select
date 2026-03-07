@@ -3,7 +3,7 @@
 Extract GIN-PWC backbone embeddings for benchmarks listed in a performance JSON.
 
 Loads a saved GIN-PWC model (e.g. models/gin_pwc/ABV/seed0), iterates over all
-benchmark paths from a JSON file (e.g. data/cp26/raw_data/smtcomp24_performance/ABV.json),
+benchmark paths from a JSON file (e.g. data/raw_data/smtcomp24_performance/ABV.json),
 builds the graph for each instance, runs the backbone, and saves:
   - <out_dir>/features.csv: path + columns emb_0 .. emb_{d-1}
   - <out_dir>/extraction_times.csv: path, time_sec, failed (0 or 1; graph build is capped at graph_timeout)
@@ -45,7 +45,7 @@ def main() -> None:
     parser.add_argument(
         "benchmarks_json",
         type=Path,
-        help="JSON file listing benchmarks (keys = relative paths), e.g. data/cp26/raw_data/smtcomp24_performance/ABV.json",
+        help="JSON file listing benchmarks (keys = relative paths), e.g. data/raw_data/smtcomp24_performance/ABV.json",
     )
     parser.add_argument(
         "-o",

@@ -3,14 +3,14 @@
 Finetune SetFit on natural-language SMT benchmark descriptions for solver selection.
 
 Builds training data from description JSON and performance JSON (e.g. under
-data/cp26/raw_data/smtcomp24_performance), trains a SetFit model, and saves
+data/raw_data/smtcomp24_performance), trains a SetFit model, and saves
 the model plus solver2id and train_config for evaluation.
 
 Example:
   source .venv/bin/activate
   python scripts/finetune_desc_setfit.py \\
     --desc-json data/meta_info_24/BV.json \\
-    --train-perf-json data/cp26/raw_data/smtcomp24_performance/BV.json \\
+    --train-perf-json data/raw_data/smtcomp24_performance/BV.json \\
     --model-dir data/models/setfit_desc/BV
 
 After training, evaluate with:
@@ -57,7 +57,7 @@ def main() -> int:
     parser.add_argument(
         "--train-perf-json",
         required=True,
-        help="Path to training performance JSON (e.g. data/cp26/raw_data/smtcomp24_performance/LOGIC.json).",
+        help="Path to training performance JSON (e.g. data/raw_data/smtcomp24_performance/LOGIC.json).",
     )
     parser.add_argument(
         "--model-dir",

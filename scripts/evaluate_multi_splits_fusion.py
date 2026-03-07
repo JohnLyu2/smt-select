@@ -41,8 +41,8 @@ from src.performance import (
 
 DEFAULT_GIN_FEATURES_BASE = Path("data/features/gin_pwc")
 DEFAULT_DESC_FEATURES_DIR = Path("data/features/desc/all-mpnet-base-v2")
-DEFAULT_LITETEXT_DIR = Path("data/cp26/results/lite+text/all-mpnet-base-v2")
-DEFAULT_SPLITS_BASE = Path("data/cp26/performance_splits/smtcomp24")
+DEFAULT_LITETEXT_DIR = Path("data/results/lite+text/all-mpnet-base-v2")
+DEFAULT_SPLITS_BASE = Path("data/train_test_splits")
 
 CSV_HEADER = ["benchmark", "selected", "solved", "runtime", "solver_runtime", "overhead", "feature_fail"]
 
@@ -630,12 +630,12 @@ def main() -> None:
         if args.qwen:
             model_name = "Qwen3-Embedding-0.6B"
             args.desc_features_dir = str(Path("data/features/desc") / model_name)
-            args.lite_text_dir = str(Path("data/cp26/results/lite+text") / model_name)
+            args.lite_text_dir = str(Path("data/results/lite+text") / model_name)
             if args.output_dir is None:
-                args.output_dir = str(Path("data/cp26/results/fusion_pwc") / model_name / args.logic)
+                args.output_dir = str(Path("data/results/graph+text") / model_name / args.logic)
         else:
             if args.output_dir is None:
-                args.output_dir = str(Path("data/cp26/results/fusion_pwc") / args.logic)
+                args.output_dir = str(Path("data/results/graph+text") / args.logic)
                 args.save_models = True
             if args.models_base is None:
                 args.models_base = Path("models")

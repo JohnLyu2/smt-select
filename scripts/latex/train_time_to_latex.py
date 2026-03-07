@@ -3,11 +3,11 @@
 Build doc/cp26/train_time.tex from train logs in result directories (no intermediate CSV).
 
 Reads train logs from:
-- Lite: data/cp26/results/lite/<logic>/train_log/seed*.log
-- Lite+Text: data/cp26/results/lite+text/all-mpnet-base-v2/<logic>/train_log/seed*.log
-- Text: data/cp26/results/text/all-mpnet-base-v2/<logic>/train_log/seed*.log
-- Graph: data/cp26/results/graph/<logic>/train_log/seed*.log
-- Graph+Text: data/cp26/results/graph+text/all-mpnet-base-v2/<logic>/train_log/seed*.log
+- Lite: data/results/lite/<logic>/train_log/seed*.log
+- Lite+Text: data/results/lite+text/all-mpnet-base-v2/<logic>/train_log/seed*.log
+- Text: data/results/text/all-mpnet-base-v2/<logic>/train_log/seed*.log
+- Graph: data/results/graph/<logic>/train_log/seed*.log
+- Graph+Text: data/results/graph+text/all-mpnet-base-v2/<logic>/train_log/seed*.log
 
 For each logic, first/last timestamp per seed log gives duration. Lite/Lite+Text include
 syntactic (and desc) extraction time; Text = log duration + desc extraction; Graph/Graph+Text
@@ -22,11 +22,11 @@ from pathlib import Path
 # Script is under scripts/latex/
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-LITE_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "lite"
-LITE_TEXT_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text" / "all-mpnet-base-v2"
-TEXT_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "text" / "all-mpnet-base-v2"
-GRAPH_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "graph"
-GRAPH_TEXT_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text" / "all-mpnet-base-v2"
+LITE_ROOT = PROJECT_ROOT / "data" / "results" / "lite"
+LITE_TEXT_ROOT = PROJECT_ROOT / "data" / "results" / "lite+text" / "all-mpnet-base-v2"
+TEXT_ROOT = PROJECT_ROOT / "data" / "results" / "text" / "all-mpnet-base-v2"
+GRAPH_ROOT = PROJECT_ROOT / "data" / "results" / "graph"
+GRAPH_TEXT_ROOT = PROJECT_ROOT / "data" / "results" / "graph+text" / "all-mpnet-base-v2"
 FEATURES_SYNTACTIC_ROOT = PROJECT_ROOT / "data" / "features" / "syntactic"
 FEATURES_DESC_ROOT = PROJECT_ROOT / "data" / "features" / "desc" / "all-mpnet-base-v2"
 OUTPUT_TEX = PROJECT_ROOT / "doc" / "cp26" / "train_time.tex"

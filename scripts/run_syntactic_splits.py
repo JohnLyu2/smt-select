@@ -4,8 +4,8 @@ Run evaluate_multi_splits.py for all logics that have syntactic features and spl
 
 Expects folder structure like data/features/syntactic with one dir per logic (ABV, ALIA, ...),
 each containing features.csv (and optionally extraction_times.csv).
-Uses splits from data/cp26/performance_splits/smtcomp24/<logic>/.
-Saves results to data/cp26/results/synt/<logic>/.
+Uses splits from data/train_test_splits/<logic>/.
+Saves results to data/results/lite/<logic>/.
 
 Usage (from project root, with venv activated):
   python scripts/run_syntactic_splits.py
@@ -22,8 +22,8 @@ from pathlib import Path
 # Project root when run as: python scripts/run_syntactic_splits.py
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 FEATURES_DIR = PROJECT_ROOT / "data" / "features" / "syntactic"
-SPLITS_BASE = PROJECT_ROOT / "data" / "cp26" / "performance_splits" / "smtcomp24"
-RESULTS_BASE = PROJECT_ROOT / "data" / "cp26" / "results" / "synt"
+SPLITS_BASE = PROJECT_ROOT / "data" / "train_test_splits"
+RESULTS_BASE = PROJECT_ROOT / "data" / "results" / "lite"
 SCRIPT = PROJECT_ROOT / "scripts" / "evaluate_multi_splits.py"
 
 

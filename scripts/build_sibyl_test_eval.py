@@ -6,11 +6,11 @@ Every test instance (from test.json) has a row. Overhead from graph_log, capped 
 Case A (in selection CSV): use selection, feature_fail=0.
 Case B (missing from selection): use SBS from train, feature_fail=1.
 
-Reads: data/cp26/results/sibyl/selection/<logic>/seed{N}.csv (benchmark, selected)
-       data/cp26/performance_splits/smtcomp24/<logic>/seed{N}/train.json, test.json
-       data/cp26/results/sibyl/graph_log/graph_build_<logic>.csv (path, time_sec, failed)
-Writes: data/cp26/results/sibyl/evaluation/<logic>/seed{N}/test_eval.csv
-        data/cp26/results/sibyl/evaluation/<logic>/summary.json (test metrics only)
+Reads: data/results/sibyl/selection/<logic>/seed{N}.csv (benchmark, selected)
+       data/train_test_splits/<logic>/seed{N}/train.json, test.json
+       data/results/sibyl/graph_log/graph_build_<logic>.csv (path, time_sec, failed)
+Writes: data/results/sibyl/evaluation/<logic>/seed{N}/test_eval.csv
+        data/results/sibyl/evaluation/<logic>/summary.json (test metrics only)
 """
 
 import argparse
@@ -27,10 +27,10 @@ from src.performance import parse_as_perf_csv
 from src.performance import parse_performance_json
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SELECTION_DIR = PROJECT_ROOT / "data" / "cp26" / "results" / "sibyl" / "selection"
-SPLITS_BASE = PROJECT_ROOT / "data" / "cp26" / "performance_splits" / "smtcomp24"
-GRAPH_LOG_DIR = PROJECT_ROOT / "data" / "cp26" / "results" / "sibyl" / "graph_log"
-OUT_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "sibyl" / "evaluation"
+SELECTION_DIR = PROJECT_ROOT / "data" / "results" / "sibyl" / "selection"
+SPLITS_BASE = PROJECT_ROOT / "data" / "train_test_splits"
+GRAPH_LOG_DIR = PROJECT_ROOT / "data" / "results" / "sibyl" / "graph_log"
+OUT_ROOT = PROJECT_ROOT / "data" / "results" / "sibyl" / "evaluation"
 OVERHEAD_CAP = 10.0
 
 HEADER = ["benchmark", "selected", "solved", "runtime", "solver_runtime", "overhead", "feature_fail"]

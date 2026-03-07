@@ -485,7 +485,7 @@ class SingleSolverDataset:
 
 def parse_performance_json(json_path: str, timeout: float) -> MultiSolverDataset:
     """
-    Parse a performance JSON file (e.g. from data/cp26/raw_data/smtcomp24_performance)
+    Parse a performance JSON file (e.g. from data/raw_data/smtcomp24_performance)
     and create a MultiSolverDataset.
 
     Expects format: { benchmark_path: { solver_name: { "result", "wallclock_time", ... } } }.

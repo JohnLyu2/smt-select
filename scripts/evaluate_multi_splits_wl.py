@@ -59,7 +59,7 @@ def _rebase_perf_data(multi_perf_data: MultiSolverDataset, benchmark_root: Path)
     )
 
 
-DEFAULT_LITE_DIR = Path("data/cp26/results/lite")
+DEFAULT_LITE_DIR = Path("data/results/lite")
 
 CSV_HEADER = [
     "benchmark",
@@ -566,11 +566,11 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.logic and not args.splits_dir:
-        splits_base = Path("data/cp26/performance_splits/smtcomp24")
+        splits_base = Path("data/train_test_splits")
         args.splits_dir = str(splits_base / args.logic)
         if args.output_dir is None:
-            # Default: save under data/cp26/results/wl/iter1/<logic>
-            base = Path("data/cp26/results/wl") / f"iter{args.wl_iter}"
+            # Default: save under data/results/wl_grakel/iter1/<logic>
+            base = Path("data/results/wl_grakel") / f"iter{args.wl_iter}"
             args.output_dir = str(base / args.logic)
             args.save_models = True
 

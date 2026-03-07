@@ -5,7 +5,7 @@ replacing feature-fail rows (feature_fail != 0) with synt's result. Assert synt 
 When feature_fail != 0, output overhead = gin_overhead + synt_overhead (synt_overhead from
 synt extraction_times.csv).
 
-Output: data/cp26/results/graph/lite_fallback/<logic>/seedN/train_eval.csv, test_eval.csv,
+Output: data/results/graph/lite_fallback/<logic>/seedN/train_eval.csv, test_eval.csv,
         and summary.json (same shape as gin_pwc).
 """
 
@@ -24,11 +24,11 @@ from src.utils import normalize_path
 from src.performance import parse_performance_json
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-GIN_PWC_DIR = PROJECT_ROOT / "data" / "cp26" / "results" / "graph" / "before_fallback"
-SYNT_DIR = PROJECT_ROOT / "data" / "cp26" / "results" / "lite"
+GIN_PWC_DIR = PROJECT_ROOT / "data" / "results" / "graph" / "before_fallback"
+SYNT_DIR = PROJECT_ROOT / "data" / "results" / "lite"
 SYNT_EXTRACTION_BASE = PROJECT_ROOT / "data" / "features" / "syntactic"
-SPLITS_BASE = PROJECT_ROOT / "data" / "cp26" / "performance_splits" / "smtcomp24"
-OUT_ROOT = PROJECT_ROOT / "data" / "cp26" / "results" / "graph" / "lite_fallback"
+SPLITS_BASE = PROJECT_ROOT / "data" / "train_test_splits"
+OUT_ROOT = PROJECT_ROOT / "data" / "results" / "graph" / "lite_fallback"
 SEEDS = [0, 10, 20, 30, 40]
 
 GIN_HEADER = ["benchmark", "selected", "solved", "runtime", "solver_runtime", "overhead", "feature_fail"]
@@ -261,13 +261,13 @@ def main() -> None:
         "--gin-dir",
         type=Path,
         default=GIN_PWC_DIR,
-        help="GIN-PWC results root (default: data/cp26/results/graph/before_fallback)",
+        help="GIN-PWC results root (default: data/results/graph/before_fallback)",
     )
     parser.add_argument(
         "--synt-dir",
         type=Path,
         default=SYNT_DIR,
-        help="Lite (synt) results root (default: data/cp26/results/lite)",
+        help="Lite (synt) results root (default: data/results/lite)",
     )
     parser.add_argument(
         "--synt-extraction-base",
@@ -279,13 +279,13 @@ def main() -> None:
         "--splits-dir",
         type=Path,
         default=SPLITS_BASE,
-        help="Performance splits root (default: data/cp26/performance_splits/smtcomp24)",
+        help="Performance splits root (default: data/train_test_splits)",
     )
     parser.add_argument(
         "--out-dir",
         type=Path,
         default=OUT_ROOT,
-        help="Output root for lite_fallback (default: data/cp26/results/graph/lite_fallback)",
+        help="Output root for lite_fallback (default: data/results/graph/lite_fallback)",
     )
     parser.add_argument("--timeout", type=float, default=1200.0, help="Timeout for PAR-2 (default: 1200)")
     args = parser.parse_args()

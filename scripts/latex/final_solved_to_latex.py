@@ -12,13 +12,13 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 RESULT_DIRS = [
-    PROJECT_ROOT / "data" / "cp26" / "results" / "lite",
-    PROJECT_ROOT / "data" / "cp26" / "results" / "lite+text" / "all-mpnet-base-v2",
-    PROJECT_ROOT / "data" / "cp26" / "results" / "graph",
-    PROJECT_ROOT / "data" / "cp26" / "results" / "machsmt" / "ehm",
-    PROJECT_ROOT / "data" / "cp26" / "results" / "graph+text",
-    PROJECT_ROOT / "data" / "cp26" / "results" / "sibyl" / "evaluation",
-    PROJECT_ROOT / "data" / "cp26" / "results" / "text" / "all-mpnet-base-v2",
+    PROJECT_ROOT / "data" / "results" / "lite",
+    PROJECT_ROOT / "data" / "results" / "lite+text" / "all-mpnet-base-v2",
+    PROJECT_ROOT / "data" / "results" / "graph",
+    PROJECT_ROOT / "data" / "results" / "machsmt" / "ehm",
+    PROJECT_ROOT / "data" / "results" / "graph+text",
+    PROJECT_ROOT / "data" / "results" / "sibyl" / "evaluation",
+    PROJECT_ROOT / "data" / "results" / "text" / "all-mpnet-base-v2",
 ]
 LABELS = ["synt", "synt_mpnet", "gin_pwc", "mach_ehm", "fusion_pwc", "sibyl", "text_mpnet"]
 

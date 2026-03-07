@@ -2,7 +2,7 @@
 """
 Train SetFit (MPNet) on description embeddings for all seeds of a logic.
 
-For each seed directory under data/cp26/performance_splits/smtcomp24/<LOGIC>/,
+For each seed directory under data/train_test_splits/<LOGIC>/,
 trains a SetFit model using benchmark descriptions and saves it.
 
 Usage:
@@ -28,7 +28,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.setfit_model import create_setfit_data, train_setfit_model
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SPLITS_BASE = PROJECT_ROOT / "data" / "cp26" / "performance_splits" / "smtcomp24"
+SPLITS_BASE = PROJECT_ROOT / "data" / "train_test_splits"
 DESC_BASE = PROJECT_ROOT / "data" / "meta_info_24" / "descriptions"
 MODEL_BASE = PROJECT_ROOT / "models" / "setfit_mpnet"
 

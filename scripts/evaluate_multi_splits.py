@@ -3,7 +3,7 @@
 Evaluate algorithm selection over multiple train/test splits (evaluate_multi_splits).
 
 Use --logic (e.g. BV, QF_BV) to run one division; omit --logic to run all logics found in feature dir(s).
-  Splits are read from data/cp26/performance_splits/smtcomp24/<logic>/ (seed0/, seed10/, ... with train.json, test.json).
+  Splits are read from data/train_test_splits/<logic>/ (seed0/, seed10/, ... with train.json, test.json).
 
 Features: --features-dir DIR [DIR ...] can be given one or more directories. Each must have one
   logic folder per division (e.g. data/features/syntactic, data/features/desc/all-mpnet-base-v2).
@@ -44,7 +44,7 @@ from src.utils import normalize_path
 # Per-instance extraction-time overhead cap (seconds) when computing metrics
 FEATURE_TIMEOUT = 5.0
 # Default splits base when using --logic (relative to project root)
-SPLITS_BASE = "data/cp26/performance_splits/smtcomp24"
+SPLITS_BASE = "data/train_test_splits"
 
 
 def _to_python_for_json(obj) -> int | float | list | dict | str | bool | None:
@@ -103,7 +103,7 @@ def evaluate_multi_splits(
     extraction_times.csv are excluded from training and get SBS at evaluation.
 
     Args:
-        splits_dir: Directory containing seed subdirs (e.g. data/cp26/performance_splits/smtcomp24/ABV)
+        splits_dir: Directory containing seed subdirs (e.g. data/train_test_splits/ABV)
         feature_csv_path: Path or list of paths to feature CSV(s); ignored if feature_csv_path_and_times_per_seed is set
         extraction_time_by_path: Map normalized instance path -> extraction time (sec); ignored if feature_csv_path_and_times_per_seed is set
         failed_paths_from_csv: Set of normalized paths with failed=1 in extraction_times CSV; used for SBS at eval

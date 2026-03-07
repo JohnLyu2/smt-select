@@ -5,7 +5,7 @@ Extract GIN-PWC backbone embeddings for a logic across all seed models.
 Specify a logic (e.g. ABV). Uses models under models/gin_pwc/<logic>/ (e.g. seed0, seed10,
 seed20, seed30, seed40). For each seed, runs extraction and writes to
 data/features/gin_pwc/<logic>/seedX/ using benchmarks from
-data/cp26/raw_data/smtcomp24_performance/<logic>.json.
+data/raw_data/smtcomp24_performance/<logic>.json.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 DEFAULT_MODELS_BASE = Path("models/gin_pwc")
-DEFAULT_PERF_DIR = Path("data/cp26/raw_data/smtcomp24_performance")
+DEFAULT_PERF_DIR = Path("data/raw_data/smtcomp24_performance")
 DEFAULT_FEATURES_BASE = Path("data/features/gin_pwc")
 
 
@@ -35,7 +35,7 @@ def main() -> None:
     parser.add_argument(
         "logic",
         type=str,
-        help="Logic name (e.g. ABV). Model dir: models/gin_pwc/<logic>/seedX; benchmarks: data/cp26/raw_data/smtcomp24_performance/<logic>.json",
+        help="Logic name (e.g. ABV). Model dir: models/gin_pwc/<logic>/seedX; benchmarks: data/raw_data/smtcomp24_performance/<logic>.json",
     )
     parser.add_argument(
         "--models-base",
