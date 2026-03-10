@@ -90,7 +90,7 @@ def _load_description_map(desc_json_path: str) -> dict[str, str]:
     """
     Load path -> description from JSON. Supports two formats:
     - List: [{"smtlib_path": "...", "description": "..."}, ...]
-    - Dict (e.g. data/meta_info_24/descriptions/LOGIC.json): {"<path>": {"description": "..."}, ...}
+    - Dict (e.g. data/descriptions/LOGIC.json): {"<path>": {"description": "..."}, ...}
     The "description" field must exist and be non-empty for each entry.
     """
     json_path = Path(desc_json_path)

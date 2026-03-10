@@ -29,7 +29,7 @@ from src.setfit_model import create_setfit_data, train_setfit_model
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SPLITS_BASE = PROJECT_ROOT / "data" / "train_test_splits"
-DESC_BASE = PROJECT_ROOT / "data" / "meta_info_24" / "descriptions"
+DESC_BASE = PROJECT_ROOT / "data" / "descriptions"
 MODEL_BASE = PROJECT_ROOT / "models" / "setfit_mpnet"
 
 

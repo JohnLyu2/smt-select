@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Evaluate algorithm selection over multiple train/test splits (evaluate_multi_splits).
+SVM-based algorithm selection over multiple train/test splits (experiment_svms).
 
 Use --logic (e.g. BV, QF_BV) to run one division; omit --logic to run all logics found in feature dir(s).
   Splits are read from data/train_test_splits/<logic>/ (seed0/, seed10/, ... with train.json, test.json).

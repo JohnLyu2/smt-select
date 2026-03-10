@@ -260,7 +260,7 @@ def encode_all_desc_from_descriptions_file(
     path column plus emb_0, emb_1, ... columns.
 
     Args:
-        json_path: Path to descriptions JSON (e.g. data/meta_info_24/descriptions/ABV.json).
+        json_path: Path to descriptions JSON (e.g. data/descriptions/ABV.json).
         output_csv_path: Path to output CSV. If None, same dir as JSON with .csv extension.
         model_name, normalize, batch_size, show_progress, show_trunc_stats, is_setfit:
             Same semantics as for encoding.
@@ -316,22 +316,22 @@ def main():
         epilog="""
 Examples:
   # Basic usage - output saved next to the JSON with .csv extension
-  python -m src.desc_encoder data/meta_info_24/descriptions/ABV.json
+  python -m src.desc_encoder data/descriptions/ABV.json
 
   # Specify custom output path
-  python -m src.desc_encoder data/meta_info_24/descriptions/ABV.json -o data/embeddings/ABV.csv
+  python -m src.desc_encoder data/descriptions/ABV.json -o data/embeddings/ABV.csv
 
   # Use different model and normalize embeddings
-  python -m src.desc_encoder data/meta_info_24/descriptions/ABV.json --model all-MiniLM-L6-v2 --normalize
+  python -m src.desc_encoder data/descriptions/ABV.json --model all-MiniLM-L6-v2 --normalize
 
   # Adjust batch size and disable progress bar
-  python -m src.desc_encoder data/meta_info_24/descriptions/ABV.json --batch-size 64 --no-progress
+  python -m src.desc_encoder data/descriptions/ABV.json --batch-size 64 --no-progress
         """,
     )
     parser.add_argument(
         "json_path",
         type=str,
-        help="Path to descriptions JSON (e.g. data/meta_info_24/descriptions/ABV.json)",
+        help="Path to descriptions JSON (e.g. data/descriptions/ABV.json)",
     )
     parser.add_argument(
         "-o",

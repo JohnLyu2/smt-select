@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Encode benchmark descriptions from description JSONs in data/meta_info_24/descriptions/
+Encode benchmark descriptions from description JSONs in data/descriptions/
 (e.g. ABV.json: path -> {raw_description, description}) and save to CSV.
 
 Output layout (like data/features/syntactic): one folder per logic, each with
@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.desc_encoder import encode_all_desc_from_descriptions_file
 
 # Fixed input directory for description JSONs (path -> {raw_description, description})
-DESCRIPTIONS_DIR = "data/meta_info_24/descriptions"
+DESCRIPTIONS_DIR = "data/descriptions"
 # Default output base (one folder per logic: <output_dir>/<logic>/features.csv, extraction_times.csv)
 DEFAULT_OUTPUT_DIR = "data/features/desc/all-mpnet-base-v2"
 # When using --setfit-dir, seeds to use per logic (all seeds per logic = Option B)
@@ -34,9 +34,9 @@ SETFIT_SEEDS = [0, 10, 20, 30, 40]
 
 
 def main():
-    """Process all description JSONs in data/meta_info_24/descriptions/ and create CSV files."""
+    """Process all description JSONs in data/descriptions/ and create CSV files."""
     parser = argparse.ArgumentParser(
-        description="Encode benchmark descriptions from description JSONs (data/meta_info_24/descriptions/) and save to CSV."
+        description="Encode benchmark descriptions from description JSONs (data/descriptions/) and save to CSV."
     )
     parser.add_argument(
         "--output-dir",
