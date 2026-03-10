@@ -7,7 +7,6 @@ evaluates it on train and test sets, aggregating metrics across seeds.
 """
 
 import argparse
-import csv
 import json
 import logging
 import os
@@ -20,6 +19,13 @@ import numpy as np
 
 from src.defaults import DEFAULT_BENCHMARK_ROOT
 from src.evaluate import as_evaluate, as_evaluate_parallel, compute_metrics
+from src.fallback_merge import (
+    CSV_HEADER,
+    load_eval_csv,
+    load_fallback_lookup,
+    merge_with_fallback,
+    write_eval_csv,
+)
 from src.performance import (
     filter_training_instances,
     MultiSolverDataset,
@@ -60,118 +66,6 @@ def _rebase_perf_data(multi_perf_data: MultiSolverDataset, benchmark_root: Path)
 
 
 DEFAULT_LITE_DIR = Path("data/results/lite")
-
-CSV_HEADER = [
-    "benchmark",
-    "selected",
-    "solved",
-    "runtime",
-    "solver_runtime",
-    "overhead",
-    "feature_fail",
-]
-
-
-def _load_lite_lookup(path: Path) -> dict[str, dict]:
-    """Load Lite eval CSV; return benchmark -> row dict."""
-    out: dict[str, dict] = {}
-    with path.open(newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            bench = (row.get("benchmark") or "").strip()
-            if bench:
-                out[bench] = row
-    return out
-
-
-def _load_eval_csv(path: Path) -> list[dict]:
-    """Load eval CSV; return list of row dicts."""
-    with path.open(newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
-
-
-def _write_eval_csv(path: Path, rows: list[dict]) -> None:
-    """Write rows using CSV_HEADER order."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(CSV_HEADER)
-        for row in rows:
-            writer.writerow([row.get(k, "") for k in CSV_HEADER])
-
-
-def _merge_with_lite(
-    wl_rows: list[dict],
-    lite_lookup: dict[str, dict],
-    timeout: float,
-) -> list[dict]:
-    """
-    Replace feature_fail rows with Lite results.
-
-    For feature_fail rows:
-      overhead_out = wl_overhead + lite_overhead
-      runtime_out  = lite_solver_runtime + overhead_out  (capped at timeout)
-    """
-    out: list[dict] = []
-    for row in wl_rows:
-        bench = (row.get("benchmark") or "").strip()
-        try:
-            ff = int(row.get("feature_fail", 0) or 0)
-        except (ValueError, TypeError):
-            ff = 0
-
-        if ff == 0:
-            out.append(row)
-            continue
-
-        if bench not in lite_lookup:
-            raise ValueError(
-                f"Missing Lite row for feature-fail benchmark: {bench!r}"
-            )
-        lt_row = lite_lookup[bench]
-
-        raw_wl_overhead = row.get("overhead", "")
-        try:
-            wl_overhead = float(raw_wl_overhead) if raw_wl_overhead not in ("", None) else 0.0
-        except (TypeError, ValueError):
-            wl_overhead = 0.0
-
-        try:
-            lt_solver_runtime = float(lt_row.get("solver_runtime") or 0.0)
-        except (TypeError, ValueError):
-            lt_solver_runtime = 0.0
-        try:
-            lt_solved = int(lt_row.get("solved") or 0)
-        except (TypeError, ValueError):
-            lt_solved = 0
-        raw_lt_overhead = lt_row.get("overhead", "")
-        try:
-            lt_overhead = float(raw_lt_overhead) if raw_lt_overhead not in ("", None) else 0.0
-        except (TypeError, ValueError):
-            lt_overhead = 0.0
-
-        overhead_out = wl_overhead + lt_overhead
-        runtime_out = lt_solver_runtime + overhead_out
-
-        if runtime_out > timeout:
-            solved = 0
-            runtime_out = timeout
-            overhead_out = max(0.0, timeout - lt_solver_runtime)
-        else:
-            solved = lt_solved
-
-        out.append(
-            {
-                "benchmark": bench,
-                "selected": lt_row.get("selected", ""),
-                "solved": str(solved),
-                "runtime": str(runtime_out),
-                "solver_runtime": str(lt_solver_runtime),
-                "overhead": f"{overhead_out:.6f}",
-                "feature_fail": "1",
-            }
-        )
-    return out
 
 
 def evaluate_multi_splits_wl(
@@ -341,14 +235,31 @@ def evaluate_multi_splits_wl(
         lt_seed_dir = lite_division_dir / f"seed{seed_val}"
         if not lt_seed_dir.is_dir():
             raise FileNotFoundError(f"Lite seed dir not found: {lt_seed_dir}")
+
+        # Train fallback: merge WL train eval with Lite train eval, recompute train metrics.
+        lt_train_csv = lt_seed_dir / "train_eval.csv"
+        if not lt_train_csv.is_file():
+            raise FileNotFoundError(f"Lite train CSV not found: {lt_train_csv}")
+        wl_train_rows = load_eval_csv(Path(train_output_csv))
+        lite_train_lookup = load_fallback_lookup(lt_train_csv)
+        merged_train = merge_with_fallback(wl_train_rows, lite_train_lookup, timeout)
+        write_eval_csv(Path(train_output_csv), merged_train, header=CSV_HEADER)
+        n_fb_train = sum(1 for r in merged_train if r.get("feature_fail") == "1")
+        logging.info(
+            "  Merged train: %d/%d rows from Lite fallback", n_fb_train, len(merged_train)
+        )
+        train_result = parse_as_perf_csv(str(train_output_csv), timeout)
+        train_metrics = compute_metrics(train_result, train_data)
+
+        # Test fallback: existing behavior, now symmetric with train.
         lt_test_csv = lt_seed_dir / "test_eval.csv"
         if not lt_test_csv.is_file():
             raise FileNotFoundError(f"Lite test CSV not found: {lt_test_csv}")
 
-        fusion_test_rows = _load_eval_csv(test_output_csv)
-        lite_test_lookup = _load_lite_lookup(lt_test_csv)
-        merged_test = _merge_with_lite(fusion_test_rows, lite_test_lookup, timeout)
-        _write_eval_csv(test_output_csv, merged_test)
+        wl_test_rows = load_eval_csv(Path(test_output_csv))
+        lite_test_lookup = load_fallback_lookup(lt_test_csv)
+        merged_test = merge_with_fallback(wl_test_rows, lite_test_lookup, timeout)
+        write_eval_csv(Path(test_output_csv), merged_test, header=CSV_HEADER)
         n_fb_test = sum(1 for r in merged_test if r.get("feature_fail") == "1")
         logging.info(
             "  Merged test: %d/%d rows from Lite fallback", n_fb_test, len(merged_test)

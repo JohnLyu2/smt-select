@@ -34,11 +34,19 @@ import torch
 from src.defaults import DEFAULT_BENCHMARK_ROOT
 from src.evaluate import as_evaluate, as_evaluate_parallel, compute_metrics
 from src.evaluate_gin import _load_gin_selector
+from src.fallback_merge import (
+    CSV_HEADER,
+    load_eval_csv,
+    load_fallback_lookup,
+    merge_with_fallback,
+    write_eval_csv,
+)
 from src.gin_ehm import train_gin_regression
 from src.gin_pwc import train_gin_pwc
 from src.performance import (
     filter_training_instances,
     MultiSolverDataset,
+    parse_as_perf_csv,
     parse_performance_json,
 )
 
@@ -71,6 +79,9 @@ def _rebase_perf_data(multi_perf_data: MultiSolverDataset, benchmark_root: Path)
     )
 
 
+DEFAULT_LITE_DIR = Path("data") / "results" / "lite"
+
+
 def evaluate_multi_splits_gin(
     splits_dir: Path,
     *,
@@ -96,6 +107,8 @@ def evaluate_multi_splits_gin(
     skip_easy_unsolvable: bool = False,
     skip_trivial_under: float = 24.0,
     seeds: list[int] | None = None,
+    lite_dir: Path | None = None,
+    fallback_lite: bool = False,
 ) -> dict:
     """
     Run train/test evaluation with GIN (EHM or PWC) for each split (seed) under splits_dir.
@@ -114,6 +127,15 @@ def evaluate_multi_splits_gin(
         raise ValueError(f"Benchmark root is not a directory: {root}")
 
     division = splits_dir.name
+
+    lite_division_dir: Path | None = None
+    if fallback_lite:
+        base = (lite_dir or DEFAULT_LITE_DIR).resolve()
+        lite_division_dir = base / division
+        if not lite_division_dir.is_dir():
+            raise FileNotFoundError(
+                f"Lite results dir not found for division {division}: {lite_division_dir}"
+            )
     seed_entries = discover_seed_dirs(splits_dir)
     if not seed_entries:
         raise ValueError(
@@ -308,6 +330,50 @@ def evaluate_multi_splits_gin(
                 csv_benchmark_root=root,
             )
         train_metrics = compute_metrics(train_result, train_data)
+
+        if fallback_lite and output_dir is not None and lite_division_dir is not None:
+            lt_seed_dir = lite_division_dir / f"seed{seed_val}"
+            if not lt_seed_dir.is_dir():
+                raise FileNotFoundError(f"Lite seed dir not found: {lt_seed_dir}")
+
+            # Train fallback
+            if train_output_csv:
+                lt_train_csv = lt_seed_dir / "train_eval.csv"
+                if not lt_train_csv.is_file():
+                    raise FileNotFoundError(f"Lite train CSV not found: {lt_train_csv}")
+                train_csv_path = Path(train_output_csv)
+                gin_train_rows = load_eval_csv(train_csv_path)
+                lite_train_lookup = load_fallback_lookup(lt_train_csv)
+                merged_train = merge_with_fallback(gin_train_rows, lite_train_lookup, timeout)
+                write_eval_csv(train_csv_path, merged_train, header=CSV_HEADER)
+                n_fb_train = sum(1 for r in merged_train if r.get("feature_fail") == "1")
+                logging.info(
+                    "  Merged train: %d/%d rows from Lite fallback",
+                    n_fb_train,
+                    len(merged_train),
+                )
+                train_result = parse_as_perf_csv(str(train_csv_path), timeout)
+                train_metrics = compute_metrics(train_result, train_data)
+
+            # Test fallback
+            if test_output_csv:
+                lt_test_csv = lt_seed_dir / "test_eval.csv"
+                if not lt_test_csv.is_file():
+                    raise FileNotFoundError(f"Lite test CSV not found: {lt_test_csv}")
+
+                test_csv_path = Path(test_output_csv)
+                gin_test_rows = load_eval_csv(test_csv_path)
+                lite_test_lookup = load_fallback_lookup(lt_test_csv)
+                merged_test = merge_with_fallback(gin_test_rows, lite_test_lookup, timeout)
+                write_eval_csv(test_csv_path, merged_test, header=CSV_HEADER)
+                n_fb_test = sum(1 for r in merged_test if r.get("feature_fail") == "1")
+                logging.info(
+                    "  Merged test: %d/%d rows from Lite fallback",
+                    n_fb_test,
+                    len(merged_test),
+                )
+                test_result = parse_as_perf_csv(str(test_csv_path), timeout)
+
         test_metrics = compute_metrics(test_result, test_data)
 
         seed_results.append({
@@ -496,7 +562,8 @@ def main() -> None:
         help="Log level (default: INFO)",
     )
     parser.add_argument(
-        "--skip-easy-unsolvable",
+        "--filter",
+        dest="skip_easy_unsolvable",
         action="store_true",
         help="Exclude train instances where no solver solves or all solve in <= N seconds; saves graph/train time",
     )
@@ -514,12 +581,25 @@ def main() -> None:
         metavar="N",
         help="Only run for these seed values (e.g. --seeds 0 10 20). If omitted, run for all discovered seeds",
     )
+    parser.add_argument(
+        "--lite-dir",
+        type=str,
+        default=str(DEFAULT_LITE_DIR),
+        help=f"Lite results root for fallback (default: {DEFAULT_LITE_DIR})",
+    )
+    parser.add_argument(
+        "--fallback-lite",
+        action="store_true",
+        default=True,
+        help="Enable Lite fallback for feature-fail instances using Lite results (enabled by default).",
+    )
 
     args = parser.parse_args()
     models_base = None
     if args.logic:
-args.splits_dir = str(Path("data/train_test_splits") / args.logic)
-    args.output_dir = str(Path("data/results/graph") / args.model_type / args.logic)
+        args.splits_dir = str(Path("data/train_test_splits") / args.logic)
+        # Save results under data/results/graph/<logic>/ (no model-type subfolder).
+        args.output_dir = str(Path("data/results/graph") / args.logic)
         args.save_models = True
         models_base = Path("models")
     if args.eval_only:
@@ -564,6 +644,8 @@ args.splits_dir = str(Path("data/train_test_splits") / args.logic)
         skip_easy_unsolvable=args.skip_easy_unsolvable,
         skip_trivial_under=args.skip_trivial_under,
         seeds=args.seeds,
+        lite_dir=Path(args.lite_dir),
+        fallback_lite=args.fallback_lite,
     )
 
 

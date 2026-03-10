@@ -26,6 +26,13 @@ import torch
 
 from src.defaults import DEFAULT_BENCHMARK_ROOT
 from src.evaluate import as_evaluate, compute_metrics, load_extraction_times_csv
+from src.fallback_merge import (
+    CSV_HEADER,
+    load_eval_csv,
+    load_fallback_lookup,
+    merge_with_fallback,
+    write_eval_csv,
+)
 from src.fusion_pwc import (
     build_emb_by_path,
     load_embedding_csv,
@@ -88,102 +95,7 @@ def load_failed_gin_paths(extraction_times_csv: Path) -> list[str]:
 
 def _load_litetext_lookup(path: Path) -> dict[str, dict]:
     """Load Lite+Text eval CSV; return benchmark -> row dict."""
-    out: dict[str, dict] = {}
-    with path.open(newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            bench = (row.get("benchmark") or "").strip()
-            if bench:
-                out[bench] = row
-    return out
-
-
-def _load_eval_csv(path: Path) -> list[dict]:
-    """Load eval CSV; return list of row dicts."""
-    with path.open(newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
-
-
-def _write_eval_csv(path: Path, rows: list[dict]) -> None:
-    """Write rows using CSV_HEADER order."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(CSV_HEADER)
-        for row in rows:
-            writer.writerow([row.get(k, "") for k in CSV_HEADER])
-
-
-def _merge_with_litetext(
-    fusion_rows: list[dict],
-    litetext_lookup: dict[str, dict],
-    timeout: float,
-) -> list[dict]:
-    """
-    Replace feature_fail rows with Lite+Text results.
-
-    For feature_fail rows:
-      overhead_out = fusion_overhead + lite_text_overhead
-      runtime_out  = lite_text_solver_runtime + overhead_out  (capped at timeout)
-    """
-    out: list[dict] = []
-    for row in fusion_rows:
-        bench = (row.get("benchmark") or "").strip()
-        try:
-            ff = int(row.get("feature_fail", 0) or 0)
-        except (ValueError, TypeError):
-            ff = 0
-
-        if ff == 0:
-            out.append(row)
-            continue
-
-        if bench not in litetext_lookup:
-            raise ValueError(
-                f"Missing Lite+Text row for feature-fail benchmark: {bench!r}"
-            )
-        lt_row = litetext_lookup[bench]
-
-        raw_fusion_overhead = row.get("overhead", "")
-        try:
-            fusion_overhead = float(raw_fusion_overhead) if raw_fusion_overhead not in ("", None) else 0.0
-        except (TypeError, ValueError):
-            fusion_overhead = 0.0
-
-        try:
-            lt_solver_runtime = float(lt_row.get("solver_runtime") or 0.0)
-        except (TypeError, ValueError):
-            lt_solver_runtime = 0.0
-        try:
-            lt_solved = int(lt_row.get("solved") or 0)
-        except (TypeError, ValueError):
-            lt_solved = 0
-        raw_lt_overhead = lt_row.get("overhead", "")
-        try:
-            lt_overhead = float(raw_lt_overhead) if raw_lt_overhead not in ("", None) else 0.0
-        except (TypeError, ValueError):
-            lt_overhead = 0.0
-
-        overhead_out = fusion_overhead + lt_overhead
-        runtime_out = lt_solver_runtime + overhead_out
-
-        if runtime_out > timeout:
-            solved = 0
-            runtime_out = timeout
-            overhead_out = max(0.0, timeout - lt_solver_runtime)
-        else:
-            solved = lt_solved
-
-        out.append({
-            "benchmark": bench,
-            "selected": lt_row.get("selected", ""),
-            "solved": str(solved),
-            "runtime": str(runtime_out),
-            "solver_runtime": str(lt_solver_runtime),
-            "overhead": f"{overhead_out:.6f}",
-            "feature_fail": "1",
-        })
-    return out
+    return load_fallback_lookup(path)
 
 
 def evaluate_multi_splits_fusion(
