@@ -103,7 +103,9 @@ To run the multimodal fusion experiments over the five splits for a logic (e.g. 
 python scripts/experiment_fusion.py --logic ABV
 ```
 
-This will load the corresponding graph and text feature directories, train the fusion model across all seeds, and write results to `data/results/graph+text/ABV/` (per-seed `train_eval.csv`/`test_eval.csv` plus `summary.json`).
+This will load the corresponding graph and text feature directories, train the fusion model across all seeds, and write results to `data/results/graph+text/ABV/` (per-seed `train_eval.csv`/`test_eval.csv` plus `summary.json`). Trained fusion models are saved under `models/fusion_pwc/ABV/seed<N>/`. 
+
+Our saved models live under `models/fusion_pwc/`, and you can also run evaluation only using the `--eval-only` flag.
 
 ### Baselines
 
