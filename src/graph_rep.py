@@ -9,8 +9,6 @@ import sys
 from pathlib import Path
 
 from tqdm import tqdm
-
-from grakel import Graph
 from z3 import (
     AstVector,
     Z3_OP_UNINTERPRETED,
@@ -137,7 +135,7 @@ def smt_to_graph(smt_path: str | Path) -> dict:
     return {"nodes": nodes, "edges": edges, "roots": roots}
 
 
-def smt_graph_to_grakel(graph_dict: dict) -> Graph:
+def smt_graph_to_grakel(graph_dict: dict) -> object:
     """
     Convert the internal graph dict from smt_to_graph() to a GraKel Graph.
 
@@ -151,6 +149,12 @@ def smt_graph_to_grakel(graph_dict: dict) -> Graph:
     Returns:
         A grakel.Graph suitable for Weisfeiler-Lehman and other graph kernels.
     """
+    try:
+        from grakel import Graph
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError(
+            "grakel is required for WL graph-kernel features; install it with 'pip install grakel'."
+        ) from e
     nodes = graph_dict["nodes"]
     raw_edges = graph_dict["edges"]
     node_labels = {nid: nodes[nid]["type"] for nid in nodes}
