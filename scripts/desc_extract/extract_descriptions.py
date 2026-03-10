@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
-Extract descriptions from meta-info JSON files (e.g. data/meta_info_24/ABV.json)
-and write per-logic JSON files under data/meta_info_24/descriptions/.
+Extract descriptions from meta-info JSON files and write per-logic description JSONs.
 
-Output format: one JSON per logic; top-level keys are smt-lib paths; each value has
-  - raw_description: the original description (unchanged, may be empty)
-  - description: same as used by encode_all_logic_desc: placeholder if missing/empty,
-    otherwise stripped text. When available, "Application: XXX" and "Category: XXX"
-    are prepended.
+Input: per-logic meta-info JSONs (default data/raw_data/meta_info/, e.g. ABV.json)
+  with benchmark entries containing a description field.
+Output: one JSON per logic under --out-dir (default data/descriptions/).
+  Top-level keys are smt-lib paths; each value has raw_description and description.
+  encode_desc_logics.py and train_setfit_splits.py read from that output path.
 """
 
 import argparse
@@ -68,21 +67,25 @@ def extract_descriptions_from_json(json_path: Path) -> dict[str, dict]:
     return out
 
 
+# Output default: downstream scripts (encode_desc_logics, train_setfit_splits) expect this path.
+DEFAULT_OUT_DIR = Path("data") / "descriptions"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Extract descriptions from meta-info JSONs into data/meta_info_24/descriptions/."
+        description="Extract descriptions from meta-info JSONs into description JSONs (default out: data/descriptions/)."
     )
     parser.add_argument(
         "--meta-dir",
         type=Path,
-        default=Path("data") / "meta_info_24",
-        help="Directory containing per-logic meta-info JSON files",
+        default=Path("data") / "raw_data" / "meta_info",
+        help="Directory containing per-logic meta-info JSON files (default: data/raw_data/meta_info)",
     )
     parser.add_argument(
         "--out-dir",
         type=Path,
         default=None,
-        help="Output directory (default: <meta-dir>/descriptions)",
+        help=f"Output directory for description JSONs (default: {DEFAULT_OUT_DIR})",
     )
     parser.add_argument(
         "--logic",
@@ -94,7 +97,7 @@ def main() -> int:
     args = parser.parse_args()
 
     meta_dir = args.meta_dir.resolve()
-    out_dir = (args.out_dir or meta_dir / "descriptions").resolve()
+    out_dir = (args.out_dir or DEFAULT_OUT_DIR).resolve()
 
     if not meta_dir.is_dir():
         print(f"Error: meta-info directory is not a directory: {meta_dir}", file=sys.stderr)
