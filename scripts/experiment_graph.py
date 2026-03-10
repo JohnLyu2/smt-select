@@ -96,7 +96,7 @@ def evaluate_multi_splits_gin(
     jobs: int = 8,
     hidden_dim: int = 64,
     num_layers: int = 3,
-    num_epochs: int = 500,
+    num_epochs: int = 200,
     batch_size: int = 64,
     lr: float = 1e-3,
     dropout: float = 0.1,
@@ -547,7 +547,7 @@ def main() -> None:
         default=8,
         help="Parallel workers for graph building and for evaluation (default: 4)",
     )
-    parser.add_argument("--epochs", type=int, default=500)
+    parser.add_argument("--epochs", type=int, default=200)
     parser.add_argument("--batch", type=int, default=64)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--val-ratio", type=float, default=0.15, help="Fraction of train data for validation (0 = no early stop)")
