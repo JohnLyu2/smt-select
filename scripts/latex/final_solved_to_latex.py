@@ -16,7 +16,7 @@ RESULT_DIRS = [
     PROJECT_ROOT / "data" / "results" / "lite+text" / "all-mpnet-base-v2",
     PROJECT_ROOT / "data" / "results" / "graph",
     PROJECT_ROOT / "data" / "results" / "machsmt" / "ehm",
-    PROJECT_ROOT / "data" / "results" / "graph+text",
+    PROJECT_ROOT / "data" / "results" / "graph+text" / "all-mpnet-base-v2",
     PROJECT_ROOT / "data" / "results" / "sibyl" / "evaluation",
     PROJECT_ROOT / "data" / "results" / "text" / "all-mpnet-base-v2",
 ]
@@ -107,22 +107,35 @@ def main() -> None:
                 all_logics.add(p.name)
     logics = sorted(all_logics)
 
-    # Collect solved means: {(logic, label): float}
+    # Collect solved and SBS/VBS per (logic, label) so we never mix different splits.
+    # (MachSMT/Sibyl can use different test sizes than lite/graph/text, giving wrong diffs.)
     solved: dict[tuple[str, str], float] = {}
+    sbs_per_method: dict[tuple[str, str], float] = {}
+    vbs_per_method: dict[tuple[str, str], float] = {}
     for res_dir, label in zip(result_dirs, LABELS):
         for logic in logics:
-            val = get_test_solved_mean(res_dir / logic / "summary.json")
+            path = res_dir / logic / "summary.json"
+            val = get_test_solved_mean(path)
             if val is not None:
                 solved[(logic, label)] = val
+            sbs, vbs = get_test_sbs_vbs_mean(path)
+            if sbs is not None:
+                sbs_per_method[(logic, label)] = sbs
+            if vbs is not None:
+                vbs_per_method[(logic, label)] = vbs
 
-    # Collect SBS/VBS (use first available summary per logic)
+    # Ref column (VBS - SBS): use canonical source per logic (lite if available)
+    canonical_label = "synt"  # lite
     sbs_vbs: dict[str, tuple[float, float]] = {}
     for logic in logics:
-        for res_dir in result_dirs:
-            sbs, vbs = get_test_sbs_vbs_mean(res_dir / logic / "summary.json")
-            if sbs is not None and vbs is not None:
-                sbs_vbs[logic] = (sbs, vbs)
-                break
+        key = (logic, canonical_label)
+        if key in sbs_per_method and key in vbs_per_method:
+            sbs_vbs[logic] = (sbs_per_method[key], vbs_per_method[key])
+        else:
+            for res_dir, label in zip(result_dirs, LABELS):
+                if (logic, label) in sbs_per_method and (logic, label) in vbs_per_method:
+                    sbs_vbs[logic] = (sbs_per_method[(logic, label)], vbs_per_method[(logic, label)])
+                    break
 
     # Determine which labels have data
     method_columns = [c for c in DISPLAY_ORDER if c not in ("vbs",) and any((l, c) in solved for l in logics)]
@@ -195,25 +208,27 @@ def main() -> None:
     lines.append(" & ".join(row3_cells) + " \\\\")
     lines.append("\\midrule")
 
-    # Data rows — values shown as difference from SBS
+    # Data rows — each cell is (solved - SBS) from that method's own summary (same split)
     for logic in logics:
-        sbs_val = sbs_vbs[logic][0] if logic in sbs_vbs else None
+        ref_sbs, ref_vbs = sbs_vbs.get(logic, (None, None))
 
         row_diffs: dict[str, float] = {}
         for key in columns_to_bold:
             val = solved.get((logic, key))
-            if val is not None and sbs_val is not None:
-                row_diffs[key] = val - sbs_val
+            sbs = sbs_per_method.get((logic, key))
+            if val is not None and sbs is not None:
+                row_diffs[key] = val - sbs
         max_diff = max(row_diffs.values()) if row_diffs else None
         best_keys = {k for k, v in row_diffs.items() if v == max_diff} if max_diff is not None else set()
 
         cells = [latex_escape(logic)]
         for key in value_columns:
             if key == "vbs":
-                cell = format_diff(sbs_vbs[logic][1] if logic in sbs_vbs else None, sbs_val)
+                cell = format_diff(ref_vbs, ref_sbs)
             else:
                 val = solved.get((logic, key))
-                cell = format_diff(val, sbs_val)
+                sbs = sbs_per_method.get((logic, key))
+                cell = format_diff(val, sbs)
             if key != "vbs" and key in best_keys:
                 cell = "\\textbf{" + cell + "}"
             cells.append(cell)
