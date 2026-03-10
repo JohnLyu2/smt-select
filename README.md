@@ -6,6 +6,7 @@ We offer the following variants, tailored to different data-availability and com
 
 - `SMT-Select (Graph + Text)`: the full multimodal version that uses GNN and pretrained sentence embedder to represent SMT instances.
 - `SMT-Select-Graph`: GNN-based algorithm selector.
+- `SMT-Select-Text`: SVM-based algorithm selector using descripton embeddings only.
 - `SMT-Lite`: SVM-based algorithm selector using lightweight syntactic features.
 - `SMT-Lite+Text`: SMT-Lite combined with textual embeddings.
 
