@@ -22,7 +22,7 @@ def split_json(
     input_path: str | Path,
     train_path: str | Path,
     test_path: str | Path,
-    test_size: float = 0.2,
+    test_size: float = 0.25,
     seed: int = 42,
 ) -> None:
     """
@@ -32,7 +32,7 @@ def split_json(
         input_path: Path to input JSON file
         train_path: Path to save training JSON file
         test_path: Path to save testing JSON file
-        test_size: Proportion of data to use for testing (default: 0.2)
+        test_size: Proportion of data to use for testing (default: 0.25)
         seed: Random seed for reproducibility (default: 42)
     """
     input_path = Path(input_path)
@@ -106,8 +106,8 @@ def main() -> None:
     parser.add_argument(
         "--test-size",
         type=float,
-        default=0.2,
-        help="Proportion of data for testing (default: 0.2)",
+        default=0.25,
+        help="Proportion of data for testing (default: 0.25)",
     )
     parser.add_argument(
         "--seed",
