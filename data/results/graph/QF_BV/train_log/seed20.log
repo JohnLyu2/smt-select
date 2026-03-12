@@ -1,0 +1,49 @@
+2026-03-11 02:32:28,475 - INFO - Building graphs for 7042 instances (timeout=5s)...
+2026-03-11 02:34:06,127 - WARNING - Graph build result timeout (15s) for /workspace/smt-select/smtlib/non-incremental/QF_BV/asp/EdgeMatching/edge-matching-width=10-height=10-colours=5.smt2 — worker may be stuck; marking failed
+2026-03-11 02:36:29,296 - WARNING - Graph build result timeout (15s) for /workspace/smt-select/smtlib/non-incremental/QF_BV/asp/Sudoku/sudoku.in3.smt2 — worker may be stuck; marking failed
+2026-03-11 02:37:28,845 - WARNING - Graph build result timeout (15s) for /workspace/smt-select/smtlib/non-incremental/QF_BV/Sage2/bench_5994.smt2 — worker may be stuck; marking failed
+2026-03-11 02:38:31,791 - WARNING - Graph build result timeout (15s) for /workspace/smt-select/smtlib/non-incremental/QF_BV/asp/EdgeMatching/edge-matching-width=8-height=8-colours=11.smt2 — worker may be stuck; marking failed
+2026-03-11 02:43:12,390 - INFO - Graphs: 5668 built, 1374 failed (of 7042 instances)
+2026-03-11 02:45:20,470 - INFO - GIN-PWC: 5668 instances, 70229 pairwise samples
+2026-03-11 02:45:20,547 - INFO - Early stopping: val_ratio=0.15, patience=50, min_epochs=100 -> 59695 train, 10534 val samples
+2026-03-11 02:47:35,694 - INFO - Best val loss 0.0808 (epoch 1)
+2026-03-11 02:47:35,696 - INFO - Epoch 1/200 train loss (weighted BCE) 0.1578 val loss 0.0808 (best)
+2026-03-11 02:52:10,693 - INFO - Best val loss 0.0550 (epoch 3)
+2026-03-11 02:56:44,788 - INFO - Best val loss 0.0434 (epoch 5)
+2026-03-11 02:59:01,191 - INFO - Best val loss 0.0402 (epoch 6)
+2026-03-11 03:08:03,272 - INFO - Epoch 10/200 train loss (weighted BCE) 0.0397 val loss 0.0450
+2026-03-11 03:10:22,392 - INFO - Best val loss 0.0335 (epoch 11)
+2026-03-11 03:24:09,397 - INFO - Best val loss 0.0315 (epoch 17)
+2026-03-11 03:31:10,579 - INFO - Epoch 20/200 train loss (weighted BCE) 0.0362 val loss 0.0379
+2026-03-11 03:35:53,497 - INFO - Best val loss 0.0286 (epoch 22)
+2026-03-11 03:38:11,495 - INFO - Best val loss 0.0281 (epoch 23)
+2026-03-11 03:45:07,796 - INFO - Best val loss 0.0276 (epoch 26)
+2026-03-11 03:47:25,962 - INFO - Best val loss 0.0249 (epoch 27)
+2026-03-11 03:54:18,383 - INFO - Epoch 30/200 train loss (weighted BCE) 0.0275 val loss 0.0279
+2026-03-11 04:08:04,593 - INFO - Best val loss 0.0245 (epoch 36)
+2026-03-11 04:17:18,879 - INFO - Epoch 40/200 train loss (weighted BCE) 0.0291 val loss 0.0282
+2026-03-11 04:21:55,304 - INFO - Best val loss 0.0239 (epoch 42)
+2026-03-11 04:24:11,283 - INFO - Best val loss 0.0230 (epoch 43)
+2026-03-11 04:40:25,480 - INFO - Epoch 50/200 train loss (weighted BCE) 0.0250 val loss 0.0298
+2026-03-11 05:03:33,681 - INFO - Epoch 60/200 train loss (weighted BCE) 0.0213 val loss 0.0275
+2026-03-11 05:12:48,765 - INFO - Best val loss 0.0226 (epoch 64)
+2026-03-11 05:28:13,977 - INFO - Epoch 70/200 train loss (weighted BCE) 0.0225 val loss 0.0267
+2026-03-11 05:30:32,199 - INFO - Best val loss 0.0225 (epoch 71)
+2026-03-11 05:35:24,110 - INFO - Best val loss 0.0220 (epoch 73)
+2026-03-11 05:53:01,979 - INFO - Epoch 80/200 train loss (weighted BCE) 0.0184 val loss 0.0260
+2026-03-11 06:08:19,896 - INFO - Best val loss 0.0219 (epoch 86)
+2026-03-11 06:17:59,829 - INFO - Best val loss 0.0211 (epoch 90)
+2026-03-11 06:17:59,832 - INFO - Epoch 90/200 train loss (weighted BCE) 0.0171 val loss 0.0211 (best)
+2026-03-11 06:42:56,784 - INFO - Best val loss 0.0192 (epoch 100)
+2026-03-11 06:42:56,786 - INFO - Epoch 100/200 train loss (weighted BCE) 0.0169 val loss 0.0192 (best)
+2026-03-11 07:08:49,178 - INFO - Epoch 110/200 train loss (weighted BCE) 0.0175 val loss 0.0206
+2026-03-11 07:33:37,367 - INFO - Epoch 120/200 train loss (weighted BCE) 0.0227 val loss 0.0236
+2026-03-11 07:58:21,786 - INFO - Epoch 130/200 train loss (weighted BCE) 0.0327 val loss 0.0226
+2026-03-11 08:03:30,459 - INFO - Best val loss 0.0190 (epoch 132)
+2026-03-11 08:23:28,072 - INFO - Epoch 140/200 train loss (weighted BCE) 0.0154 val loss 0.0211
+2026-03-11 08:47:30,373 - INFO - Epoch 150/200 train loss (weighted BCE) 0.0159 val loss 0.0252
+2026-03-11 09:13:07,286 - INFO - Epoch 160/200 train loss (weighted BCE) 0.0155 val loss 0.0212
+2026-03-11 09:36:49,778 - INFO - Epoch 170/200 train loss (weighted BCE) 0.0169 val loss 0.0305
+2026-03-11 10:01:46,677 - INFO - Epoch 180/200 train loss (weighted BCE) 0.0192 val loss 0.0218
+2026-03-11 10:06:50,043 - INFO - Early stop: no val improvement for 50 epochs (min_epochs=100 reached), restoring best
+2026-03-11 10:06:50,198 - INFO - Saved GIN-PWC model, vocab, config, failed_paths to models/gin_pwc/QF_BV/seed20
