@@ -11,16 +11,13 @@ from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler
 
-from .performance import parse_performance_json
+from .performance import parse_performance_json, PERF_DIFF_THRESHOLD
 from .feature import (
     extract_feature_from_csv,
     extract_feature_from_csvs_concat,
 )
 from .solver_selector import SolverSelector
 from .utils import normalize_path
-
-PERF_DIFF_THRESHOLD = 1e-1  # Threshold for considering performance differences
-
 
 def _load_path_list(value: str | Path | None) -> list[str]:
     """Path to file (one path per line) → list of paths. None → []."""
