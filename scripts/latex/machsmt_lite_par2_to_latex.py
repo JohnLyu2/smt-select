@@ -81,13 +81,12 @@ def main() -> None:
         for logic in logics:
             data[(logic, label)] = get_test_gap_par2(res_dir / logic / "summary.json")
 
-    ncols = 1 + len(LABELS)
-    col_spec = "@{}l" + "c" * len(LABELS) + "@{}"
+    col_spec = "l" + "c" * len(LABELS)
 
     lines = [
-        "\\begin{table}[h]",
+        "\\begin{table}[ht]",
         "\\centering",
-        f"\\begin{{tabular*}}{{\\columnwidth}}{{@{{\\extracolsep{{\\fill}}}}{col_spec}}}",
+        f"\\begin{{tabular}}{{{col_spec}}}",
         "\\toprule",
         " & " + " & ".join(COLUMN_HEADERS) + " \\\\",
         "\\midrule",
@@ -117,7 +116,7 @@ def main() -> None:
 
     lines.extend([
         "\\bottomrule",
-        "\\end{tabular*}",
+        "\\end{tabular}",
         "\\caption{PAR-2 SBS--VBS gap closed (\\%) on the test set: MachSMT-EHM, MachSMT-PWC vs.\\ SMT-Select-Lite. Mean over five random train--test splits.}",
         "\\label{tab:machsmt_lite_par2}",
         "\\end{table}",

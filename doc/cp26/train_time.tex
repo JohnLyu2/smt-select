@@ -2,14 +2,12 @@
 \centering
 \begin{tabular}{lccccc}
 \toprule
- & \multicolumn{5}{c}{SMT-Select} \\
-\cmidrule(lr){2-6}
  & Lite & Text & Lite+Text & Graph & Graph+Text \\
 \midrule
 ABV & $\leq 0.1$ & $\leq 0.1$ & $\leq 0.1$ & 0.2 & 0.3 \\
 ALIA & $\leq 0.1$ & $\leq 0.1$ & $\leq 0.1$ & $\leq 0.1$ & 0.3 \\
 BV & $\leq 0.1$ & $\leq 0.1$ & $\leq 0.1$ & 1.1 & 1.6 \\
-QF\_BV & 1.5 & 0.2 & 1.8 & 96.9 & 99.3 \\
+QF\_BV & 1.6 & 0.3 & 1.9 & 312.7 & 321.0 \\
 QF\_IDL & 0.2 & $\leq 0.1$ & 0.2 & 65.1 & 65.6 \\
 QF\_LIA & 0.4 & $\leq 0.1$ & 0.4 & 156.4 & 158.8 \\
 QF\_NRA & $\leq 0.1$ & $\leq 0.1$ & $\leq 0.1$ & 38.1 & 39.3 \\
@@ -17,6 +15,6 @@ QF\_SLIA & 0.4 & 0.8 & 1.5 & 14.4 & 17.8 \\
 UFNIA & $\leq 0.1$ & $\leq 0.1$ & $\leq 0.1$ & 12.3 & 12.8 \\
 \bottomrule
 \end{tabular}
-\caption{Average training time in minutes.}
+\caption{Average training time (minutes) for SMT-Select variants.}
 \label{tab:train_time}
 \end{table}
