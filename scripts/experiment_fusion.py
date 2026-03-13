@@ -46,7 +46,7 @@ from src.performance import (
     MultiSolverDataset,
 )
 
-DEFAULT_GIN_FEATURES_BASE = Path("data/features/gin_pwc")
+DEFAULT_GIN_FEATURES_BASE = Path("data/features/graph")
 DEFAULT_DESC_FEATURES_DIR = Path("data/features/desc/all-mpnet-base-v2")
 DEFAULT_LITETEXT_DIR = Path("data/results/lite+text/all-mpnet-base-v2")
 DEFAULT_SPLITS_BASE = Path("data/train_test_splits")

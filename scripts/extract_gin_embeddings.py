@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_MODELS_BASE = Path("models/gin_pwc")
 DEFAULT_PERF_DIR = Path("data/raw_data/smtcomp24_performance")
-DEFAULT_FEATURES_BASE = Path("data/features/gin_pwc")
+DEFAULT_FEATURES_BASE = Path("data/features/graph")
 
 
 def _write_checkpoint(

@@ -95,7 +95,7 @@ We store precomputed GIN graph embeddings for each logic under `data/features/gr
 python scripts/extract_gin_embeddings.py ABV
 ```
 
-This command looks for models under `models/gin_pwc/ABV/seed*/`, benchmarks in `data/raw_data/smtcomp24_performance/ABV.json`, and writes seed-wise graph features to `data/features/gin_pwc/ABV/seed*/`.
+This command looks for models under `models/gin_pwc/ABV/seed*/`, benchmarks in `data/raw_data/smtcomp24_performance/ABV.json`, and writes seed-wise graph features to `data/features/graph/ABV/seed*/`.
 
 To run the multimodal fusion experiments over the five splits for a logic (e.g. ABV), using precomputed graph and text features:
 
