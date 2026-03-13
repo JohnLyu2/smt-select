@@ -378,10 +378,10 @@ def evaluate_multi_splits_fusion(
             raise FileNotFoundError(f"Lite+Text test CSV not found: {lt_test_csv}")
 
         test_csv_path = Path(test_output_csv)
-        fusion_test_rows = _load_eval_csv(test_csv_path)
+        fusion_test_rows = load_eval_csv(test_csv_path)
         lt_test_lookup = _load_litetext_lookup(lt_test_csv)
-        merged_test = _merge_with_litetext(fusion_test_rows, lt_test_lookup, timeout)
-        _write_eval_csv(test_csv_path, merged_test)
+        merged_test = merge_with_fallback(fusion_test_rows, lt_test_lookup, timeout)
+        write_eval_csv(test_csv_path, merged_test, header=CSV_HEADER)
         n_fb_test = sum(1 for r in merged_test if r.get("feature_fail") == "1")
         logging.info("  Merged test: %d/%d rows from Lite+Text fallback", n_fb_test, len(merged_test))
 
@@ -530,6 +530,7 @@ def main() -> None:
     parser.add_argument("--min-epochs", type=int, default=100)
     parser.add_argument("--seeds", type=int, nargs="*", default=None, metavar="N")
     parser.add_argument("--qwen", action="store_true", help="Use Qwen3-Embedding-0.6B text embeddings and corresponding lite+text results.")
+    parser.add_argument("--setfit", action="store_true", help="Use SetFit (setfit_mpnet) description features from data/features/desc/setfit_mpnet and corresponding lite+text results.")
     parser.add_argument("--log-level", type=str, default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
     args = parser.parse_args()
 
@@ -545,9 +546,20 @@ def main() -> None:
             args.lite_text_dir = str(Path("data/results/lite+text") / model_name)
             if args.output_dir is None:
                 args.output_dir = str(Path("data/results/graph+text") / model_name / args.logic)
+        elif args.setfit:
+            # SetFit description features live under data/features/desc/setfit_mpnet,
+            # but we store Lite+Text and Graph+Text results under ".../setfit/<logic>/".
+            model_name = "setfit"
+            args.desc_features_dir = str(Path("data/features/desc") / "setfit_mpnet")
+            args.lite_text_dir = str(Path("data/results/lite+text") / model_name)
+            if args.output_dir is None:
+                args.output_dir = str(Path("data/results/graph+text") / model_name / args.logic)
+            args.save_models = True
+            if args.models_base is None:
+                args.models_base = Path("models")
         else:
             if args.output_dir is None:
-                args.output_dir = str(Path("data/results/graph+text") / args.logic)
+                args.output_dir = str(Path("data/results/graph+text/all-mpnet-base-v2") / args.logic)
                 args.save_models = True
             if args.models_base is None:
                 args.models_base = Path("models")
