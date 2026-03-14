@@ -4,7 +4,7 @@ SMT-Select is a unified framework for SMT algorithm selection that learns repres
 
 We offer the following variants, tailored to different data-availability and computational-resource scenarios:
 
-- `SMT-Select (Graph + Text)`: the full multimodal version that uses GNN and pretrained sentence embedder to represent SMT instances.
+- `SMT-Select (Graph + Text)`: the full multimodal version that uses GNN and pretrained sentence encoder to represent SMT instances.
 - `SMT-Select-Graph`: GNN-based algorithm selector.
 - `SMT-Select-Text`: SVM-based algorithm selector using descripton embeddings only.
 - `SMT-Lite`: SVM-based algorithm selector using lightweight syntactic features.
@@ -25,15 +25,13 @@ pip install -e .
 
 Raw performance data lives in [data/raw_data/smtcomp24_performance/](data/raw_data/smtcomp24_performance/). Five random train-test splits per logic are in [data/train_test_splits/](data/train_test_splits/) (create them with [scripts/split_data_json.py](scripts/split_data_json.py) and the desired seeds). 
 
-\TODO{Saved results}
-
-Download the SMT benchmarks before reproducing results. [scripts/download_smtlib.sh](scripts/download_smtlib.sh) downloads one logic at a time (pass the logic name as the only argument) under `smtlib/`. Example:
+Download the corresponding SMT-LIB benchmarks before reproducing results. [scripts/download_smtlib.sh](scripts/download_smtlib.sh) downloads one logic at a time (pass the logic name as the only argument) under `smtlib/`. Example:
 
 ```bash
 ./scripts/download_smtlib.sh QF_BV
 ```
 
-Our experimental results are stored in [data/results](data/results). The reproduction instructions for each variant are provided below: 
+Our experimental results are stored in [data/results](data/results). The reproduction instructions for each variant are provided below. 
 
 ### `SMT-Select-Lite` 
 
@@ -59,7 +57,7 @@ Then run the experiments:
 python scripts/experiment_svms.py --logic QF_BV --features-dir data/features/desc/all-mpnet-base-v2 --output-dir data/results/text/all-mpnet-base-v2
 ```
 
-Results go to `data/results/text/<model>/<logic>/` (e.g. `summary.json`, per-seed CSVs). Use `--model-name` in `encode_desc_logics` for another encoder; omit `--logic` to run all logics that have desc features and splits.
+Results go to `data/results/text/all-mpnet-base-v2/<logic>/` (e.g. `summary.json`, per-seed CSVs). Use `--model-name` in `encode_desc_logics` for another encoder; omit `--logic` to run all logics that have desc features and splits.
 
 ### `SMT-Select-Lite+Text` 
 
@@ -71,7 +69,7 @@ Run the experiments:
 python scripts/experiment_svms.py --logic QF_BV --features-dir data/features/syntactic data/features/desc/all-mpnet-base-v2 --output-dir data/results/lite+text/all-mpnet-base-v2
 ```
 
-Results are saved to `data/results/lite+text/<model>/<logic>/`.
+Results are saved to `data/results/lite+text/all-mpnet-base-v2/<logic>/`.
 
 ### `SMT-Select-Graph`
 
