@@ -81,7 +81,7 @@ python scripts/experiment_graph.py --logic ABV
 
 This automatically uses performance splits from `data/train_test_splits/ABV/`, SMT-LIB benchmarks under `smtlib/non-incremental/`, and writes results to `data/results/graph/ABV/` (per-seed CSVs plus `summary.json`). Trained GIN models for each split are saved under `models/gin_pwc/ABV/seed<N>/`, and you can rerun only evaluation with `--eval-only` (reusing our saved models under `models/gin_pwc/`) to reproduce results without retraining.
 
-For larger datasets, namely QF_BV, QF_LIA, QF_SLIA, and UFNIA, we enable a `--filter` flag that excludes training instances unsolved by all competition solvers or solved by all solvers within 24 seconds.
+For larger datasets, namely QF_BV, QF_LIA, QF_SLIA, and UFNIA, we enable a `--filter` flag that excludes training instances solved by all solvers within 24 seconds.
 
 ### `SMT-Select-Graph+Text`
 
