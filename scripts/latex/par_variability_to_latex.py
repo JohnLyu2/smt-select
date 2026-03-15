@@ -133,7 +133,7 @@ def main() -> None:
     lines.extend([
         "\\bottomrule",
         "\\end{tabular}}",
-        "\\caption{Test set PAR-2 (seconds) by SMT-Select variant. Mean $\\pm$ std over five random train--test splits.}",
+        "\\caption{Test set PAR-2 (seconds) by SMT-Select variants. Mean $\\pm$ std over five random train--test splits.}",
         "\\label{tab:par_variability}",
         "\\end{table}",
     ])

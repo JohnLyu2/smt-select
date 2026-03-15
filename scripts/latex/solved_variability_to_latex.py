@@ -131,7 +131,7 @@ def main() -> None:
     lines.extend([
         "\\bottomrule",
         "\\end{tabular*}",
-        "\\caption{Test set number of instances solved by SMT-Select variant. Mean $\\pm$ std over five random train--test splits.}",
+        "\\caption{Test set number of instances solved by SMT-Select variants. Mean $\\pm$ std over five random train--test splits.}",
         "\\label{tab:solved_variability}",
         "\\end{table}",
     ])
